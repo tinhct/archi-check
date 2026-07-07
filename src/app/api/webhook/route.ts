@@ -184,9 +184,81 @@ export async function POST(req: NextRequest) {
       const commentAuthor = comment.user.login;
       const repoName = repository.name;
       const repoOwner = repository.owner.login;
+      const commentBody = comment.body.trim();
+
+      // Case-insensitive bypass check ignoring trailing/leading whitespace
+      const isBypassCommand = /^\/archicheck\s+bypass\s*$/i.test(commentBody);
 
       try {
         const octokit = await gitHubAuthService.getInstallationClient(installation.id);
+
+        if (isBypassCommand) {
+          // Fetch Current Quiz State to verify the PR is tracked
+          const state = await getPRState(prNumber);
+          if (!state) {
+            return NextResponse.json({ message: 'Bypass skipped: PR not tracked by ArchiCheck' }, { status: 200 });
+          }
+
+          // Fetch Commenter permission levels from GitHub API
+          const permissionResponse = await octokit.rest.repos.getCollaboratorPermissionLevel({
+            owner: repoOwner,
+            repo: repoName,
+            username: commentAuthor,
+          });
+          
+          const role = permissionResponse.data.permission; // 'admin' | 'maintain' | 'write' | 'read' | 'none'
+          const isAuthorized = role === 'admin' || role === 'maintain';
+
+          if (isAuthorized) {
+            // 1. Set commit status to Success (Unblocks CI/CD)
+            await octokit.rest.repos.createCommitStatus({
+              owner: repoOwner,
+              repo: repoName,
+              sha: state.commitSha,
+              state: 'success',
+              context: 'archicheck/verification',
+              target_url: comment.html_url,
+              description: '⚠️ Emergency bypass executed by Tech Lead.',
+            });
+
+            // 2. Set State in Upstash Redis
+            await setPRState(prNumber, {
+              ...state,
+              status: 'bypassed',
+              bypassReason: `Emergency bypass executed by @${commentAuthor}`,
+              validatedAt: new Date().toISOString()
+            });
+
+            // 3. Post confirmation comment to PR
+            await octokit.rest.issues.createComment({
+              owner: repoOwner,
+              repo: repoName,
+              issue_number: prNumber,
+              body: `⚠️ **Emergency bypass executed by @${commentAuthor}.**\n\nAutomated architectural verification check has been bypassed. PR is unblocked for merge.`
+            });
+
+            // 4. Log structured metadata JSON
+            console.log(JSON.stringify({
+              event: 'bypass_executed',
+              pr_id: prNumber.toString(),
+              user: commentAuthor,
+              role
+            }));
+
+            return NextResponse.json({ message: 'Emergency bypass executed successfully' }, { status: 200 });
+
+          } else {
+            // Rejection reply for unauthorized users
+            await octokit.rest.issues.createComment({
+              owner: repoOwner,
+              repo: repoName,
+              issue_number: prNumber,
+              body: `❌ Unauthorized. Only Maintainers or Admins can execute an emergency bypass. (Current role: \`${role}\`)`
+            });
+
+            return NextResponse.json({ message: 'Unauthorized bypass attempt rejected' }, { status: 200 });
+          }
+        }
 
         // Fetch Quiz State from Redis (1000ms timeout)
         const state = await getPRState(prNumber);

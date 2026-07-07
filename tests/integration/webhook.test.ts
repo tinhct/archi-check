@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 import { env } from '@/config/env';
 import { gitHubAuthService } from '@/lib/github/auth';
-import { getPRState, setPRState } from '@/lib/redis/client';
+import { getPRState } from '@/lib/redis/client';
 
 // Mock GitHub App Authentication and Octokit client calls
 vi.mock('@/lib/github/auth', () => {
@@ -15,6 +15,9 @@ vi.mock('@/lib/github/auth', () => {
         rest: {
           repos: {
             createCommitStatus: vi.fn().mockResolvedValue({}),
+            getCollaboratorPermissionLevel: vi.fn().mockResolvedValue({
+              data: { permission: 'admin' }
+            }),
           },
           pulls: {
             listCommits: vi.fn().mockResolvedValue({
@@ -207,5 +210,69 @@ describe('Webhook API Route Integration Tests', () => {
     expect(response.status).toBe(202);
     const body = await response.json();
     expect(body.message).toBe('Comment accepted for evaluation');
+  });
+
+  it('should execute emergency bypass if the commenter is an Admin or Maintainer', async () => {
+    const payload = {
+      action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {}
+      },
+      comment: {
+        body: '/archicheck bypass',
+        user: { login: 'techlead-admin' },
+        html_url: 'https://github.com/mock/pr/comment-999'
+      },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
+    };
+
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.message).toBe('Emergency bypass executed successfully');
+  });
+
+  it('should reject emergency bypass if the commenter is not authorized', async () => {
+    const payload = {
+      action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {}
+      },
+      comment: {
+        body: '/archicheck bypass  ', // trailing whitespace
+        user: { login: 'junior-dev' },
+        html_url: 'https://github.com/mock/pr/comment-888'
+      },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
+    };
+
+    // Override mock response to return write permission for this test
+    const mockInstallationClient = await gitHubAuthService.getInstallationClient(123);
+    vi.spyOn(mockInstallationClient.rest.repos, 'getCollaboratorPermissionLevel').mockResolvedValueOnce({
+      data: { permission: 'write' }
+    } as any);
+
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.message).toBe('Unauthorized bypass attempt rejected');
   });
 });
