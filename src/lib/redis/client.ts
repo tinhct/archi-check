@@ -14,35 +14,51 @@ export const redis = new Redis({
 /**
  * Saves the state of a pull request quiz to Redis.
  * Key structure: `archicheck:pr:${prId}`
+ * Fail-open: Logs errors but does not throw, ensuring CI/CD flows are not blocked by Redis outages.
  * 
  * @param prId The pull request ID.
  * @param state The state object containing quiz status, questions, and head commit SHA.
  */
-export async function saveQuizState(prId: number, state: QuizState): Promise<void> {
+export async function setPRState(prId: number, state: QuizState): Promise<void> {
   const key = `archicheck:pr:${prId}`;
-  // Store quiz state with a 30-day expiration window to conserve Redis space
-  await redis.set(key, JSON.stringify(state), { ex: 30 * 24 * 60 * 60 });
+  try {
+    // Store quiz state with a 30-day expiration window to conserve Redis space
+    await redis.set(key, JSON.stringify(state), { ex: 30 * 24 * 60 * 60 });
+  } catch (error) {
+    console.error(`[ArchiCheck] Redis setPRState failed for PR #${prId} (failing open):`, error);
+  }
 }
 
 /**
  * Retrieves the quiz state of a pull request from Redis.
+ * Fail-open: Returns null if Redis is unreachable, treating it as a cache miss.
  * 
  * @param prId The pull request ID.
- * @returns The QuizState or null if not found.
+ * @returns The QuizState or null if not found or unreachable.
  */
-export async function getQuizState(prId: number): Promise<QuizState | null> {
+export async function getPRState(prId: number): Promise<QuizState | null> {
   const key = `archicheck:pr:${prId}`;
-  const data = await redis.get<string>(key);
-  if (!data) return null;
-  return typeof data === 'string' ? JSON.parse(data) : data;
+  try {
+    const data = await redis.get<string>(key);
+    if (!data) return null;
+    return typeof data === 'string' ? JSON.parse(data) : data;
+  } catch (error) {
+    console.error(`[ArchiCheck] Redis getPRState failed for PR #${prId} (failing open):`, error);
+    return null;
+  }
 }
 
 /**
  * Clears the quiz state of a pull request from Redis.
+ * Fail-open: Logs errors but does not throw.
  * 
  * @param prId The pull request ID.
  */
-export async function clearQuizState(prId: number): Promise<void> {
+export async function deletePRState(prId: number): Promise<void> {
   const key = `archicheck:pr:${prId}`;
-  await redis.del(key);
+  try {
+    await redis.del(key);
+  } catch (error) {
+    console.error(`[ArchiCheck] Redis deletePRState failed for PR #${prId} (failing open):`, error);
+  }
 }
