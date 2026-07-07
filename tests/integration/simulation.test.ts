@@ -3,13 +3,12 @@ import { POST } from '@/app/api/webhook/route';
 import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 import { env } from '@/config/env';
-import { gitHubAuthService } from '@/lib/github/auth';
-import { getPRState, setPRState } from '@/lib/redis/client';
+import { QuizState } from '@/types/archicheck';
 import { llmProvider } from '@/lib/llm/provider';
 import { heuristicsService } from '@/lib/analyzer/heuristics';
 
 // Capture and track all background tasks registered via Next.js waitUntil
-let activePromises: Promise<any>[] = [];
+let activePromises: Promise<unknown>[] = [];
 
 vi.mock('next/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('next/server')>();
@@ -28,7 +27,7 @@ async function flushBackgroundTasks() {
 }
 
 // Create storage objects to act as our simulated database and git provider state
-let mockRedisDb: Record<string, any> = {};
+let mockRedisDb: Record<string, QuizState> = {};
 let mockGitHubComments: string[] = [];
 let mockCommitStatuses: Array<{ state: string; description: string; target_url?: string }> = [];
 
