@@ -5,8 +5,9 @@ import { gitHubAuthService } from '@/lib/github/auth';
 import { diffParserService } from '@/lib/analyzer/diff-parser';
 import { heuristicsService } from '@/lib/analyzer/heuristics';
 import { llmProvider } from '@/lib/llm/provider';
-import { setPRState } from '@/lib/redis/client';
-import { generateQuizComment, generateRedisFailureComment } from '@/lib/github/comments';
+import { setPRState, getPRState } from '@/lib/redis/client';
+import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarningComment } from '@/lib/github/comments';
+import { parseDeveloperReply } from '@/lib/github/comment-parser';
 import { waitUntil } from 'next/server';
 
 /**
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
             await setPRState(prNumber, {
               prId: prNumber,
               commitSha: headSha,
+              prAuthor: pull_request.user.login,
               status: 'pending',
               quizPayload,
             });
@@ -174,10 +176,115 @@ export async function POST(req: NextRequest) {
   }
 
   if (event === 'issue_comment') {
-    const { action, comment } = payload;
-    if (action === 'created') {
-      console.log(`[ArchiCheck] Processing new comment: "${comment.body.substring(0, 30)}..."`);
-      return NextResponse.json({ message: 'Comment processed' }, { status: 200 });
+    const { action, issue, comment, repository, installation } = payload;
+    
+    // We only process created comments on active pull requests
+    if (action === 'created' && issue.pull_request && installation?.id) {
+      const prNumber = issue.number;
+      const commentAuthor = comment.user.login;
+      const repoName = repository.name;
+      const repoOwner = repository.owner.login;
+
+      try {
+        const octokit = await gitHubAuthService.getInstallationClient(installation.id);
+
+        // Fetch Quiz State from Redis (1000ms timeout)
+        const state = await getPRState(prNumber);
+
+        // If this PR is not tracked or not actively in pending state, drop the event
+        if (!state || state.status !== 'pending') {
+          return NextResponse.json({ message: 'Comment acknowledged but no active gate pending' }, { status: 200 });
+        }
+
+        // Verify that the commenter is the PR Author
+        if (commentAuthor !== state.prAuthor) {
+          // Post non-author warning comment and reject
+          await octokit.rest.issues.createComment({
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: prNumber,
+            body: generateNonAuthorWarningComment(commentAuthor, state.prAuthor)
+          });
+          return NextResponse.json({ message: 'Warning comment posted to non-author commenter' }, { status: 200 });
+        }
+
+        // Isolate developer reply (strip blockquotes)
+        const cleanReply = parseDeveloperReply(comment.body);
+        if (!cleanReply) {
+          return NextResponse.json({ message: 'Empty reply after parsing blockquotes' }, { status: 200 });
+        }
+
+        // Run LLM validation asynchronously in the background
+        const validationTask = (async () => {
+          try {
+            // A. Fetch original diff
+            const rawDiff = await diffParserService.fetchPRDiff(octokit, repoOwner, repoName, prNumber);
+
+            // B. Validate via LLM
+            const evaluation = await llmProvider.validateAnswers(rawDiff, state.quizPayload, [cleanReply]);
+
+            if (evaluation.passed) {
+              // C1. Update status check to Success
+              await octokit.rest.repos.createCommitStatus({
+                owner: repoOwner,
+                repo: repoName,
+                sha: state.commitSha,
+                state: 'success',
+                context: 'archicheck/verification',
+                description: '✅ Verification complete. Access approved.',
+              });
+
+              // C2. Update Redis state to Success
+              await setPRState(prNumber, {
+                ...state,
+                status: 'success',
+                userAnswers: [cleanReply],
+                validatedAt: new Date().toISOString()
+              });
+
+              // C3. Post verification complete comment
+              await octokit.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: `✅ **Verification complete!**\n\n*Reasoning*: ${evaluation.reasoning}`
+              });
+
+            } else {
+              // D1. Keep Status check as pending, but update description with nudge
+              await octokit.rest.repos.createCommitStatus({
+                owner: repoOwner,
+                repo: repoName,
+                sha: state.commitSha,
+                state: 'pending',
+                context: 'archicheck/verification',
+                description: `⏳ Interrogation failed (Score: ${evaluation.score}/10). Justification needed.`,
+              });
+
+              // D2. Post nudge comment
+              await octokit.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: `⏳ **Please elaborate further.**\n\n*Feedback*: ${evaluation.reasoning}`
+              });
+            }
+
+          } catch (err) {
+            console.error(`[ArchiCheck] Async answer validation task failed for PR #${prNumber}:`, err);
+          }
+        })();
+
+        if (typeof waitUntil === 'function') {
+          waitUntil(validationTask);
+        }
+
+        return NextResponse.json({ message: 'Comment accepted for evaluation' }, { status: 202 });
+
+      } catch (err) {
+        console.error('[ArchiCheck] Webhook handler failed to parse issue_comment logic:', err);
+        return NextResponse.json({ error: 'System degraded, failing open.' }, { status: 200 });
+      }
     }
   }
 

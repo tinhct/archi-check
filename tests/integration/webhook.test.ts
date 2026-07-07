@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 import { env } from '@/config/env';
 import { gitHubAuthService } from '@/lib/github/auth';
+import { getPRState, setPRState } from '@/lib/redis/client';
 
 // Mock GitHub App Authentication and Octokit client calls
 vi.mock('@/lib/github/auth', () => {
@@ -31,8 +32,25 @@ vi.mock('@/lib/github/auth', () => {
   };
 });
 
+// Mock Upstash Redis state cache
+vi.mock('@/lib/redis/client', () => {
+  return {
+    setPRState: vi.fn().mockResolvedValue(undefined),
+    getPRState: vi.fn().mockResolvedValue({
+      prId: 42,
+      commitSha: 'abcdef1234567890',
+      prAuthor: 'pr-author-user',
+      status: 'pending',
+      quizPayload: {
+        questions: [{ id: 'q1', question: 'Q', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }]
+      }
+    }),
+    deletePRState: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
 // Helper to construct a NextRequest with the correct headers and signature
-function createMockRequest(payload: object, signatureHeaderValue?: string): NextRequest {
+function createMockRequest(payload: object, eventType: string = 'pull_request', signatureHeaderValue?: string): NextRequest {
   const bodyString = JSON.stringify(payload);
   
   let signature = signatureHeaderValue;
@@ -47,7 +65,7 @@ function createMockRequest(payload: object, signatureHeaderValue?: string): Next
     body: bodyString,
     headers: {
       'content-type': 'application/json',
-      'x-github-event': 'pull_request',
+      'x-github-event': eventType,
       'x-hub-signature-256': signature,
     },
   });
@@ -78,7 +96,7 @@ describe('Webhook API Route Integration Tests', () => {
   });
 
   it('should reject requests with an invalid signature', async () => {
-    const req = createMockRequest({ action: 'opened' }, 'sha256=invalid-signature-hash');
+    const req = createMockRequest({ action: 'opened' }, 'pull_request', 'sha256=invalid-signature-hash');
     
     const response = await POST(req);
     expect(response.status).toBe(401);
@@ -87,13 +105,14 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.error).toBe('Invalid HMAC signature');
   });
 
-  it('should accept pull_request.opened event with valid signature, trigger synchronous pending status lock, and return 202', async () => {
+  it('should accept pull_request.opened event and return 202', async () => {
     const payload = {
       action: 'opened',
       pull_request: {
         number: 42,
         head: { sha: 'abcdef1234567890' },
         created_at: '2026-07-07T00:10:00Z',
+        user: { login: 'pr-author-user' }
       },
       repository: {
         name: 'archi-check',
@@ -113,36 +132,80 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.pr).toBe(42);
     expect(body.sha).toBe('abcdef1234567890');
 
-    // Verify Octokit client was fetched and commit status was set to Pending synchronously
     expect(gitHubAuthService.getInstallationClient).toHaveBeenCalledWith(123);
   });
 
-  it('should accept issue_comment.created event and return 200', async () => {
+  it('should block non-author comment attempts and post warning comment', async () => {
     const payload = {
       action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {} // Flag it as a PR comment
+      },
       comment: {
-        body: 'Approved! /archicheck bypass reason',
-        user: { login: 'techlead-user' },
+        body: 'I am a reviewer trying to answer the quiz.',
+        user: { login: 'some-reviewer-user' },
       },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
     };
-    
-    const bodyString = JSON.stringify(payload);
-    const hmac = crypto.createHmac('sha256', env.GITHUB_WEBHOOK_SECRET);
-    const hash = hmac.update(bodyString).digest('hex');
 
-    const req = new Request('http://localhost:3000/api/webhook', {
-      method: 'POST',
-      body: bodyString,
-      headers: {
-        'content-type': 'application/json',
-        'x-github-event': 'issue_comment',
-        'x-hub-signature-256': `sha256=${hash}`,
-      },
+    // Ensure mock Redis state returns the correct author
+    vi.mocked(getPRState).mockResolvedValueOnce({
+      prId: 42,
+      commitSha: 'abcdef1234567890',
+      prAuthor: 'pr-author-user', // Author is 'pr-author-user', commenter is 'some-reviewer-user'
+      status: 'pending',
+      quizPayload: { questions: [] }
     });
 
-    const response = await POST(req as unknown as NextRequest);
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
     expect(response.status).toBe(200);
     const body = await response.json();
-    expect(body.message).toBe('Comment processed');
+    expect(body.message).toBe('Warning comment posted to non-author commenter');
+  });
+
+  it('should accept PR author comments, clean replies, and return 202', async () => {
+    const payload = {
+      action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {}
+      },
+      comment: {
+        body: 'My clean justification response details.',
+        user: { login: 'pr-author-user' },
+      },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
+    };
+
+    // Ensure mock Redis state returns the correct author matching the comment
+    vi.mocked(getPRState).mockResolvedValueOnce({
+      prId: 42,
+      commitSha: 'abcdef1234567890',
+      prAuthor: 'pr-author-user',
+      status: 'pending',
+      quizPayload: { questions: [] }
+    });
+
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
+    expect(response.status).toBe(202);
+    const body = await response.json();
+    expect(body.message).toBe('Comment accepted for evaluation');
   });
 });

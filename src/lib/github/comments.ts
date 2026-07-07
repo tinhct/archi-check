@@ -28,7 +28,9 @@ export function generateQuizComment(payload: QuizPayload): string {
     '💡 **How to reply**:',
     '- Reply directly in this PR thread answering the questions above.',
     '- Only new, non-quoted text blocks in your comment will be evaluated by the gate.',
-    '- Once submitted, the system will automatically validate your justification and release the status hold.'
+    '- Once submitted, the system will automatically validate your justification and release the status hold.',
+    '',
+    '*💡 Tip: You may respond in English, Vietnamese, German, or your native technical language. Technical accuracy is what matters.*'
   ].join('\n');
 
   return `${intro}\n${questionsSection}\n${instructions}`;
@@ -43,4 +45,11 @@ export function generateRedisFailureComment(): string {
     'State persistence cached database is currently unreachable (Redis Write Failure).',
     'Automated architectural review skipped to prevent pipeline blocking. **Manual peer review is heavily advised.**'
   ].join('\n');
+}
+
+/**
+ * Generates warning comment when a user other than the PR author attempts to answer the quiz.
+ */
+export function generateNonAuthorWarningComment(user: string, author: string): string {
+  return `❌ @${user}, to ensure systemic intuition is retained by the code contributor, only the PR Author (@${author}) may answer this interrogation. Tech Leads may use \`/archicheck bypass\` if this is an emergency.`;
 }

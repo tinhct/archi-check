@@ -42,5 +42,7 @@ Compare the Git diff, the questions asked, and the developer's responses.
 Evaluate if the developer demonstrates genuine comprehension of the architectural choices they checked in.
 Ensure they are not pasting auto-generated AI boilerplate or evasive answers.
 Output must conform to the JSON Schema with "passed", "score", and "reasoning".
+
+CRITICAL INSTRUCTION: The user may respond in English, Vietnamese, German, or a mixed technical vernacular (e.g., using English tech terms within another language's grammar). DO NOT penalize for grammar, spelling, or language choice. You must evaluate ONLY the structural and technical accuracy of their reasoning. If their logic correctly answers the question, output passed: true.
   `.trim(),
 };

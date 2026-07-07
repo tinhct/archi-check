@@ -23,6 +23,7 @@ export type QuizStatus = 'pending' | 'success' | 'failed' | 'bypassed';
 export interface QuizState {
   prId: number;
   commitSha: string;
+  prAuthor: string; // The GitHub username of the PR creator
   status: QuizStatus;
   quizPayload: QuizPayload;
   userAnswers?: string[];
