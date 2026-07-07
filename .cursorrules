@@ -1,1 +1,3 @@
 DOCUMENTATION STANDARDS: When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. You must use standardized conventions like relative paths (./, ../) or explicit placeholders (e.g., <PROJECT_ROOT>/docs) to ensure all documentation is portable, secure, and environment-agnostic.
+
+RAID LOG MAINTENANCE: Whenever a new technical risk is identified, an assumption is made, a blocking issue occurs, or an architectural decision is finalized, you must immediately append it to `/docs/PM/Sprint_Reports/RAID_log.md`. Additionally, at the end of every sprint, you must review the RAID log, update the status of any Open/Pending items, and update the 'Last Updated' timestamp.
