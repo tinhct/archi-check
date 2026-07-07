@@ -15,7 +15,7 @@ Setup the core Git repository, establish open-source compliance standards, confi
 * **Next.js & Project Config**: Standardized Next.js App Router project initialized with strict linter and code formatting. Test suites integrated via Vitest.
 * **OSS Compliance Pack**: Established MIT LICENSE, repository codeownership rules, vulnerability disclosure policies (90-day embargo), and contributor guidelines.
 * **GitHub Repository**: Remote repository initialized as a private repository (`tinhct/archi-check`) with main branch protection (blocking force pushes, requiring 1 PR approval).
-* **CI/CD pipeline**: Active GitHub Action in [.github/workflows/ci.yml](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/.github/workflows/ci.yml) validating lint rules and running unit/integration test suites on every code change.
+* **CI/CD pipeline**: Active GitHub Action in [.github/workflows/ci.yml](../../../.github/workflows/ci.yml) validating lint rules and running unit/integration test suites on every code change.
 * **Secret Scanning**: Configured GitGuardian ggshield scan step inside the pipeline to analyze commit diffs for API keys or secrets.
 * **Vercel Hosting**: Linked project to Vercel hosting under scope `archi-tect/archi-check` and set up environment variable placeholders.
 

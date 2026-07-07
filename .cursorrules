@@ -1,0 +1,1 @@
+DOCUMENTATION STANDARDS: When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. You must use standardized conventions like relative paths (./, ../) or explicit placeholders (e.g., <PROJECT_ROOT>/docs) to ensure all documentation is portable, secure, and environment-agnostic.

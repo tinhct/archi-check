@@ -28,8 +28,8 @@ flowchart TD
 ```
 
 # Architecture & Components
-* **Sanitization Utility** ([sanitizer.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/security/sanitizer.ts)): Core regular expression matching engine.
-* **Fixture Test Suite** ([sanitizer.test.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/tests/unit/sanitizer.test.ts)): Unit tests verifying that various credential signatures are redacted correctly.
+* **Sanitization Utility** ([sanitizer.ts](../../src/lib/security/sanitizer.ts)): Core regular expression matching engine.
+* **Fixture Test Suite** ([sanitizer.test.ts](../../tests/unit/sanitizer.test.ts)): Unit tests verifying that various credential signatures are redacted correctly.
 
 # Data Model Changes
 * None. Operates directly on string values.

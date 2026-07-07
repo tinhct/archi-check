@@ -29,9 +29,9 @@ sequenceDiagram
 ```
 
 # Architecture & Components
-* **GitHub Integration Services** ([auth.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/github/auth.ts), [route.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/app/api/webhook/route.ts)): Resolves installation-scoped Octokit clients, fetches the raw unified diff, retrieves the commits list, and triggers status checkpoints.
-* **Diff Parser Service** ([diff-parser.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/analyzer/diff-parser.ts)): Filters out blocklisted files, splits the patch into file hunks, and counts lines added/removed and complexity keywords on clean additions.
-* **Heuristics Scorer Service** ([heuristics.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/analyzer/heuristics.ts)): Computes complexity scores and implements gating thresholds including the "First Commit Proxy" velocity rules.
+* **GitHub Integration Services** ([auth.ts](../../src/lib/github/auth.ts), [route.ts](../../src/app/api/webhook/route.ts)): Resolves installation-scoped Octokit clients, fetches the raw unified diff, retrieves the commits list, and triggers status checkpoints.
+* **Diff Parser Service** ([diff-parser.ts](../../src/lib/analyzer/diff-parser.ts)): Filters out blocklisted files, splits the patch into file hunks, and counts lines added/removed and complexity keywords on clean additions.
+* **Heuristics Scorer Service** ([heuristics.ts](../../src/lib/analyzer/heuristics.ts)): Computes complexity scores and implements gating thresholds including the "First Commit Proxy" velocity rules.
 
 # Data Model Changes
 * **ComplexityAnalysis** structure updated to include standard verification keys:

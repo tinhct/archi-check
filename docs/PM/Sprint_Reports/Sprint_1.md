@@ -15,11 +15,11 @@ Register the GitHub App, implement timing-safe webhook ingestion, validate paylo
   * **Task 1.3.3**: Implement CRUD handlers (`setPRState`, `getPRState`, `deletePRState`) with fail-open wrappers.
 
 # Implementation Outcome
-* **GitHub App Integration**: Staging app `ArchiCheck-Staging` registered with correct permissions. Short-lived token client generation built and verified in [auth.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/github/auth.ts).
+* **GitHub App Integration**: Staging app `ArchiCheck-Staging` registered with correct permissions. Short-lived token client generation built and verified in [auth.ts](../../../src/lib/github/auth.ts).
 * **Webhook Receiver**: Webhook endpoint at `/api/webhook` routes events to their handlers. Timing-safe HMAC check validates signatures against the secret.
 * **Local Proxy Tunnel**: Stable development setup achieved using `ngrok` with a free authenticated static domain, allowing seamless server-to-server webhook delivery.
-* **Redis Caching**: Edge-compatible `@upstash/redis` client configured. CRUD operations with fail-open try/catch strategies fully implemented in [client.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/src/lib/redis/client.ts) and verified.
-* **Vitest Environments**: Built integration tests for Redis and Webhooks. Added automatic environment variable loading inside [vitest.config.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/vitest.config.ts) utilizing Next.js's env utility.
+* **Redis Caching**: Edge-compatible `@upstash/redis` client configured. CRUD operations with fail-open try/catch strategies fully implemented in [client.ts](../../../src/lib/redis/client.ts) and verified.
+* **Vitest Environments**: Built integration tests for Redis and Webhooks. Added automatic environment variable loading inside [vitest.config.ts](../../../vitest.config.ts) utilizing Next.js's env utility.
 
 # Decisions Made
 * **JWT Key Normalization**: Formatted private keys by replacing literal `\n` sequences with true line breaks (`.replace(/\\n/g, '\n')`) to avoid parser failures when importing certificates from single-line configs.
