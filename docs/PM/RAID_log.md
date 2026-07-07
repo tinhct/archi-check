@@ -14,8 +14,8 @@
 | R6 | 2026-07-07 | LLM API latency/outages freezing developer pull request merges. | H | Implement a 15-second total timeout with fail-open fallback questions. | Closed |
 | R7 | 2026-07-07 | PR merge race conditions during heuristics processing window. | M | Lock commit status to Pending immediately upon webhook signature check. | Closed |
 | R8 | 2026-07-07 | Upstash Redis database timeout/failure deadlocking gated PRs. | H | Wrap state cache in 1000ms timeout, fail-open to Success, and warn in PR comment. | Closed |
-| R9 | 2026-07-07 | Out-of-order status check race condition (Success finishes before Pending). | H | Await the initial Pending status check synchronously before starting async heuristics. | Open |
-| R10 | 2026-07-07 | Vercel execution context freeze during async waitUntil background task. | H | Handle errors cleanly, minimize payload size, and trace worker lifecycle. | Open |
+| R9 | 2026-07-07 | Out-of-order status check race condition (Success finishes before Pending). | H | Await the initial Pending status check synchronously before starting async heuristics. | Closed |
+| R10 | 2026-07-07 | Vercel execution context freeze during async waitUntil background task. | H | Handle errors cleanly, minimize payload size, and trace worker lifecycle. | Closed |
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
