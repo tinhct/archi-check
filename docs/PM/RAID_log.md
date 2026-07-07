@@ -14,6 +14,8 @@
 | R6 | 2026-07-07 | LLM API latency/outages freezing developer pull request merges. | H | Implement a 15-second total timeout with fail-open fallback questions. | Closed |
 | R7 | 2026-07-07 | PR merge race conditions during heuristics processing window. | M | Lock commit status to Pending immediately upon webhook signature check. | Closed |
 | R8 | 2026-07-07 | Upstash Redis database timeout/failure deadlocking gated PRs. | H | Wrap state cache in 1000ms timeout, fail-open to Success, and warn in PR comment. | Closed |
+| R9 | 2026-07-07 | Out-of-order status check race condition (Success finishes before Pending). | H | Await the initial Pending status check synchronously before starting async heuristics. | Open |
+| R10 | 2026-07-07 | Vercel execution context freeze during async waitUntil background task. | H | Handle errors cleanly, minimize payload size, and trace worker lifecycle. | Open |
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
@@ -38,6 +40,7 @@
 | D8 | 2026-07-07 | Vertex AI factory abstraction. | Keeps core OSS code key-agnostic, while fully protecting internal pilots. |
 | D9 | 2026-07-07 | Lookbehind value-only redaction. | Keeps variables declared (`const key = "[REDACTED]"`) syntactically parseable. |
 | D10 | 2026-07-07 | Lock status check to Pending immediately. | Prevents auto-merge race conditions where fast approvals bypass heuristics. |
+| D11 | 2026-07-07 | Await initial status check synchronously. | Guarantees the block status finishes registering on GitHub before Edge responds 202. |
 
 ## 🐛 Issues (Current problems occurring right now)
 
