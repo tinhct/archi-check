@@ -1,8 +1,35 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '@/app/api/webhook/route';
 import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 import { env } from '@/config/env';
+import { gitHubAuthService } from '@/lib/github/auth';
+
+// Mock GitHub App Authentication and Octokit client calls
+vi.mock('@/lib/github/auth', () => {
+  return {
+    gitHubAuthService: {
+      getInstallationClient: vi.fn().mockResolvedValue({
+        request: vi.fn().mockResolvedValue({ data: 'mock-diff' }),
+        rest: {
+          repos: {
+            createCommitStatus: vi.fn().mockResolvedValue({}),
+          },
+          pulls: {
+            listCommits: vi.fn().mockResolvedValue({
+              data: [{ commit: { author: { date: '2026-07-07T00:00:00Z' } } }]
+            }),
+          },
+          issues: {
+            createComment: vi.fn().mockResolvedValue({
+              data: { html_url: 'https://github.com/mock/pr/comment-123' }
+            }),
+          }
+        }
+      })
+    }
+  };
+});
 
 // Helper to construct a NextRequest with the correct headers and signature
 function createMockRequest(payload: object, signatureHeaderValue?: string): NextRequest {
@@ -29,6 +56,10 @@ function createMockRequest(payload: object, signatureHeaderValue?: string): Next
 }
 
 describe('Webhook API Route Integration Tests', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('should reject requests missing the GitHub signature header', async () => {
     const req = new Request('http://localhost:3000/api/webhook', {
       method: 'POST',
@@ -56,13 +87,21 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.error).toBe('Invalid HMAC signature');
   });
 
-  it('should accept pull_request.opened event with valid signature and return 202', async () => {
+  it('should accept pull_request.opened event with valid signature, trigger synchronous pending status lock, and return 202', async () => {
     const payload = {
       action: 'opened',
       pull_request: {
         number: 42,
         head: { sha: 'abcdef1234567890' },
+        created_at: '2026-07-07T00:10:00Z',
       },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
     };
     
     const req = createMockRequest(payload);
@@ -73,6 +112,9 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.message).toContain('accepted and queued');
     expect(body.pr).toBe(42);
     expect(body.sha).toBe('abcdef1234567890');
+
+    // Verify Octokit client was fetched and commit status was set to Pending synchronously
+    expect(gitHubAuthService.getInstallationClient).toHaveBeenCalledWith(123);
   });
 
   it('should accept issue_comment.created event and return 200', async () => {
