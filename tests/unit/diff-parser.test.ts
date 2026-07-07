@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { diffParserService } from '@/lib/analyzer/diff-parser';
-import { MOCK_DIFF_SIMPLE, MOCK_DIFF_COMPLEX } from '../fixtures/mock-diffs';
+import { MOCK_DIFF_COMPLEX } from '../fixtures/mock-diffs';
 
 describe('DiffParserService Unit Tests', () => {
   it('should identify blocklisted files correctly', () => {

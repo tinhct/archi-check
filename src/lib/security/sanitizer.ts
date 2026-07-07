@@ -1,4 +1,3 @@
-import { parse } from 'yaml';
 
 export const DEFAULT_PATTERNS = [
   { name: 'AWS_ACCESS_KEY_ID', regex: /(A3T[A-Z0-9]{16}|AKIA[0-9A-Z]{16})/g },
@@ -83,12 +82,13 @@ export async function scrubSecrets(
               }));
               processedLine = processedLine.replace(regex, '[REDACTED_SECRET]');
             }
-          } catch (err: any) {
+          } catch (err) {
+            const error = err as Error;
             // Re-throw compilation timeouts to trigger fail-safe
-            if (err.message?.includes('timeout')) {
-              throw err;
+            if (error.message?.includes('timeout')) {
+              throw error;
             }
-            console.error(`[ArchiCheck] Failed to compile or run custom regex pattern "${patternString}":`, err);
+            console.error(`[ArchiCheck] Failed to compile or run custom regex pattern "${patternString}":`, error);
           }
         }
         return processedLine;

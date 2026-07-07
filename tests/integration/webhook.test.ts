@@ -266,7 +266,7 @@ describe('Webhook API Route Integration Tests', () => {
     const mockInstallationClient = await gitHubAuthService.getInstallationClient(123);
     vi.spyOn(mockInstallationClient.rest.repos, 'getCollaboratorPermissionLevel').mockResolvedValueOnce({
       data: { permission: 'write' }
-    } as any);
+    } as never);
 
     const req = createMockRequest(payload, 'issue_comment');
     const response = await POST(req);

@@ -124,7 +124,7 @@ export class LLMProvider {
   /**
    * Calls the developer-tier Gemini API using the official SDK.
    */
-  private async callGeminiDeveloper(prompt: string, schema: any, signal: AbortSignal): Promise<string> {
+  private async callGeminiDeveloper(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
     const genAI = new GoogleGenerativeAI(this.apiKey);
     const model = genAI.getGenerativeModel({
       model: 'gemini-1.5-pro',
@@ -161,7 +161,7 @@ export class LLMProvider {
   /**
    * Calls the enterprise-tier Vertex AI endpoint using the official Google Cloud SDK.
    */
-  private async callVertexAI(prompt: string, schema: any, signal: AbortSignal): Promise<string> {
+  private async callVertexAI(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
     if (!this.googleCredsJson) {
       throw new Error('GOOGLE_CREDS_JSON is required for Vertex AI configuration');
     }
@@ -278,16 +278,17 @@ export class LLMProvider {
         const result = await fn(controller.signal);
         clearTimeout(timeoutId);
         return result;
-      } catch (error: any) {
+      } catch (error) {
+        const err = error as Error & { status?: number };
         clearTimeout(timeoutId);
         attempts++;
 
-        if (error.name === 'AbortError' || Date.now() - start >= 15000) {
+        if (err.name === 'AbortError' || Date.now() - start >= 15000) {
           throw new Error('LLM call timed out');
         }
 
-        const isRateLimit = error.message?.includes('429') || error.status === 429;
-        const isServerError = error.status >= 500 || error.message?.includes('500') || error.message?.includes('503');
+        const isRateLimit = err.message?.includes('429') || err.status === 429;
+        const isServerError = err.status >= 500 || err.message?.includes('500') || err.message?.includes('503');
         const shouldRetry = (isRateLimit || isServerError) && attempts <= 2;
 
         if (!shouldRetry) {
@@ -295,7 +296,7 @@ export class LLMProvider {
         }
 
         const delay = delays[attempts - 1] || 500;
-        console.warn(`[ArchiCheck] LLM attempt ${attempts} failed (${error.message}). Retrying in ${delay}ms...`);
+        console.warn(`[ArchiCheck] LLM attempt ${attempts} failed (${err.message}). Retrying in ${delay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

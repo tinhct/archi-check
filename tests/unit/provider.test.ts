@@ -23,7 +23,7 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
     // Spy on prototype method to intercept instantiation inside the provider
     const spy = vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue({
       generateContent: vi.fn().mockRejectedValue(new Error('API Rate Limit Exceeded'))
-    } as any);
+    } as never);
 
     const result = await llmProvider.generateQuiz('some-diff-content');
 
@@ -36,7 +36,7 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
   it('should validate answers with a fallback value when the validation fails (Fail-Open)', async () => {
     const spy = vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue({
       generateContent: vi.fn().mockRejectedValue(new Error('API Timeout'))
-    } as any);
+    } as never);
 
     const mockQuiz = {
       questions: [{ id: 'q1', question: 'Q', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }]
