@@ -16,7 +16,7 @@ describe('Upstash Redis Cache Integration Tests', () => {
 
     console.log(`[ArchiCheck] Redis ping returned "${response}" in ${duration.toFixed(2)}ms`);
     
-    expect(response).toBe('OK');
+    expect(response).toBe('PONG');
     
     // In local development from different regions, latency can exceed 50ms due to physical distance.
     // However, when deployed to Vercel Serverless/Edge co-located with Upstash Redis, it will execute <= 50ms.
