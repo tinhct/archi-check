@@ -9,9 +9,10 @@ export class GitHubAuthService {
   private app: App;
 
   constructor() {
+    const formattedKey = env.GITHUB_PRIVATE_KEY.replace(/\\n/g, '\n');
     this.app = new App({
       appId: env.GITHUB_APP_ID,
-      privateKey: env.GITHUB_PRIVATE_KEY,
+      privateKey: formattedKey,
       webhooks: {
         secret: env.GITHUB_WEBHOOK_SECRET,
       },
