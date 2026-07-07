@@ -41,6 +41,10 @@
 | D9 | 2026-07-07 | Lookbehind value-only redaction. | Keeps variables declared (`const key = "[REDACTED]"`) syntactically parseable. |
 | D10 | 2026-07-07 | Lock status check to Pending immediately. | Prevents auto-merge race conditions where fast approvals bypass heuristics. |
 | D11 | 2026-07-07 | Await initial status check synchronously. | Guarantees the block status finishes registering on GitHub before Edge responds 202. |
+| D12 | 2026-07-07 | Strict PR Author Validation. | Prevents junior developer cognitive offloading by rejecting answers from reviewers. |
+| D13 | 2026-07-07 | Language-Agnostic Intent-Based LLM Scoring. | Instructs LLM to evaluate raw technical correctness, accepting multilingual responses. |
+| D14 | 2026-07-07 | Simple argument-free /archicheck bypass command. | Reduces friction and regex parse failure risks during P0 incidents. |
+| D15 | 2026-07-07 | Mutate commit status check description on bypass. | Retains context `archicheck/verification` to unlock merge while leaving audit trails in UI. |
 
 ## 🐛 Issues (Current problems occurring right now)
 
