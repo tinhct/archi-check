@@ -9,8 +9,41 @@
 *   **In-Scope for this Release:**
     *   **Epic-01: Diff Scorer & Security Sanitizer** (parsing logic, regex lookbehinds, ReDoS watchdogs, LLM provider timeout retries).
     *   **Epic-02: Interrogation Gate & Bypass** (synchronous pending checks, author verification rules, blockquote comment parser, slash command roles).
+    *   **Defensive Prompt-Injection Controls** (regex XML tag sanitizations and defensive instructions).
 *   **Out-of-Scope:**
     *   **Epic-03: Staging Polish & Telemetry** (cohort configurations and token usage alert integrations are deferred to subsequent sprints).
+
+## 🧪 Testing Types Execution Plan
+
+### 1. Smoke Testing Plan
+*   **Scope**: Verify that the main API endpoint `/api/webhook` starts and resolves timing-safe checks without runtime errors.
+*   **Execution**: Automated run on Vercel preview deployment.
+
+### 2. Functional Testing Plan
+*   **Scope**: Validate story behaviors against AC (Heuristics, Secret Scrubber, LLM retries, Author validation, and Admin bypass).
+*   **Execution**: Automated Vitest run matching the Traceability Matrix stories below.
+
+### 3. Regression Testing Plan
+*   **Scope**: Run the full 32-test suite on all modified paths to ensure zero regression on Edge context configurations or mock handlers.
+*   **Execution**: CI pipeline gate check (GitGaurdian + Vitest coverage gates >90%).
+
+### 4. Performance Testing Plan
+*   **Scope**: Validate latencies for timing-safe checks (<200ms) and Redis operations (<1000ms).
+*   **Execution**: Integration tests trace timing logs.
+
+### 5. Stress Testing Plan
+*   **Scope**: Inject simulated Upstash connection failures and Gemini 429 rate limit errors.
+*   **Execution**: Verify that LLM and Redis fail-open logic immediately unblocks status gates.
+
+### 6. Penetration Testing Plan
+*   **Scope**: Red-team tag escape vectors (injecting `</answers>` into comments) and unauthorized bypasses (write/read role command injections).
+*   **Execution**: Run prompt-injection and permission-check unit tests.
+
+### 7. Install / Upgrade / Rollback Plan
+*   **Scope**: Clean install audits and SHA checkout rollbacks.
+*   **Execution**: Build checks on GitHub Actions runner.
+
+---
 
 ## 🔗 Traceability & Execution Matrix
 
@@ -25,9 +58,9 @@
 
 ## 🚨 Risk-Based Testing Priorities
 
-*   **Catastrophic backtracking (ReDoS)**: Encountering malicious inputs containing exponential backslash iterations. Mitigated by truncating lines >500 characters and running RegExp evaluations inside a 500ms CPU watcher wrapper.
-*   **Auto-merge bot race conditions**: PRs being merged before the webhook calculations complete. Mitigated by setting status checks to `Pending` synchronously inside the HTTP POST router handler before returning `202 Accepted`.
-*   **Environment context hangs**: Next.js `waitUntil` blocks freezing Vitest runs. Mitigated by mocking Edge Promise scopes to await them explicitly in E2E simulations.
+*   **Catastrophic backtracking (ReDoS)**: Mitigated by truncating lines >500 characters and running RegExp evaluations inside a 500ms CPU watcher wrapper.
+*   **Auto-merge bot race conditions**: Mitigated by setting status checks to `Pending` synchronously inside the HTTP POST router handler before returning `202 Accepted`.
+*   **Indirect Prompt Injection**: Mitigated by XML tag-escaping regex substitutions (`sanitizePromptInput`) and defensive instruction configurations.
 
 ## 📝 Release Sign-Off
 
