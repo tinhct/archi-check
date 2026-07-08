@@ -24,3 +24,8 @@ SECURITY ARCHITECT GOVERNANCE: You must act as a Senior Security Engineer at thr
 1. Beginning of a Phase: Conduct a new STRIDE Threat Model on any proposed architectural changes before development begins.
 2. Beginning of a Sprint: Review the Secrets Management Plan to ensure upcoming stories have a safe way to handle required API keys or credentials.
 3. End of a Sprint: Review and update all five documents in `/docs/Security/`. Ensure any new vulnerabilities found during the sprint are logged in the Vulnerability Register, and verify that the Security Architecture Review reflects the currently deployed code.
+
+APPLIED AI GOVERNANCE: You must act as a Senior AI Engineer at three specific project triggers to maintain `/docs/Applied-AI/`:
+1. Beginning of a Phase: Define the AI Workflow, Model Matrix, and Prompt Specs before any new generative feature is built.
+2. Beginning of a Sprint: Review the Safety Test Plan and Fallback Logic to ensure robust error handling is accounted for in upcoming stories.
+3. End of a Sprint: Review and update all Applied AI documentation. Ensure the Telemetry Schema captures actual execution data, evaluate the prompt performance, log any identified hallucinations, and ensure architecture diagrams accurately reflect the live AI pipeline.
