@@ -14,6 +14,10 @@
 
 * **Test Environment:** [e.g., Local Dev, Staging Sandbox, Mock-Server Cluster]
 * **Test Data Profile:** [Describe the structural or mock data profile used for testing]
+* **Input Data Sets & Payloads:**
+  * [Document exact mock payloads, files, variables, or API inputs applied]
+* **Expected vs. Actual Verification Results:**
+  * [Detail expected behavior vs. actual logs, execution latencies, and responses]
 
 ## 🧪 Test Specifications & Flows
 

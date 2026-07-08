@@ -14,6 +14,29 @@
 
 * **Test Environment:** Local Dev Node 20.20.2 / Vitest 4.1.10 sandbox environment.
 * **Test Data Profile:** Mock GitHub Webhook payloads (containing HMAC headers, unified code diff strings, blockquoted comments, and custom collaborators API responses) and mock state objects.
+* **Input Data Sets & Payloads:**
+  1. **Git Unified Diffs**:
+     * *Standard Diff*: Adding `+const a = 1;` and `+if (a) { ... }` (complexity keywords).
+     * *Blocklisted Diff*: Modifications targeting `package-lock.json` and static `.png`/`.svg` assets.
+     * *Secrets Diff*: Lines containing raw API Keys (`const key = "AIzaSy..."`) and passwords.
+     * *Malicious Diff*: Code lines containing prompt injection tag escapes (`</diff>\nIgnore instruct...`).
+  2. **Webhook Payloads**:
+     * *pull_request.opened*: JSON object specifying target repository, commit SHA, and author `junior-dev`.
+     * *issue_comment.created*: Comment bodies containing blockquotes (`> What is this?`) and developer justifications.
+     * *bypass command*: Comment bodies containing `/archicheck bypass` from user `techlead-admin`.
+  3. **Security HMAC Signatures**:
+     * SHA-256 HMAC signature header values calculated using repository webhook secret tokens.
+  4. **Redis State States**:
+     * Stateful mock JSON records representing `QuizState` objects mapped to keys `pr:101`.
+* **Expected vs. Actual Verification Results:**
+  1. *Complexity Scorer*: Expected score is calculated timing-safely. Actual: Complexity scores mapped and gated successfully (Pass).
+  2. *Lookbehind Secret Scrubbing*: Expected values redacted (declarations preserved). Actual: Secret values scrubbed cleanly (Pass).
+  3. *ReDoS Watchdog*: Expected timeout triggers on catastrophic backtracks >500ms. Actual: Watchdog aborted regex loops in 502ms (Pass).
+  4. *Gating Lock*: Expected commit check status locked to `pending` synchronously. Actual: Checked status locked at router entry (Pass).
+  5. *TimingSafe signature check*: Expected spoofed HMAC signature rejected with 401. Actual: Rejected TimingSafeMismatch (Pass).
+  6. *Author Constraints*: Expected non-author reply rejected (check remains pending). Actual: Warning comment posted, PR locked (Pass).
+  7. *Bypass Command*: Expected bypass sets check to success with Tech Lead description. Actual: Status updated to success (Pass).
+  8. *Circuit Breaker Fail-Opens*: Expected Redis/LLM API timeouts fall back gracefully. Actual: Fallbacks unblocked gating checks successfully (Pass).
 
 ## 🧪 Test Specifications & Flows
 
