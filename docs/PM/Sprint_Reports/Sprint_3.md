@@ -14,6 +14,8 @@ Deliver the end-to-end user experience by generating Markdown comments, processi
   * **Task 3.3.1: Success / Failure Toggling**: Updated the commit status check state to `Success` and posted feedback based on LLM scores.
   * **Task 3.3.2: Emergency Bypass Slash Command (`/archicheck bypass`)**: Programmed permission level checks (`admin`, `maintain`) to unlock statuses with `"⚠️ Emergency bypass executed by Tech Lead."` description.
   * **Task 3.3.3: Milestone 1 End-to-End Simulation**: Ran complete webhook validation simulations proving that the gating-to-unlock flow executes flawlessly.
+* **Story 3.4: LLM Contract Testing & Resiliency**
+  * **Task 3.4.1: Contract Schema & Outage Validation**: Created unit mock tests simulating API timeouts, rate limits (429), and altered response schemas to validate timings-safe fail-open default states.
 
 # Implementation Outcome
 * **Markdown Comment Injection**: Structured comments are posted containing targeted code snippets and rationales, with native language tip overlays in [comments.ts](../../../src/lib/github/comments.ts).
@@ -23,7 +25,7 @@ Deliver the end-to-end user experience by generating Markdown comments, processi
 * **Strict Author Auditing**: Webhook rejects answer validations from any user other than the PR author, posting a canned response warning.
 * **Multilingual Validation prompts**: Updated system prompt [prompts.ts](../../../src/lib/llm/prompts.ts) to score reasoning purely based on technical accuracy, ignoring grammar or language choice (supporting English, Vietnamese, and German).
 * **Emergency Slash Overrides**: Intercepts `/archicheck bypass` commands, queries collaborator permissions, and overrides the lock to `Success` if the commenter is an Admin or Maintainer.
-* **Test Verification**: Expanded Vitest suites with 30 passing tests covering parsing, ReDoS, author verification, and emergency bypass workflows.
+* **Test Verification**: Expanded Vitest suites with 32 passing tests covering parsing, ReDoS, author verification, emergency bypass, and LLM schema/outage contract validation workflows.
 
 # Decisions Made
 * **Lock Early, Unlock Fast**: Set the commit status check to `Pending` synchronously at the start of the webhook payload handler, blocking the merge button before responding to GitHub and eliminating race conditions.
@@ -31,6 +33,7 @@ Deliver the end-to-end user experience by generating Markdown comments, processi
 * **Multilingual Gating**: Tuned the LLM validator prompt to accept technical justifications in Vietnamese, German, or technical slang, prioritizing technical intent over syntactic perfection.
 * **Argument-Free Bypass Command**: Configured `/archicheck bypass` to run without parameters to avoid stressful command-line parsing bugs during production outages.
 * **Overwrite Status Descriptions**: Kept the status context strictly set to `archicheck/verification` during bypass overrides but mutated the description to `"⚠️ Emergency bypass executed by Tech Lead."` to retain visible audit check logs.
+* **Graceful Contract Fail-Open**: Handled JSON parsing and schema structure errors inside the LLM provider factory to route model responses to default pass-open configs, ensuring API changes do not stall merges.
 
 # Lessons Learned
 * **Test Mocking Coverage**: Mocking `gitHubAuthService` in integration tests requires stubbing both `.rest` and `.request` methods since unified diff fetching uses direct request parameters, avoiding runtime `TypeError` issues.
