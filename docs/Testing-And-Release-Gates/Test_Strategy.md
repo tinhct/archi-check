@@ -41,7 +41,13 @@ Our quality baseline guarantees that ArchiCheck functions autonomously and secur
 *   **Strategy**: Run the entire workspace test suite before any merge. Focus on historical bugs (e.g., `waitUntil` mocks and Octokit stubs). Enforce a minimum **90% code coverage** limit in CI checks.
 *   **Tooling**: Vitest code coverage reports (`c8`/`istanbul` providers).
 
-### 4. Performance Testing
+### 4. End-to-End (E2E) Testing
+*   **Objective**: Validate chronological, stateful multi-system workflows and data transitions.
+*   **Strategy**: Simulate the complete user journey in a stateful mock pipeline (PR opened -> locked -> reviewer reject -> author validation -> bypass override -> fail-opens).
+*   **Co-execution Policy**: MUST execute concurrently and alongside functional and regression testing under `npm run test:run` in all CI/CD pipelines. Any E2E failure blocks the merge release gate.
+*   **Tooling**: E2E simulation runner (`simulation.test.ts`).
+
+### 5. Performance Testing
 *   **Objective**: Ensure Edge execution latencies remain below SLA targets.
 *   **Strategy**: Measure response latency for:
     1. Signature checks (Target SLA: <200ms).

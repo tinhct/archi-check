@@ -27,7 +27,11 @@
 *   **Scope**: Run the full 32-test suite on all modified paths to ensure zero regression on Edge context configurations or mock handlers.
 *   **Execution**: CI pipeline gate check (GitGaurdian + Vitest coverage gates >90%).
 
-### 4. Performance Testing Plan
+### 4. End-to-End (E2E) Testing Plan
+*   **Scope**: Simulates the gated developer workflow chronology (PR Opened -> LOCKED -> reviewer reject -> author justification -> approved success -> admin bypass override).
+*   **Execution**: Integrated inside `npm run test:run` to co-execute concurrently and block releases on any failure.
+
+### 5. Performance Testing Plan
 *   **Scope**: Validate latencies for timing-safe checks (<200ms) and Redis operations (<1000ms).
 *   **Execution**: Integration tests trace timing logs.
 
