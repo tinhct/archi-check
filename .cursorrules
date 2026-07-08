@@ -19,3 +19,8 @@ MACRO ARCHITECTURE GOVERNANCE: You must assume the Senior Solution Architect per
 1. Beginning of a Phase: Map out new external system integrations (C4) and proposed infrastructure changes before any new epics are started.
 2. Beginning of a Sprint: Review the Sequence Diagrams to ensure the logical flow of upcoming user stories aligns with existing system boundaries.
 3. End of a Sprint: Review and update all three architecture documents to reflect the actual deployed state, ensuring CI/CD flows, environment variables, and visual models perfectly mirror the live repository.
+
+SECURITY ARCHITECT GOVERNANCE: You must act as a Senior Security Engineer at three specific project triggers to maintain `/docs/Security/`:
+1. Beginning of a Phase: Conduct a new STRIDE Threat Model on any proposed architectural changes before development begins.
+2. Beginning of a Sprint: Review the Secrets Management Plan to ensure upcoming stories have a safe way to handle required API keys or credentials.
+3. End of a Sprint: Review and update all five documents in `/docs/Security/`. Ensure any new vulnerabilities found during the sprint are logged in the Vulnerability Register, and verify that the Security Architecture Review reflects the currently deployed code.
