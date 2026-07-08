@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % |
 |-------------|---------------|-------|-------------|------|--------------|
-| 3           | 8             | 2     | 0           | 6    | 75.0%        |
+| 3           | 9             | 2     | 0           | 7    | 77.8%        |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -45,8 +45,18 @@
 * **Assigned Sprint:** Sprint 2
 * **Description:** As a developer, I want LLM calls wrapped in timeouts and exponential backoffs so that API rate limits never hang my build pipeline.
 * **Acceptance Criteria:**
-  1. [x] Wraps Gemini and Vertex AI invocations in a 15-second total timeout limit.
-  2. [x] Handles exponential retry wait cycles on 429/5xx codes.
+*   1. [x] Wraps Gemini and Vertex AI invocations in a 15-second total timeout limit.
+*   2. [x] Handles exponential retry wait cycles on 429/5xx codes.
+* **Dependencies / Blockers:** None
+
+##### 🆔 AC-ST-104: LLM Contract Testing & Resiliency
+* **Priority:** High
+* **Status:** Done
+* **Assigned Sprint:** Sprint 3
+* **Description:** As a QA engineer, I want contract tests written against the LLM APIs so that schema drift and API outages trigger graceful fail-open behaviors without blocking CI.
+* **Acceptance Criteria:**
+*   1. [x] Spies on Gemini/Vertex SDK calls to inject 429/Timeout exceptions and asserts default fail-open fallback yields.
+*   2. [x] Validates that invalid JSON or altered response schemas throw parsing exceptions and redirect flow to fallback states timing-safely.
 * **Dependencies / Blockers:** None
 
 ---

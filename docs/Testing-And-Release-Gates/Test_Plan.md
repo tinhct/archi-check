@@ -56,6 +56,7 @@
 | **AC-ST-101** | Diff Complexity Scoring | Unit | Run | Pass | None |
 | **AC-ST-102** | Payload Sanitization & ReDoS Shield | Unit | Run | Pass | BUG-01 (ReDoS Regex timeout) |
 | **AC-ST-103** | Resilient LLM Connection | Unit | Run | Pass | None |
+| **AC-ST-104** | LLM Contract Testing & Resiliency | Unit / Contract | Run | Pass | None |
 | **AC-ST-201** | Synchronous Gate Lock & Markdown UI | Integration | Run | Pass | BUG-02 (WaitUntil mock) |
 | **AC-ST-202** | Author Answer Validation | Integration | Run | Pass | None |
 | **AC-ST-203** | Break-Glass Slash Command | Integration | Run | Pass | BUG-03 (Bypass status check context) |
