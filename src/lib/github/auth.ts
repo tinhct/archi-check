@@ -42,19 +42,15 @@ export class GitHubAuthService {
       return {
         request: async (options: any) => {
           console.log('[Mock GitHub] request called:', options);
-          return {
-            data: `diff --git a/src/lib/llm/provider.ts b/src/lib/llm/provider.ts
+          let diffLines = `diff --git a/src/lib/llm/provider.ts b/src/lib/llm/provider.ts
 index 123456..789012 100644
 --- a/src/lib/llm/provider.ts
 +++ b/src/lib/llm/provider.ts
-@@ -10,3 +10,12 @@
-+const test = "complex_keyword_here";
-+if (test) {
-+  console.log("adding complexity to force gating checks");
-+  const process = "complexity_indicators";
-+  const run = "ai_reliance";
-+}`
-          };
+@@ -10,3 +10,320 @@\n`;
+          for (let i = 0; i < 315; i++) {
+            diffLines += `+const complexityLine_${i} = "forcing_velocity_spray_and_pray_gating_check";\n`;
+          }
+          return { data: diffLines };
         },
         rest: {
           repos: {
