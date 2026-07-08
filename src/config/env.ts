@@ -17,12 +17,12 @@ const envSchema = z
     GOOGLE_CREDS_JSON: z.string().optional(),
     COMPLEXITY_THRESHOLD: z
       .string()
-      .transform((val) => parseInt(val, 10))
-      .default('5'),
+      .default('5')
+      .transform((val) => parseInt(val, 10)),
     AGENT_RELIANCE_THRESHOLD: z
       .string()
-      .transform((val) => parseFloat(val))
-      .default('0.7'),
+      .default('0.7')
+      .transform((val) => parseFloat(val)),
   })
   .refine(
     (data) => {

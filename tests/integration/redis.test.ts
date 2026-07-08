@@ -37,6 +37,7 @@ describe('Upstash Redis Cache Integration Tests', () => {
     const mockState: QuizState = {
       prId: mockPRId,
       commitSha: 'dummy-sha-12345',
+      prAuthor: 'junior-dev',
       status: 'pending',
       quizPayload: {
         questions: [

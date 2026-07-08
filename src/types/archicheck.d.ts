@@ -30,3 +30,10 @@ export interface QuizState {
   validatedAt?: string;
   bypassReason?: string;
 }
+
+export interface EvaluationResult {
+  passed: boolean;
+  score: number;
+  reasoning: string;
+}
+

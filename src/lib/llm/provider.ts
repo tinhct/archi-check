@@ -143,7 +143,8 @@ export class LLMProvider {
       model: 'gemini-1.5-pro',
       generationConfig: {
         responseMimeType: 'application/json',
-        responseSchema: schema
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        responseSchema: schema as any
       }
     });
 
@@ -174,7 +175,8 @@ export class LLMProvider {
   /**
    * Calls the enterprise-tier Vertex AI endpoint using the official Google Cloud SDK.
    */
-  private async callVertexAI(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async callVertexAI(prompt: string, schema: object, _signal: AbortSignal): Promise<string> {
     if (!this.googleCredsJson) {
       throw new Error('GOOGLE_CREDS_JSON is required for Vertex AI configuration');
     }
@@ -192,13 +194,14 @@ export class LLMProvider {
       model: 'gemini-1.5-pro',
       generationConfig: {
         responseMimeType: 'application/json',
-        responseSchema: schema
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        responseSchema: schema as any
       }
     });
 
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }]
-    }, { signal });
+    });
 
     const candidates = result.response.candidates;
     const text = candidates?.[0]?.content?.parts?.[0]?.text;
@@ -301,7 +304,7 @@ export class LLMProvider {
         }
 
         const isRateLimit = err.message?.includes('429') || err.status === 429;
-        const isServerError = err.status >= 500 || err.message?.includes('500') || err.message?.includes('503');
+        const isServerError = (err.status !== undefined && err.status >= 500) || err.message?.includes('500') || err.message?.includes('503');
         const shouldRetry = (isRateLimit || isServerError) && attempts <= 2;
 
         if (!shouldRetry) {

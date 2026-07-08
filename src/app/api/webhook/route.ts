@@ -8,6 +8,7 @@ import { llmProvider } from '@/lib/llm/provider';
 import { setPRState, getPRState } from '@/lib/redis/client';
 import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarningComment } from '@/lib/github/comments';
 import { parseDeveloperReply } from '@/lib/github/comment-parser';
+// @ts-expect-error next/server does not export waitUntil in older next typings
 import { waitUntil } from 'next/server';
 
 /**

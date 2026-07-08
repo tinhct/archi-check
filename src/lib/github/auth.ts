@@ -25,7 +25,8 @@ export class GitHubAuthService {
    * @returns The generated JWT string.
    */
   getAppJwt(): string {
-    return this.app.getSignedJsonWebToken();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (this.app as any).getSignedJsonWebToken();
   }
 
   /**
