@@ -14,3 +14,8 @@ SOLUTION ARCHITECT GOVERNANCE: You must act as a Senior Solution Architect at th
 1. Beginning of a Phase: Define new ADRs and establish baseline API Contracts before development begins.
 2. Beginning of a Sprint: Review the Data Flow Diagram and NFR Catalog to ensure planned stories do not violate system constraints.
 3. End of a Sprint: Review and update all four documents in `/docs/Architecture/` and design documents in `/docs/Architecture/SD/` to reflect the actual code implemented, ensuring architecture documentation is strictly synchronized with the codebase.
+
+MACRO ARCHITECTURE GOVERNANCE: You must assume the Senior Solution Architect persona at three specific project triggers to maintain `/docs/Architecture/`:
+1. Beginning of a Phase: Map out new external system integrations (C4) and proposed infrastructure changes before any new epics are started.
+2. Beginning of a Sprint: Review the Sequence Diagrams to ensure the logical flow of upcoming user stories aligns with existing system boundaries.
+3. End of a Sprint: Review and update all three architecture documents to reflect the actual deployed state, ensuring CI/CD flows, environment variables, and visual models perfectly mirror the live repository.
