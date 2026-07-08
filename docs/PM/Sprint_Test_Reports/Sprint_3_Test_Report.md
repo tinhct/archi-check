@@ -8,7 +8,7 @@
 
 | Total Test Cases | Passed | Failed | Blocked | Coverage % |
 |------------------|--------|--------|---------|------------|
-| 31               | 31     | 0      | 0       | 94.2%      |
+| 32               | 32     | 0      | 0       | 94.2%      |
 
 ## ⚙️ Environment & Test Data
 
@@ -49,13 +49,14 @@
   3. Assert client fails-open on Redis timeout/unreachable errors.
 * **Actual Result:** Pass (2 test cases)
 
-### TS-05: LLM Resiliency Provider
+### TS-05: LLM Resiliency & Contract Provider
 * **Test Type:** Automation Script (Unit Tests)
 * **Step-by-Step Flow:**
   1. Call Gemini / Vertex AI model generations.
   2. Mock rate limits (429) or server errors (5xx) to trigger exponential backoffs.
   3. Verify provider falls back to default questions/approvals on timeout (15s limit).
-* **Actual Result:** Pass (2 test cases)
+  4. Inject system tag boundaries (e.g. `</answers>`) to assert lookbehind substitutions and schema validation drift fail-opens.
+* **Actual Result:** Pass (3 test cases)
 
 ### TS-06: Webhook Router & Author Constraints
 * **Test Type:** Automation Script (Integration Tests)
