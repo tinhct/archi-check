@@ -28,6 +28,7 @@ sequenceDiagram
     alt Heuristics Decide: Bypass Gate
         Edge->>GH: Update Commit Status to SUCCESS
     else Heuristics Decide: Gate Interrogation
+        Note over Edge: Sanitize XML tag boundaries (diff)
         Edge->>LLM: Generate Quiz questions from Diff
         LLM-->>Edge: QuizPayload (questions)
         Edge->>Redis: setPRState(prId, status: 'pending', prAuthor)
@@ -45,6 +46,7 @@ sequenceDiagram
         Edge->>GH: Post Warning comment (Reject answer)
     else Commenter IS PR Author
         Note over Edge: Strip blockquotes from comment body
+        Note over Edge: Sanitize XML tag boundaries (diff/answers)
         Edge->>GH: Fetch original PR Diff (resilient re-fetch)
         GH-->>Edge: Raw Diff
         Edge->>LLM: validateAnswers(diff, quiz, justification)

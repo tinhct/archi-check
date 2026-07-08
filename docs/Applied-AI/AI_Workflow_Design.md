@@ -11,7 +11,7 @@ flowchart TD
     B -->|Gate Locked| D[Retrieve PR Code Diff]
     
     subgraph Quiz Generation Flow
-        D --> E[Gemini 1.5 Pro Quiz Generator]
+        D --> E[Sanitize Diff & Call Gemini 1.5 Pro Quiz Generator]
         E -->|Output| F{Validate JSON Output Schema}
         F -->|Fail / Parse Error| G[Circuit Breaker: Fail-Open Default Quiz]
         F -->|Pass| H[Cache QuizState in Redis]
@@ -20,9 +20,9 @@ flowchart TD
     H --> I[Post Markdown Quiz Comment to GitHub]
     
     subgraph Answer Validation Flow
-        J[Author Response Comment] --> K[Strip Blockquotes]
+        J[Author Response Comment] --> K[Strip Blockquotes & Sanitize Inputs]
         K --> L[Retrieve Original Code Diff]
-        L --> M[Gemini 1.5 Pro Validator]
+        L --> M[Sanitize Inputs & Call Gemini 1.5 Pro Validator]
         M -->|Output| N{Validate JSON Output Schema}
         N -->|Fail / Parse Error| O[Circuit Breaker: Fail-Open Success State]
         N -->|Pass| P{LLM Score >= 7 / passed: true?}

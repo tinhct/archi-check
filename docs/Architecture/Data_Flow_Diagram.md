@@ -14,7 +14,7 @@ graph TD
     E -->|pull_request.opened / synchronize| F[Lock Commit Status to Pending synchronously]
     F -->|3. Kick off async task via waitUntil| G{Evaluate Heuristics}
     G -->|No Gate Required| H[Update Commit Status to Success]
-    G -->|Gate Required| I[Call Gemini/Vertex AI Quiz Generator]
+    G -->|Gate Required| I[Sanitize Diff & Call Gemini/Vertex AI Quiz Generator]
     I -->|4. Generate Quiz Questions| J[Store QuizState in Upstash Redis]
     J -->|5. Post Quiz Comment to PR Thread| K[Update Commit Status context to Pending with Target URL]
     
@@ -25,7 +25,7 @@ graph TD
     
     L -->|Comment is Quiz Answer| P{Commenter is PR Author?}
     P -->|No| Q[Post Non-Author Warning Comment, Reject Answer]
-    P -->|Yes| R[Strip Blockquotes & Call LLM Answer Validator]
+    P -->|Yes| R[Strip Blockquotes, Sanitize Inputs & Call LLM Validator]
     R -->|passed: true| S[Update Status to Success, Set Redis to Success, Post Confirm Comment]
     R -->|passed: false| T[Keep Status Pending, Post Nudge Comment]
 ```
