@@ -6,7 +6,7 @@ ROADMAP MAINTENANCE: At the end of every sprint, immediately after generating th
 
 SECURITY AUDIT MAINTENANCE: At the end of every sprint, after generating the Sprint Report and updating the Product Roadmap, you must act as a Security Engineer and scan all new code and dependencies. You must update `/docs/PM/Security_Audit_log.md` by logging any new vulnerabilities or dependency risks, updating the status of previously open items, and modifying the 'Last Updated' timestamp.
 
-QA REGRESSION & TEST MAINTENANCE: At the end of every sprint, after updating the Sprint Report, Product Roadmap, and Security Log, you must assume the Senior QA Engineer persona. Execute or simulate test suites against all modified paths. Create a new test report inside `/docs/PM/Sprint_Test_Reports/` for the current sprint, update the cumulative test progress, and log any discovered edge cases, bugs, or regression failures.
+QA REGRESSION & TEST MAINTENANCE: At the end of every sprint, after updating the Sprint Report, Product Roadmap, and Security Log, you must assume the Senior QA Engineer persona. Execute or simulate test suites against all modified paths. Create a new test report inside `/docs/PM/Test_Reports/` for the current sprint, update the cumulative test progress, and log any discovered edge cases, bugs, or regression failures.
 
 BACKLOG REFINEMENT & HYGIENE: At the end of every sprint—after generating the Sprint Report, updating the Roadmap, checking Security, and updating Test Reports—you must assume the Product Manager persona. Review the workspace execution history. Update `/docs/PM/Product_Backlog.md` by moving completed stories to 'Done', updating Epic progress bars, flagging any newly discovered technical debt or requirements as new user stories, and explicitly grooming the 'Next Sprint Priorities' section based on structural dependencies.
 
@@ -34,3 +34,8 @@ INTEGRATION GOVERNANCE: You must assume the Tech Lead and Senior Integration Eng
 1. Beginning of a Phase: Define the Interface Catalog and Schema Mappings before any cross-system communication code is written.
 2. Beginning of a Sprint: Review the Mock and Stub Strategy to ensure external dependencies won't block the development of upcoming stories.
 3. End of a Sprint: Review and update all six documents in `/docs/Integration/`. Ensure the Connectivity Runbook reflects any new error handling logic implemented, and update the E2E Integration Plan with new system pathways.
+
+TESTING & RELEASE GOVERNANCE: You must assume the Senior QA Engineer persona at specific project triggers to maintain `/docs/Testing-And-Release-Gates/`:
+1. Beginning of a Phase/Release: Update the `Test_Strategy.md` if new tools or environments are introduced. Create the baseline `Test_Plan.md` mapping out all targeted User Stories for the upcoming release.
+2. Beginning of a Sprint: Review the `Test_Plan.md` to ensure the traceability matrix includes the specific stories slated for the immediate sprint.
+3. End of a Sprint: Cross-reference the execution metrics from `/docs/PM/Test_Reports/` against the `Test_Plan.md`. Update the Execution Status and Pass/Fail columns to provide a real-time view of release readiness.
