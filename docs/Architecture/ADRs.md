@@ -4,6 +4,24 @@
 
 *Note: Add new decisions at the top.*
 
+## ADR-008: Prompt-Injection Tag Sanitization & Defensive Prompting
+* **Date:** 2026-07-08
+* **Status:** Accepted
+
+### Context
+Developers or PR code comments could inject malicious prompt strings (Indirect Prompt Injection/Jailbreaks) inside diff contents or validation response comments. Since the system places these inputs within XML wrapper blocks (`<diff>`, `<answers>`), attackers could input fake closing tags (e.g. `</answers>`) to escape these blocks and inject instructions (e.g. forcing `passed: true`).
+
+### Decision
+Apply a two-layered defense strategy:
+1. **Input Sanitization**: Use a regex replacing helper (`sanitizePromptInput`) in `provider.ts` to substitute user-submitted XML tags matching system prompt boundaries with safe bracket versions (e.g., `[/answers]`).
+2. **Defensive Instructions**: Append a dedicated `[SECURITY INSTRUCTION]` block inside the system prompts explicitly directing the LLM to ignore hijack attempts or instruction escapes inside these tag blocks.
+
+### Consequences
+* **Positive:** Effectively mitigates indirect prompt injections and tag escaping without affecting code operator symbols (`<`, `>`).
+* **Negative:** Slightly increases prompt size by a few dozen tokens due to system instructions overhead.
+
+---
+
 ## ADR-007: Overwrite status check description on bypass
 * **Date:** 2026-07-07
 * **Status:** Accepted

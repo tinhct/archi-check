@@ -1,6 +1,6 @@
 # Security Audit Log
 
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-08
 
 ## 🛡️ Vulnerability Tracker (Simulated SAST)
 
@@ -10,6 +10,7 @@
 | V2 | 2026-07-06 | Webhook signature timing side-channel attack | H | `src/lib/security/hmac.ts#L10` | Use Node's `crypto.timingSafeEqual` instead of string equivalence operators to validate HMACs. | Resolved |
 | V3 | 2026-07-07 | Hardcoded credential exposure during Git commit | C | Codebase / Commits | Configure GitGuardian scanning (GGShield) as an automated CI gating step. | Resolved |
 | V4 | 2026-07-07 | Unauthorized Gate Bypass via issue comments | H | `src/app/api/webhook/route.ts#L225` | Restrict bypass slash command evaluations strictly to collaborators with `admin` or `maintain` roles. | Resolved |
+| V5 | 2026-07-08 | Prompt-Injection & XML tag-escape vulnerability in developer validation replies | H | `src/lib/llm/provider.ts#L84` | Escape XML tag bounds (<diff>, <questions>, <answers>) and inject [SECURITY INSTRUCTION] blocks in system prompts. | Resolved |
 
 ## 📦 Dependency Risks (Simulated SCA)
 
