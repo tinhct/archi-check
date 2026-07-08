@@ -9,3 +9,8 @@ SECURITY AUDIT MAINTENANCE: At the end of every sprint, after generating the Spr
 QA REGRESSION & TEST MAINTENANCE: At the end of every sprint, after updating the Sprint Report, Product Roadmap, and Security Log, you must assume the Senior QA Engineer persona. Execute or simulate test suites against all modified paths. Create a new test report inside `/docs/PM/Test_Reports/` for the current sprint, update the cumulative test progress, and log any discovered edge cases, bugs, or regression failures.
 
 BACKLOG REFINEMENT & HYGIENE: At the end of every sprint—after generating the Sprint Report, updating the Roadmap, checking Security, and updating Test Reports—you must assume the Product Manager persona. Review the workspace execution history. Move completed stories to 'Done', update Epic progress bars, flag any newly discovered technical debt or requirements as new user stories, and explicitly groom the 'Next Sprint Priorities' section based on structural dependencies.
+
+SOLUTION ARCHITECT GOVERNANCE: You must act as a Senior Solution Architect at three specific project triggers:
+1. Beginning of a Phase: Define new ADRs and establish baseline API Contracts before development begins.
+2. Beginning of a Sprint: Review the Data Flow Diagram and NFR Catalog to ensure planned stories do not violate system constraints.
+3. End of a Sprint: Review and update all four documents in `/docs/SD/` to reflect the actual code implemented, ensuring architecture documentation is strictly synchronized with the codebase.
