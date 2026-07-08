@@ -33,12 +33,12 @@ To manually validate the "Golden Path" (the primary user journey) and ensure all
 
 * **Description:** Verify that opening a pull request with complex changes synchronously locks the PR status checks to Pending and posts the architectural quiz comment thread.
 
-| Step | Action (User Input) | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
-|------|---------------------|--------------------------|------------------------|---------------------------|
-| 1.   | Start dev server via terminal: `npm run dev` | Server starts on `localhost:3000`. API route bound. | 200 OK on Vercel Edge dev route logs. | |
-| 2.   | POST a mock `pull_request.opened` event to `/api/webhook` | Receives HTTP `202 Accepted` response. | Headers TimingSafe HMAC verification passes. | |
-| 3.   | Check commit status checks | Commit status check `archicheck/verification` is locked to `pending`. | POST to `/repos/.../statuses` returns 201 Created. | |
-| 4.   | Inspect PR comment thread | Markdown quiz comment containing files, snippet, and rationales is posted. | POST to `/repos/.../comments` returns 201 Created. | |
+| Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
+|------|---------------------|----------------|--------------------------|------------------------|---------------------------|
+| 1.   | Start dev server | Run `npm run dev` in the root workspace terminal. | Server starts on `localhost:3000`. API route bound. | 200 OK on Vercel Edge dev route logs. | |
+| 2.   | POST a mock `pull_request.opened` event | Run `npx vite-node scratch/trigger_webhook.ts opened`. Ensure `MOCK_GITHUB=true` is set in `.env.local`. | Receives HTTP `202 Accepted` response. | Headers TimingSafe HMAC verification passes. | |
+| 3.   | Check commit status checks | Run `curl -H "Authorization: token YOUR_GITHUB_TOKEN" "https://api.github.com/repos/tinhct/archi-check/commits/<COMMIT_SHA>/status"` (get `<COMMIT_SHA>` using `git rev-parse HEAD`). | Commit status check `archicheck/verification` is locked to `pending`. | POST to `/repos/.../statuses` returns 201 Created. | |
+| 4.   | Inspect PR comment thread | Run `curl -H "Authorization: Bearer YOUR_REDIS_REST_TOKEN" "https://tough-starling-158111.upstash.io/get/archicheck:pr:101"`. | Markdown quiz comment containing files, snippet, and rationales is posted. | Stored state in Upstash Redis cache namespace. | |
 
 ---
 
@@ -46,13 +46,13 @@ To manually validate the "Golden Path" (the primary user journey) and ensure all
 
 * **Description:** Verify that the PR author can reply with answers in technical slang (English, Vietnamese, or German) and unblock the status gate checks.
 
-| Step | Action (User Input) | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
-|------|---------------------|--------------------------|------------------------|---------------------------|
-| 1.   | POST an `issue_comment.created` event from `junior-dev` | Receives HTTP `202 Accepted` response. | Event verified timing-safely. | |
-| 2.   | Parse commenter body text justification | Email blockquotes (`>`) are stripped from comment body. | String cleaner output extracts pure developer answer. | |
-| 3.   | Run LLM validation analysis | Answer is scored by Gemini 1.5 Pro. If score >= 7, pass state triggers. | Vertex/Gemini returns schema-compliant JSON. | |
-| 4.   | Verify commit check status | Gating check is unlocked and set to `success` in repository. | POST to `/repos/.../statuses` returns 201 with `success`. | |
-| 5.   | Check PR comment feedback | Approved access confirmation comment is posted. | POST to `/repos/.../comments` returns 201 Created. | |
+| Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
+|------|---------------------|----------------|--------------------------|------------------------|---------------------------|
+| 1.   | POST an `issue_comment.created` event | Run `npx vite-node scratch/trigger_webhook.ts comment`. | Receives HTTP `202 Accepted` response. | Event verified timing-safely. | |
+| 2.   | Parse commenter body text justification | Check the terminal console logs of your running Next.js dev server. | Email blockquotes (`>`) are stripped from comment body. | String cleaner output extracts pure developer answer. | |
+| 3.   | Run LLM validation analysis | Check terminal console logs for LLM scoring outputs (score 0-10). | Answer is scored by Gemini 1.5 Pro. If score >= 7, pass state triggers. | Vertex/Gemini returns schema-compliant JSON. | |
+| 4.   | Verify commit check status | Run `curl -H "Authorization: token YOUR_GITHUB_TOKEN" "https://api.github.com/repos/tinhct/archi-check/commits/<COMMIT_SHA>/status"`. | Gating check is unlocked and set to `success` in repository. | Status check updates state value to `success`. | |
+| 5.   | Check PR comment feedback | Query `archicheck:pr:101` in Upstash Redis. (It should return `{"result":null}` indicating state was deleted on success pass). | Approved access confirmation comment is posted. | Cache key deleted cleanly upon verification success. | |
 
 ---
 
@@ -60,12 +60,12 @@ To manually validate the "Golden Path" (the primary user journey) and ensure all
 
 * **Description:** Verify that repository maintainers can bypass the gating lock check during outages or emergencies.
 
-| Step | Action (User Input) | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
-|------|---------------------|--------------------------|------------------------|---------------------------|
-| 1.   | POST an `issue_comment.created` event containing `/archicheck bypass` from `techlead-admin` | Receives HTTP `202 Accepted` response. | Webhook accepts command timing-safely. | |
-| 2.   | Validate commenter repository permissions | System checks if commenter role is `admin` or `maintain`. | GET `/repos/.../collaborators/.../permission` returns 200. | |
-| 3.   | Mutate gate checks status | Status check context `archicheck/verification` is updated to `success`. | POST `/repos/.../statuses` sets description to "⚠️ Emergency bypass...". | |
-| 4.   | Inspect PR comments logs | Bypass audit comment is injected into PR comment thread. | POST to `/repos/.../comments` returns 201. | |
+| Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
+|------|---------------------|----------------|--------------------------|------------------------|---------------------------|
+| 1.   | POST an `issue_comment.created` event containing bypass | Run `npx vite-node scratch/trigger_webhook.ts bypass`. | Receives HTTP `202 Accepted` response. | Webhook accepts command timing-safely. | |
+| 2.   | Validate commenter repository permissions | Check dev server terminal console for log: `[Mock GitHub] getCollaboratorPermissionLevel called`. | System checks if commenter role is `admin` or `maintain`. | GET `/repos/.../collaborators/.../permission` returns 200. | |
+| 3.   | Mutate gate checks status | Run `curl -H "Authorization: token YOUR_GITHUB_TOKEN" "https://api.github.com/repos/tinhct/archi-check/commits/<COMMIT_SHA>/status"`. | Status check context `archicheck/verification` is updated to `success`. | POST `/repos/.../statuses` sets description to "⚠️ Emergency bypass...". | |
+| 4.   | Inspect PR comments logs | Check output of `trigger_webhook.ts` or local server logs. | Bypass audit comment is injected into PR comment thread. | POST to `/repos/.../comments` returns 201. | |
 
 ---
 
