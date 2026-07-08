@@ -4,7 +4,7 @@
 
 ## 🚨 Risk Mitigation Profiles
 
-* **Prompt Injection Defense:** Strict separation of system configuration parameters and user comments. The validator prompt separates input structures using specific placeholder tags (e.g. `<developer_response>`) and directs the model to treat contents strictly as raw string data to be analyzed, never as commands.
+* **Prompt Injection Defense:** Untrusted inputs (Git diffs, target questions, and developer answers) are wrapped inside explicit XML tags (`<diff>`, `<questions>`, `<answers>`). To prevent tag-escape hijacking (e.g., developers posting `</answers>` to inject new LLM directives), a runtime sanitizer in `provider.ts` replaces any user-supplied XML brackets matching these tags with safe bracket formatting (e.g., `[/answers]`). Furthermore, the system instructions contain a dedicated `[SECURITY INSTRUCTION]` block directing the model to treat all data within these tags strictly as untrusted literal content.
 * **Data Leakage Prevention:** Diffs are scrubbed via `scrubSecrets` in `sanitizer.ts` prior to hitting Vertex AI/Gemini endpoints, ensuring no passwords or API keys are sent to external networks.
 * **Hallucination Checks:** Prompts are grounded strictly on the file structure and unified diff contents. The model is directed to refuse evaluating concepts not present in the files under review.
 

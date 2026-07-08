@@ -51,10 +51,23 @@ export class LLMProvider {
   }
 
   /**
+   * Helper to escape system XML tag boundaries to prevent injection attempts.
+   */
+  private sanitizePromptInput(input: string): string {
+    return input
+      .replace(/<\/diff>/gi, '[/diff]')
+      .replace(/<diff>/gi, '[diff]')
+      .replace(/<\/questions>/gi, '[/questions]')
+      .replace(/<questions>/gi, '[questions]')
+      .replace(/<\/answers>/gi, '[/answers]')
+      .replace(/<answers>/gi, '[answers]');
+  }
+
+  /**
    * Generates a quiz from a git diff payload.
    */
   async generateQuiz(diff: string): Promise<QuizPayload> {
-    const prompt = PROMPTS.QUIZ_GENERATION_V1.replace('{{diff}}', diff);
+    const prompt = PROMPTS.QUIZ_GENERATION_V1.replace('{{diff}}', this.sanitizePromptInput(diff));
 
     try {
       const jsonResponse = await this.executeWithRetry((signal) =>
@@ -87,9 +100,9 @@ export class LLMProvider {
     answers: string[]
   ): Promise<EvaluationResult> {
     const prompt = PROMPTS.ANSWER_VALIDATION_V1
-      .replace('{{diff}}', diff)
-      .replace('{{questions}}', JSON.stringify(questions))
-      .replace('{{answers}}', JSON.stringify(answers));
+      .replace('{{diff}}', this.sanitizePromptInput(diff))
+      .replace('{{questions}}', this.sanitizePromptInput(JSON.stringify(questions)))
+      .replace('{{answers}}', this.sanitizePromptInput(JSON.stringify(answers)));
 
     try {
       const jsonResponse = await this.executeWithRetry((signal) =>

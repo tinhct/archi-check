@@ -22,4 +22,5 @@
 | **ReDoS CPU Watchdog** | Truncates lines >500 characters and aborts RegExp matching after 500ms. | Active |
 | **GitHub App Token Rotation** | Installation client tokens automatically expire after 1 hour (managed by GitHub). | Active |
 | **Leaked Credentials Gating** | GitGuardian ggshield pre-commit/CI pipeline repository scanning checks. | Active |
+| **Prompt Injection Gating** | XML tag-escape regex replacements & system level security instructions. | Active |
 | **Fail-Open Gating SLA** | 1,000ms Redis timeouts & 15s LLM timeouts unblock PRs to prevent pipeline locks. | Active |
