@@ -25,11 +25,15 @@
 
 ### Q: How do you calculate the architectural complexity scores? Describe the Algorithmic Complexity Scoring Engine.
 
-**A:** ArchiCheck utilizes a multi-dimensional Algorithmic Complexity Scoring Engine to evaluate the repository. The final complexity score (0-100) is a weighted aggregate of three primary factors:
+**A:** ArchiCheck calculates a **Baseline Complexity Score (0 to 10)** for each pull request. This score is derived by scanning the added lines of the Git unified diff (excluding blocklisted assets, documentation, or lockfiles) and checking the ratio of structural syntax keywords against total additions:
 
-1. **Cyclomatic & Cognitive Complexity (40%):** Evaluates the sheer number of branching logics (if/else, loops) and how difficult the code is for a human to read and maintain.
-2. **Coupling & Dependency Weight (40%):** Analyzes the C4 model dependencies. Code that tightly couples multiple external domains or has deep inheritance trees receives a higher complexity penalty.
-3. **Volatility & Debt Index (20%):** Cross-references the `Product_Backlog.md` and `RAID_log.md` to determine how often a specific module changes and how many open defects are tied to it. High churn plus high defect rates exponentially increase the complexity score.
+1. **Keyword Analysis**: The engine counts structural syntax indicators (keywords like `class`, `interface`, `async`, `useState`, `useEffect`, `if`, `for`, `switch`, `try`, etc.).
+2. **Scoring Formula**:
+   $$\text{Score} = \min\left(10, \left\lceil \frac{\text{complexityIndicators}}{\text{linesAdded}} \times 10 + \frac{\text{totalLinesModified}}{100} \right\rceil\right)$$
+
+This baseline score is then fed into the **Heuristics Gating Engine** which decides whether to lock the PR:
+* **Standard Gate**: Locks the gate if the complexity score is $\ge 7$ (configurable via `COMPLEXITY_THRESHOLD`) **AND** the estimated AI-reliance ratio is $\ge 0.5$ (configurable via `AGENT_RELIANCE_THRESHOLD`).
+* **Velocity ("Spray & Pray") Gate**: Overrides standard thresholds to immediately lock the PR if development was suspiciously fast (the First Commit Proxy time delta between first commit and PR is $< 15\text{ minutes}$) **AND** the changes are substantial ($> 300\text{ lines added}$).
 
 ---
 
