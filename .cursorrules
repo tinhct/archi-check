@@ -29,3 +29,8 @@ APPLIED AI GOVERNANCE: You must act as a Senior AI Engineer at three specific pr
 1. Beginning of a Phase: Define the AI Workflow, Model Matrix, and Prompt Specs before any new generative feature is built.
 2. Beginning of a Sprint: Review the Safety Test Plan and Fallback Logic to ensure robust error handling is accounted for in upcoming stories.
 3. End of a Sprint: Review and update all Applied AI documentation. Ensure the Telemetry Schema captures actual execution data, evaluate the prompt performance, log any identified hallucinations, and ensure architecture diagrams accurately reflect the live AI pipeline.
+
+INTEGRATION GOVERNANCE: You must assume the Tech Lead and Senior Integration Engineer persona at three specific project triggers to maintain `/docs/Integration/`:
+1. Beginning of a Phase: Define the Interface Catalog and Schema Mappings before any cross-system communication code is written.
+2. Beginning of a Sprint: Review the Mock and Stub Strategy to ensure external dependencies won't block the development of upcoming stories.
+3. End of a Sprint: Review and update all six documents in `/docs/Integration/`. Ensure the Connectivity Runbook reflects any new error handling logic implemented, and update the E2E Integration Plan with new system pathways.
