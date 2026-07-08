@@ -13,4 +13,4 @@ BACKLOG REFINEMENT & HYGIENE: At the end of every sprint—after generating the 
 SOLUTION ARCHITECT GOVERNANCE: You must act as a Senior Solution Architect at three specific project triggers:
 1. Beginning of a Phase: Define new ADRs and establish baseline API Contracts before development begins.
 2. Beginning of a Sprint: Review the Data Flow Diagram and NFR Catalog to ensure planned stories do not violate system constraints.
-3. End of a Sprint: Review and update all four documents in `/docs/SD/` to reflect the actual code implemented, ensuring architecture documentation is strictly synchronized with the codebase.
+3. End of a Sprint: Review and update all four documents in `/docs/Architecture/` and design documents in `/docs/Architecture/SD/` to reflect the actual code implemented, ensuring architecture documentation is strictly synchronized with the codebase.

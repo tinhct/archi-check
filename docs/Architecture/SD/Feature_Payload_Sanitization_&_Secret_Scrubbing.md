@@ -28,9 +28,9 @@ flowchart TD
 ```
 
 # Architecture & Components
-* **Sanitization Utility** ([sanitizer.ts](../../src/lib/security/sanitizer.ts)): Core lookbehind regular expression matching engine. Incorporates a 500-character line shield and a 500ms execution timer.
+* **Sanitization Utility** ([sanitizer.ts]../../../src/lib/security/sanitizer.ts): Core lookbehind regular expression matching engine. Incorporates a 500-character line shield and a 500ms execution timer.
 * **YAML Config Loader** (integrated in API webhook): Loads `.archicheck.yml` using the standard `yaml` package and extracts `custom_secret_patterns` to merge with default patterns.
-* **Fixture Test Suite** ([sanitizer.test.ts](../../tests/unit/sanitizer.test.ts)): Unit tests verifying lookbehind variable redacts, safe non-secret passes, and 500ms CPU timeout triggers when encountering ReDoS backtracking.
+* **Fixture Test Suite** ([sanitizer.test.ts]../../../tests/unit/sanitizer.test.ts): Unit tests verifying lookbehind variable redacts, safe non-secret passes, and 500ms CPU timeout triggers when encountering ReDoS backtracking.
 
 # Data Model Changes
 * `.archicheck.yml` configuration schema:

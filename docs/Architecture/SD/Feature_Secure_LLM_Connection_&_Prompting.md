@@ -32,13 +32,13 @@ flowchart TD
 ```
 
 # Architecture & Components
-* **LLM Provider Factory** ([provider.ts](../../src/lib/llm/provider.ts)): Routes API calls between standard Gemini developer endpoints and enterprise Vertex AI endpoints based on dynamic env switches.
-* **Environment Validation** ([env.ts](../../src/config/env.ts)): Ensures `GOOGLE_CREDS_JSON` is strictly required at startup if `LLM_PROVIDER_TYPE` is set to `vertex`.
-* **System Prompt Templates** ([prompts.ts](../../src/lib/llm/prompts.ts)): Defines versioned prompting templates that direct the LLM to output structured JSON responses conforming to architectural standards.
-* **JSON Schema Enforcement** ([schema.ts](../../src/lib/llm/schema.ts)): Declares Zod schemas (`quizPayloadSchema`, `evaluationResponseSchema`) to validate structured LLM inputs and outputs.
+* **LLM Provider Factory** ([provider.ts]../../../src/lib/llm/provider.ts): Routes API calls between standard Gemini developer endpoints and enterprise Vertex AI endpoints based on dynamic env switches.
+* **Environment Validation** ([env.ts]../../../src/config/env.ts): Ensures `GOOGLE_CREDS_JSON` is strictly required at startup if `LLM_PROVIDER_TYPE` is set to `vertex`.
+* **System Prompt Templates** ([prompts.ts]../../../src/lib/llm/prompts.ts): Defines versioned prompting templates that direct the LLM to output structured JSON responses conforming to architectural standards.
+* **JSON Schema Enforcement** ([schema.ts]../../../src/lib/llm/schema.ts): Declares Zod schemas (`quizPayloadSchema`, `evaluationResponseSchema`) to validate structured LLM inputs and outputs.
 
 # Data Model Changes
-* Environment variable validation rules added to [env.ts](../../src/config/env.ts):
+* Environment variable validation rules added to [env.ts]../../../src/config/env.ts):
   * `LLM_PROVIDER_TYPE`: `gemini-developer` | `vertex` (default: `gemini-developer`)
   * `GOOGLE_CREDS_JSON`: service account credentials JSON string (required when type is `vertex`)
 

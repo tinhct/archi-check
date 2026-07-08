@@ -9,7 +9,7 @@ Parse Git diffs to extract algorithmic complexity, scrub all sensitive credentia
 * **Story 2.2: Payload Sanitization (Secret Scrubbing)**
   * **Task 2.2.1**: Update `sanitizer.ts` with default credential matching rules, line-length truncation shields (500 chars), custom patterns from `.archicheck.yml`, and 500ms ReDoS circuit breakers.
   * **Task 2.2.2**: Write unit tests verifying secret redaction and ReDoS circuit breaker triggers.
-  * **Task 2.2.3**: Coordinate security architecture reviews (archived in [Feature_Payload_Sanitization_&_Secret_Scrubbing.md](../../SD/Feature_Payload_Sanitization_&_Secret_Scrubbing.md)).
+  * **Task 2.2.3**: Coordinate security architecture reviews (archived in [Feature_Payload_Sanitization_&_Secret_Scrubbing.md](../../Architecture/SD/Feature_Payload_Sanitization_&_Secret_Scrubbing.md)).
 * **Story 2.3: Secure LLM API Connection & Prompting**
   * **Task 2.3.1**: Build `provider.ts` to support both standard Gemini Developer API and Google Cloud Vertex AI SDK integrations.
   * **Task 2.3.2**: Draft architectural system prompts inside `prompts.ts` using structured JSON output schemas.

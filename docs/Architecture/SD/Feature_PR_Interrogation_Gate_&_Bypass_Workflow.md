@@ -55,13 +55,13 @@ sequenceDiagram
 ```
 
 # Architecture & Components
-* **Webhook Router** ([route.ts](../../src/app/api/webhook/route.ts)): Orchestrates event parsing, role authorizations, state checks, and routes comments to validation/bypass workflows.
-* **Comment UI Generator** ([comments.ts](../../src/lib/github/comments.ts)): Formats feedback and warning Markdown comment blocks posted to GitHub issues.
-* **Reply Parser** ([comment-parser.ts](../../src/lib/github/comment-parser.ts)): Filters lines starting with `>` to remove quotes and isolate new reply text.
-* **LLM Validator** ([provider.ts](../../src/lib/llm/provider.ts)): Sends the isolated reply, original diff, and generated questions to the LLM for evaluation.
+* **Webhook Router** ([route.ts]../../../src/app/api/webhook/route.ts): Orchestrates event parsing, role authorizations, state checks, and routes comments to validation/bypass workflows.
+* **Comment UI Generator** ([comments.ts]../../../src/lib/github/comments.ts): Formats feedback and warning Markdown comment blocks posted to GitHub issues.
+* **Reply Parser** ([comment-parser.ts]../../../src/lib/github/comment-parser.ts): Filters lines starting with `>` to remove quotes and isolate new reply text.
+* **LLM Validator** ([provider.ts]../../../src/lib/llm/provider.ts): Sends the isolated reply, original diff, and generated questions to the LLM for evaluation.
 
 # Data Model Changes
-* Updated `QuizState` type definition in [archicheck.d.ts](../../src/types/archicheck.d.ts) to store author info and bypass reasons:
+* Updated `QuizState` type definition in [archicheck.d.ts]../../../src/types/archicheck.d.ts) to store author info and bypass reasons:
   ```typescript
   export interface QuizState {
     prId: number;
