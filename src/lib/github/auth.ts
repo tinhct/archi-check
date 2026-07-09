@@ -87,7 +87,58 @@ index 123456..789012 100644
             diffLines += `+const [state, setState] = useState(0);\n`;
             return { data: diffLines };
           }
-          
+
+          if (pullNumber === 501) {
+            // Sandbox Scenario 1: Leaky Diff
+            const diffLines = `diff --git a/src/index.ts b/src/index.ts
+index 123456..789012 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -1,4 +1,40 @@
++const AWS_KEY = "AKIAIOSFODNN7EXAMPLE";
++const slack_token = "xoxb-123456789012-123456789012-abcdefghijklmnopqrstuvwx";
++const gcp_key = "-----BEGIN RSA PRIVATE KEY-----\\nMIIEvgI...\\n-----END RSA PRIVATE KEY-----";
++const normal_line = "this is normal code change";
++`;
+            return { data: diffLines };
+          }
+
+          if (pullNumber === 502) {
+            // Sandbox Scenario 2: Prompt Injection Diff Trigger
+            const diffLines = `diff --git a/src/main.ts b/src/main.ts
+index 123456..789012 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -1,3 +1,30 @@
++const phrase = "prompt-injection";
++`;
+            return { data: diffLines };
+          }
+
+          if (pullNumber === 503) {
+            // Sandbox Scenario 3: ReDoS Bomb
+            const diffLines = `diff --git b/src/main.ts b/src/main.ts
+index 123456..789012 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -1,3 +1,30 @@
++const bomb = "TRIGGER_REDOS_TIMEOUT";
++`;
+            return { data: diffLines };
+          }
+
+          if (pullNumber === 504) {
+            // Sandbox Scenario 4: Perfect Loop
+            const diffLines = `diff --git b/src/main.ts b/src/main.ts
+index 123456..789012 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -1,3 +1,30 @@
++const clean_code = "all passes cleanly";
++`;
+            return { data: diffLines };
+          }
+
           // Default 315 lines of provider.ts
           let diffLines = `diff --git a/src/lib/llm/provider.ts b/src/lib/llm/provider.ts
 index 123456..789012 100644
