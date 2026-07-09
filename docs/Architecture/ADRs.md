@@ -1,8 +1,28 @@
 # Architecture Decision Records (ADRs)
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 *Note: Add new decisions at the top.*
+
+## ADR-009: Environment-Driven Provider Factory & Production Discriminated Union
+* **Date:** 2026-07-09
+* **Status:** Accepted
+
+### Context
+To support offline local testing without API costs (Developer Experience), we need a Mock LLM provider. However, running mock services in a live production environment poses a critical security risk (accidental auto-approval of gates). We need to decouple LLM provider instantiation while structurally preventing mock activations in production.
+
+### Decision
+1. **Provider Factory**: Decouple the LLM layer using a factory pattern (`provider.ts`) supporting `gemini-developer`, `vertex`, and `mock` provider types.
+2. **Discriminated Union Validation**: Implement a Zod schema in `src/config/env.ts` that validates production configurations based on `LLM_PROVIDER_TYPE` using a discriminated union:
+   * **`gemini-developer`**: Requires `LLM_API_KEY`.
+   * **`vertex`**: Requires `GOOGLE_CREDS_JSON`.
+   * **`mock`**: Instantly fails validation if `NODE_ENV === 'production'` with a critical error message.
+
+### Consequences
+* **Positive:** Allows contributors to test gating rules and UI comments offline instantly with zero API cost. Guarantees that mock mode can never boot or bypass checks in production.
+* **Negative:** Slightly increases environment configuration complexity by enforcing conditional variable validation.
+
+---
 
 ## ADR-008: Prompt-Injection Tag Sanitization & Defensive Prompting
 * **Date:** 2026-07-08

@@ -12,9 +12,10 @@ graph TD
     C([AI: Vertex AI Credentials]) -->|Blocks| B
     D([Database: Upstash Redis State Cache]) -->|Blocks| B
     B -->|Blocks| E[Epic 3: Staging Polish & Telemetry]
+    B -->|Blocks| G[Epic 4: Repository Customization & DX]
     E --> F((Release v1.0))
+    G --> F
 ```
-
 ## 🔗 Active Dependencies
 
 | Dep ID | Type (Internal/External/AI) | Description & Impact | Blocked Item (Story/Epic) | Blocking Item / Owner | Target Resolution Date | Status (Open/At Risk/Resolved) |

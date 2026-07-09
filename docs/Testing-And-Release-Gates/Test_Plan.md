@@ -9,6 +9,7 @@
 *   **In-Scope for this Release:**
     *   **Epic-01: Diff Scorer & Security Sanitizer** (parsing logic, regex lookbehinds, ReDoS watchdogs, LLM provider timeout retries).
     *   **Epic-02: Interrogation Gate & Bypass** (synchronous pending checks, author verification rules, blockquote comment parser, slash command roles).
+    *   **Epic-04: Repository Customization & DX** (local mock LLM service, `.archicheck.yml` configuration parser, file size limiters).
     *   **Defensive Prompt-Injection Controls** (regex XML tag sanitizations and defensive instructions).
 *   **Out-of-Scope:**
     *   **Epic-03: Staging Polish & Telemetry** (cohort configurations and token usage alert integrations are deferred to subsequent sprints).
@@ -60,6 +61,8 @@
 | **AC-ST-201** | Synchronous Gate Lock & Markdown UI | Integration | Run | Pass | BUG-02 (WaitUntil mock) |
 | **AC-ST-202** | Author Answer Validation | Integration | Run | Pass | None |
 | **AC-ST-203** | Break-Glass Slash Command | Integration | Run | Pass | BUG-03 (Bypass status check context) |
+| **AC-ST-401** | Local Mock LLM Service | Integration / Unit | To Do | N/A | None |
+| **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | To Do | N/A | None |
 
 ## 🚨 Risk-Based Testing Priorities
 

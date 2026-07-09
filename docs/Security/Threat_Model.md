@@ -38,3 +38,6 @@ flowchart TD
 | **Secret Sanitizer Engine** | No | No | No | Yes | Yes | No | **Lookbehind Scrubber & watchdogs**: Use ECMAScript lookbehinds to redact values; truncate lines >500 chars and halt regex after 500ms. |
 | **State Caching** | Yes | Yes | No | Yes | Yes | No | **Upstash TLS**: Use secure REST endpoints with a 1,000ms timeout circuit breaker, failing open to prevent build hangs. |
 | **LLM Inference** | Yes | No | No | Yes | Yes | No | **Defensive System Prompts & Compliance**: Inject strict security instructions directing the model to ignore injected commands inside diff/answers blocks. Call GCP Vertex AI endpoints (zero data retention policy) with 15s timeouts. |
+| **Mock LLM Activation** | No | Yes | No | No | No | Yes | **Production Block Constraint**: Zod schema in `env.ts` explicitly rejects `LLM_PROVIDER_TYPE=mock` when `NODE_ENV === 'production'` to prevent mock bypass in production. |
+| **YAML Config Parser** | No | Yes | No | No | Yes | No | **Size Limiter & Graceful Fallback**: Enforce 50KB maximum size check on fetched `.archicheck.yml` string. Wrap YAML parsing in `try/catch` and validate schemas via Zod defaults. |
+

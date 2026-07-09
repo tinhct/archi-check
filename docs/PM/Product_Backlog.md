@@ -1,6 +1,6 @@
 # Product Backlog: ArchiCheck
 
-**Last Refined:** 2026-07-08
+**Last Refined:** 2026-07-09
 
 **Product Owner Persona:** Senior Agile Product Manager
 
@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % |
 |-------------|---------------|-------|-------------|------|--------------|
-| 3           | 9             | 2     | 0           | 7    | 77.8%        |
+| 4           | 11            | 4     | 0           | 7    | 63.6%        |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -129,6 +129,41 @@
 
 ---
 
+### Epic-04: Repository Customization & Developer Experience (DX)
+* **Status:** To Do
+* **Description:** Enable seamless local contribution workflows without incurring API costs, and allow repository maintainers to customize ArchiCheck’s threshold logic.
+* **Progress:** `[░░░░░░░░░░] 0%`
+
+#### 📋 User Stories
+
+##### 🆔 AC-ST-401: Local Mock LLM Service
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 4
+* **Description:** As an open-source contributor, I want a local mock LLM service that intercepts prompt requests and returns a schema-compliant mock response so that I can test UI and comprehension gates offline without API keys.
+* **Acceptance Criteria:**
+  1. [ ] Returns strict JSON schema defined in `src/lib/llm/schema.ts` (`{ passed: boolean, reasoning: string }` or `{ questions: Array }`).
+  2. [ ] Activated via environment variable `LLM_PROVIDER_TYPE=mock`.
+  3. [ ] Restricts execution to non-production environments (`NODE_ENV !== 'production'`).
+  4. [ ] Implements a string-length evaluation heuristic (justifications $\le 20$ chars fail with a nudge comment, $> 20$ chars pass).
+* **Dependencies / Blockers:** None
+
+##### 🆔 AC-ST-402: Robust .archicheck.yml Configuration Parser
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 4
+* **Description:** As a Repository Administrator, I want to define custom complexity thresholds and prompt parameters in a `.archicheck.yml` or `.archicheck.yaml` file so that ArchiCheck’s cognitive gate matches my team's standards.
+* **Acceptance Criteria:**
+  1. [ ] Fetches configuration file sequentially from HEAD commit (`.archicheck.yml` first, then fallback to `.archicheck.yaml`).
+  2. [ ] Limits fetched config file size to 50KB to protect against memory DoS.
+  3. [ ] Gracefully falls back to system defaults on 404, parsing errors, or validation failures without throwing or crashing the webhook.
+  4. [ ] Validates inputs via Zod schema containing `lines_added_threshold`, `algorithmic_complexity_score`, `ai_reliance_ratio`, and `excluded_paths` with strict defaults.
+* **Dependencies / Blockers:** None
+
+---
+
 ## 🎯 Next Sprint Priorities (Refinement Queue)
-1. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for enterprise trial cohorts).
-2. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required before deploying to regional cohorts).
+1. **AC-ST-401: Local Mock LLM Service** (High - Critical for offline testing DX).
+2. **AC-ST-402: Robust .archicheck.yml Configuration Parser** (High - Critical for maintainer custom settings).
+3. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for enterprise trial cohorts).
+4. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required before deploying to regional cohorts).
