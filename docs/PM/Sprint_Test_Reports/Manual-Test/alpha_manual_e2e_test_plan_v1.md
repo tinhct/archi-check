@@ -43,7 +43,7 @@ To manually validate the core integration webhook flow, emergency bypass slash c
 | Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
 |------|---------------------|----------------|--------------------------|------------------------|---------------------------|
 | 1.   | Start Next.js App | Run `npm run dev` in the root workspace terminal. | Server starts on `localhost:3000`. API route bound. | 200 OK on Vercel Edge dev route logs. | [ ] Pass / [ ] Fail |
-| 2.   | POST a mock `pull_request.opened` event | Run `npx vite-node scratch/trigger_webhook.ts opened`. | Receives HTTP `202 Accepted` response. | Headers TimingSafe HMAC verification passes. | [ ] Pass / [ ] Fail |
+| 2.   | POST a mock `pull_request.opened` event | Run `npx vite-node scratch/trigger_webhook.ts opened`. <br><br>*Note: This simulator command opens pull request number **101** by default.* | Receives HTTP `202 Accepted` response. | Headers TimingSafe HMAC verification passes. | [ ] Pass / [ ] Fail |
 | 3.   | Check commit status checks | Inspect Next.js dev server terminal logs. | `[Mock GitHub] createCommitStatus called` shows state: `'pending'` and description: `'ArchiCheck is evaluating your pull request changes...'`. | POST to `/repos/.../statuses` returns 201. | [ ] Pass / [ ] Fail |
 | 4.   | Inspect PR comment thread | Inspect Next.js dev server terminal logs. | `[Mock GitHub] createComment called` containing the generated quiz questions is printed. | Stored state in Upstash Redis cache namespace. | [ ] Pass / [ ] Fail |
 
@@ -54,7 +54,7 @@ To manually validate the core integration webhook flow, emergency bypass slash c
 
 | Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
 |------|---------------------|----------------|--------------------------|------------------------|---------------------------|
-| 1.   | POST an `issue_comment.created` event | Run `npx vite-node scratch/trigger_webhook.ts comment`. | Receives HTTP `202 Accepted` response. | Event verified timing-safely. | [ ] Pass / [ ] Fail |
+| 1.   | POST an `issue_comment.created` event | Run `npx vite-node scratch/trigger_webhook.ts comment`. <br><br>*Note: This command defaults to commenting on PR **101**. To comment on a different PR, append a hyphen and the target PR number (e.g. `comment-403`).* | Receives HTTP `202 Accepted` response. | Event verified timing-safely. | [ ] Pass / [ ] Fail |
 | 2.   | Parse commenter body text justification | Check the terminal console logs of your running Next.js dev server. | Email blockquotes (`>`) are stripped from comment body. | String cleaner output extracts pure developer answer. | [ ] Pass / [ ] Fail |
 | 3.   | Run LLM validation analysis | Check terminal console logs for LLM scoring outputs (score 0-10). | Answer is evaluated. If score >= 7, pass state triggers. | Mock/Gemini returns schema-compliant JSON. | [ ] Pass / [ ] Fail |
 | 4.   | Verify commit check status | Inspect dev server terminal. | `[Mock GitHub] createCommitStatus called` showing state: `'success'` and description: `'Verification complete! Approved.'`. | Status check updates state value to `success`. | [ ] Pass / [ ] Fail |
@@ -66,7 +66,7 @@ To manually validate the core integration webhook flow, emergency bypass slash c
 
 | Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
 |------|---------------------|----------------|--------------------------|------------------------|---------------------------|
-| 1.   | POST an `issue_comment.created` event containing bypass | Run `npx vite-node scratch/trigger_webhook.ts bypass`. | Receives HTTP `202 Accepted` response. | Webhook accepts command timing-safely. | [ ] Pass / [ ] Fail |
+| 1.   | POST an `issue_comment.created` event containing bypass | Run `npx vite-node scratch/trigger_webhook.ts bypass`. <br><br>*Note: This command defaults to bypassing PR **101**. To bypass a different PR, append a hyphen and the target PR number (e.g. `bypass-403`).* | Receives HTTP `202 Accepted` response. | Webhook accepts command timing-safely. | [ ] Pass / [ ] Fail |
 | 2.   | Validate commenter repository permissions | Check dev server terminal console logs. | `[Mock GitHub] getCollaboratorPermissionLevel called` verifying commenter role is `admin` or `maintain`. | GET `/repos/.../collaborators/.../permission` returns 200. | [ ] Pass / [ ] Fail |
 | 3.   | Mutate gate checks status | Inspect dev server terminal. | `[Mock GitHub] createCommitStatus called` with `state: 'success'` and description `"⚠️ Emergency bypass..."`. | Status check context `archicheck/verification` is updated to `success`. | [ ] Pass / [ ] Fail |
 
@@ -78,10 +78,10 @@ To manually validate the core integration webhook flow, emergency bypass slash c
 | Step | Action (User Input) | Action Details | Expected System Response | Dev/Network Validation | Actual Result (Pass/Fail) |
 |------|---------------------|----------------|--------------------------|------------------------|---------------------------|
 | 1.   | Create local `.archicheck.yml` configuration | Create `.archicheck.yml` in the root repository directory containing:<br>```yaml<br>lines_added_threshold: 50<br>excluded_paths:<br>  - '**/ignored-dir/**'<br>``` | Custom configuration file is registered. | Parser matches file parameters correctly. | [ ] Pass / [ ] Fail |
-| 2.   | Trigger `opened` event inside ignored path | Run `npx vite-node scratch/trigger_webhook.ts opened-ignored`. | Receives HTTP `202 Accepted`. PR is bypassed. | Next.js logs show: `Bypassed: Changes do not meet complexity thresholds.` because `src/ignored-dir/file.ts` is excluded. | [ ] Pass / [ ] Fail |
-| 3.   | Trigger `opened` event in gated path | Run `npx vite-node scratch/trigger_webhook.ts opened-gated`. | Receives HTTP `202 Accepted`. PR gets gated. | Next.js logs print `[Mock GitHub] createComment called` with mock questions. | [ ] Pass / [ ] Fail |
-| 4.   | Submit brief reply justification | Run `npx vite-node scratch/trigger_webhook.ts comment-403 "Too short"`. | Receives HTTP `202 Accepted`. PR remains gated. | Next.js logs print `[Mock GitHub] createComment called` with nudge warning. | [ ] Pass / [ ] Fail |
-| 5.   | Submit detailed reply justification | Run `npx vite-node scratch/trigger_webhook.ts comment-403 "This is a detailed explanation answering the mock quiz questions."`. | Receives HTTP `202 Accepted`. PR check unlocks. | Next.js logs print `[Mock GitHub] createCommitStatus called` with `state: 'success'`. | [ ] Pass / [ ] Fail |
+| 2.   | Trigger `opened` event inside ignored path | Run `npx vite-node scratch/trigger_webhook.ts opened-ignored`. <br><br>*Note: This command triggers the gating analysis for simulated PR number **402** containing changes inside the ignored directory.* | Receives HTTP `202 Accepted`. PR is bypassed. | Next.js logs show: `Bypassed: Changes do not meet complexity thresholds.` because `src/ignored-dir/file.ts` is excluded. | [ ] Pass / [ ] Fail |
+| 3.   | Trigger `opened` event in gated path | Run `npx vite-node scratch/trigger_webhook.ts opened-gated`. <br><br>*Note: This command triggers gating analysis for simulated PR number **403** (exceeding custom thresholds).* | Receives HTTP `202 Accepted`. PR gets gated. | Next.js logs print `[Mock GitHub] createComment called` with mock questions. | [ ] Pass / [ ] Fail |
+| 4.   | Submit brief reply justification | Run `npx vite-node scratch/trigger_webhook.ts comment-403 "Too short"`. <br><br>*Note: Suffix **`-403`** explicitly routes the comment to PR **403** created in Step 3. Ensure the suffix matches the pull request number of the active gate.* | Receives HTTP `202 Accepted`. PR remains gated. | Next.js logs print `[Mock GitHub] createComment called` with nudge warning. | [ ] Pass / [ ] Fail |
+| 5.   | Submit detailed reply justification | Run `npx vite-node scratch/trigger_webhook.ts comment-403 "This is a detailed explanation answering the mock quiz questions."`. <br><br>*Note: Suffix **`-403`** routes the comment to PR **403**.* | Receives HTTP `202 Accepted`. PR check unlocks. | Next.js logs print `[Mock GitHub] createCommitStatus called` with `state: 'success'`. | [ ] Pass / [ ] Fail |
 
 ---
 
