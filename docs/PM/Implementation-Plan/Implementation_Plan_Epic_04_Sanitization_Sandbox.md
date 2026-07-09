@@ -2,9 +2,9 @@
 
 **Target Story/Epic:** Epic-04 / AC-ST-404 (Interactive Sanitization Pipeline Sandbox)
 
-**Status:** Under Review
+**Status:** Approved
 
-**Approved By:** tinhct/User | **Approval Date:** YYYY-MM-DD
+**Approved By:** tinhct/User | **Approval Date:** 2026-07-09
 
 ## 🎯 Execution Scope
 

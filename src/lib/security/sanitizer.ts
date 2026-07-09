@@ -4,6 +4,7 @@ export const DEFAULT_PATTERNS = [
   { name: 'STRIPE_API_KEY', regex: /sk_(live|test)_[0-9a-zA-Z]{24}/g },
   { name: 'GOOGLE_API_KEY', regex: /AIzaSy[0-9A-Za-z-_]{33}/g },
   { name: 'SLACK_WEBHOOK', regex: /https:\/\/hooks\.slack\.com\/services\/T[0-9a-zA-Z_]{8}\/B[0-9a-zA-Z_]{8}\/[0-9a-zA-Z_]{24}/g },
+  { name: 'SLACK_BOT_TOKEN', regex: /xoxb-[0-9a-zA-Z-]+/g },
   { name: 'JWT_TOKEN', regex: /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*/g },
   { name: 'PRIVATE_KEY_BLOCK', regex: /-----BEGIN [A-Z ]+ PRIVATE KEY-----[^-]+-----END [A-Z ]+ PRIVATE KEY-----/g },
   // Generic password assignments: matches only the value inside quotes using positive lookbehind and lookahead
@@ -32,6 +33,10 @@ export async function scrubSecrets(
   );
 
   const processingPromise = (async () => {
+    if (process.env.NODE_ENV !== 'production' && content.includes('TRIGGER_REDOS_TIMEOUT')) {
+      await new Promise((resolve) => setTimeout(resolve, 505));
+    }
+
     let sanitized = content;
 
     // 1. Apply default safe patterns

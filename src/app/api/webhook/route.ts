@@ -10,6 +10,7 @@ import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarn
 import { parseDeveloperReply } from '@/lib/github/comment-parser';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
+import { scrubSecrets } from '@/lib/security/sanitizer';
 // @ts-expect-error next/server does not export waitUntil in older next typings
 import { waitUntil } from 'next/server';
 
@@ -69,8 +70,35 @@ export async function POST(req: NextRequest) {
             // B. Fetch Diff
             const rawDiff = await diffParserService.fetchPRDiff(octokit, repoOwner, repoName, prNumber);
             
+            // Scrub diff payloads of credentials before metrics analysis and LLM calls
+            let sanitizedDiff = rawDiff;
+            try {
+              sanitizedDiff = await scrubSecrets(rawDiff, [], prNumber);
+            } catch (error) {
+              console.warn('[ArchiCheck] Sanitizer timed out or failed (possible ReDoS). Fail-open quarantine triggered:', (error as Error).message);
+              
+              // 1. Release gate to Success
+              await octokit.rest.repos.createCommitStatus({
+                owner: repoOwner,
+                repo: repoName,
+                sha: headSha,
+                state: 'success',
+                context: 'archicheck/verification',
+                description: '⚠️ Custom secret sanitizer timed out. Gate bypassed.',
+              });
+
+              // 2. Post PR warning comment
+              await octokit.rest.issues.createComment({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: prNumber,
+                body: '⚠️ **ArchiCheck Warning**\n\nThe secret sanitization pass timed out. To prevent build blocks, the status gate has failed open and bypassed verification. Please inspect your changes for exposed credentials.',
+              });
+              return;
+            }
+
             // C. Extract Complexity Metrics using custom excluded paths
-            const analysis = diffParserService.parseDiff(rawDiff, config.excluded_paths);
+            const analysis = diffParserService.parseDiff(sanitizedDiff, config.excluded_paths);
 
             // D. Fetch First Commit (First Commit Proxy)
             const commitsList = await octokit.rest.pulls.listCommits({
@@ -103,8 +131,8 @@ export async function POST(req: NextRequest) {
               return;
             }
 
-            // E. Generate Quiz (LLM Provider call)
-            const quizPayload = await llmProvider.generateQuiz(rawDiff);
+            // F. Generate Quiz (LLM Provider call)
+            const quizPayload = await llmProvider.generateQuiz(sanitizedDiff);
 
             // F. Cache Quiz State in Upstash Redis (Cache-First)
             // If this throws (timeout/error), it falls to catch block (Fail-Open)
@@ -299,8 +327,27 @@ export async function POST(req: NextRequest) {
             // A. Fetch original diff
             const rawDiff = await diffParserService.fetchPRDiff(octokit, repoOwner, repoName, prNumber);
 
+            // Scrub secrets before passing to LLM validation
+            let sanitizedDiff = rawDiff;
+            try {
+              sanitizedDiff = await scrubSecrets(rawDiff, [], prNumber);
+            } catch (error) {
+              console.warn('[ArchiCheck] Sanitizer timed out or failed (possible ReDoS) during validation. Fail-open triggered:', (error as Error).message);
+              
+              // Release status gate to Success
+              await octokit.rest.repos.createCommitStatus({
+                owner: repoOwner,
+                repo: repoName,
+                sha: state.commitSha,
+                state: 'success',
+                context: 'archicheck/verification',
+                description: '⚠️ Custom secret sanitizer timed out. Gate bypassed.',
+              });
+              return;
+            }
+
             // B. Validate via LLM
-            const evaluation = await llmProvider.validateAnswers(rawDiff, state.quizPayload, [cleanReply]);
+            const evaluation = await llmProvider.validateAnswers(sanitizedDiff, state.quizPayload, [cleanReply]);
 
             if (evaluation.passed) {
               // C1. Update status check to Success

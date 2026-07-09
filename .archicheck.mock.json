@@ -1,27 +1,40 @@
 [
   {
-    "trigger_keywords": ["useState", "useEffect"],
-    "minimum_answer_length": 25,
+    "trigger_keywords": ["AKIA", "xoxb-", "BEGIN PRIVATE KEY"],
+    "minimum_answer_length": 20,
     "questions": [
       {
         "id": "q1",
-        "question": "Why is local useState state synchronization chosen over global state context?",
-        "targetFile": "src/components/Dashboard.tsx",
-        "codeSnippet": "const [data, setData] = useState(null);",
-        "rationale": "Verify client-side local UI state boundaries."
+        "question": "What is the architectural purpose of this React refactor? (Mock generated after credential scrubbing)",
+        "targetFile": "src/index.ts",
+        "codeSnippet": "const AWS_KEY = \"[REDACTED_SECRET]\";",
+        "rationale": "Verify security design."
       }
     ]
   },
   {
-    "trigger_keywords": ["sql", "SELECT", "INSERT"],
-    "force_fail": true,
+    "trigger_keywords": ["prompt-injection"],
+    "minimum_answer_length": 20,
     "questions": [
       {
         "id": "q1",
-        "question": "What security mitigations prevent SQL injection attacks in this raw query?",
-        "targetFile": "src/lib/db/query.ts",
-        "codeSnippet": "const result = await db.query('SELECT * FROM users');",
-        "rationale": "Verify SQL parametrization sanitization rules."
+        "question": "Why did you choose this design pattern?",
+        "targetFile": "src/main.ts",
+        "codeSnippet": "function processData() {}",
+        "rationale": "Verify developer architectural intent."
+      }
+    ]
+  },
+  {
+    "trigger_keywords": ["TRIGGER_REDOS_TIMEOUT"],
+    "minimum_answer_length": 20,
+    "questions": [
+      {
+        "id": "q1",
+        "question": "This question should not be visible because ReDoS circuit breaker aborts execution.",
+        "targetFile": "src/lib/security/sanitizer.ts",
+        "codeSnippet": "TRIGGER_REDOS_TIMEOUT",
+        "rationale": "Ensure fail-open abort routing works."
       }
     ]
   },

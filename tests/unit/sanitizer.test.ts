@@ -19,6 +19,18 @@ describe('Secret Sanitizer Unit Tests', () => {
     expect(sanitized).toContain('api_key = "[REDACTED_SECRET]"');
   });
 
+  it('should redact Slack Bot Tokens and AWS Keys and Private Key Blocks', async () => {
+    const input = 'const AWS = "AKIAIOSFODNN7EXAMPLE";\nconst slack = "xoxb-123-456-abc";\nconst pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIEvgI...\n-----END RSA PRIVATE KEY-----";';
+    const sanitized = await scrubSecrets(input);
+
+    expect(sanitized).not.toContain('AKIAIOSFODNN7EXAMPLE');
+    expect(sanitized).not.toContain('xoxb-123-456-abc');
+    expect(sanitized).not.toContain('MIIEvgI');
+    expect(sanitized).toContain('AWS = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('slack = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('pem = "[REDACTED_SECRET]"');
+  });
+
   it('should leave non-sensitive code untouched', async () => {
     const input = 'const x = 5;\nconsole.log(x);';
     const sanitized = await scrubSecrets(input);
@@ -27,14 +39,17 @@ describe('Secret Sanitizer Unit Tests', () => {
   });
 
   it('should trigger the 500ms circuit breaker when encountering a ReDoS pattern', async () => {
-    // ReDoS pattern: matching a sequence of 'x' values with nested quantifiers.
-    // 26 characters ensures it consistently exceeds our 500ms sanitization limit
-    // while finishing in under 2 seconds on the test sandbox execution CPU.
     const redosPattern = '(x+x+)+y';
     const longString = 'x'.repeat(26) + '...some text...';
 
-    // We expect the promise to reject with a timeout error
     await expect(scrubSecrets(longString, [redosPattern])).rejects.toThrow(
+      'Sanitization timeout (possible ReDoS)'
+    );
+  }, 15000);
+
+  it('should trigger mock ReDoS timeout when encountering TRIGGER_REDOS_TIMEOUT keyword', async () => {
+    const input = 'some code\nTRIGGER_REDOS_TIMEOUT\nother code';
+    await expect(scrubSecrets(input)).rejects.toThrow(
       'Sanitization timeout (possible ReDoS)'
     );
   }, 15000);
