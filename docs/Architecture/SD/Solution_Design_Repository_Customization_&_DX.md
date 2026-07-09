@@ -76,6 +76,11 @@ interface SandboxScenario {
     *   Implement priority loader (`local.json` -> `mock.json`), aborting fatal startup errors on malformed JSON structures.
     *   Build pattern-matching fixture routing based on diff additions scanning.
     *   Integrate dynamic answer validations based on length limits and force-fail settings.
+*   **Phase 4: Interactive Sanitization Pipeline Sandbox**
+    *   Wire up `scrubSecrets` in both main event routing branches of the Next.js API webhook.
+    *   Implement case-insensitive prompt injection triggers (lookbehinds, JSON vectors, and role-override commands) in the sandbox answer validator.
+    *   Simulate ReDoS timeout circuit breakers via non-production artificial delays (triggered by `"TRIGGER_REDOS_TIMEOUT"` keyword).
+
 
 # Security & Performance Risks
 *   **DoS via Large Configurations**: Blocked by the strict 50KB file size check.

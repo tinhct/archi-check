@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
 |-------------|---------------|-------|-------------|------|--------------|----------------------|
-| 4           | 12            | 2     | 1           | 9    | 75.0%        | 2026-07-09           |
+| 4           | 13            | 2     | 1           | 10   | 76.9%        | 2026-07-09           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -132,7 +132,7 @@
 ### Epic-04: Repository Customization & Developer Experience (DX)
 * **Status:** In Progress
 * **Description:** Enable seamless local contribution workflows without incurring API costs, and allow repository maintainers to customize ArchiCheck’s threshold logic.
-* **Progress:** `[▓▓▓▓▓▓▓░░░] 66%`
+* **Progress:** `[▓▓▓▓▓▓▓▓░░] 75%`
 
 #### 📋 User Stories
 
@@ -162,15 +162,27 @@
 
 ##### 🆔 AC-ST-403: Evolving Local Mock LLM Service into a Dynamic Developer Sandbox
 * **Priority:** High
-* **Status:** In Progress
+* **Status:** Done
 * **Assigned Sprint:** Sprint 4
 * **Description:** As an open-source contributor, I want to configure custom trigger keywords and validation parameters (minimum length, force fail) in `.archicheck.mock.json` / `.archicheck.mock.local.json` files so that I can test diverse gating scenarios and reply validations offline.
 * **Acceptance Criteria:**
-  1. [ ] Priority lookup evaluates `.archicheck.mock.local.json` before falling back to `.archicheck.mock.json`.
-  2. [ ] Halts execution and throws fatal exception if files exist but contain malformed JSON, and gracefully falls back to default hardcoded questions on missing files.
-  3. [ ] Routes incoming PR diffs to specific mock quiz templates based on `trigger_keywords` matches against added code lines.
-  4. [ ] Statelessly matches diff contents to evaluate developer responses against configurable `minimum_answer_length` and `force_fail` parameters.
+  1. [x] Priority lookup evaluates `.archicheck.mock.local.json` before falling back to `.archicheck.mock.json`.
+  2. [x] Halts execution and throws fatal exception if files exist but contain malformed JSON, and gracefully falls back to default hardcoded questions on missing files.
+  3. [x] Routes incoming PR diffs to specific mock quiz templates based on `trigger_keywords` matches against added code lines.
+  4. [x] Statelessly matches diff contents to evaluate developer responses against configurable `minimum_answer_length` and `force_fail` parameters.
 * **Dependencies / Blockers:** Relies on AC-ST-401
+
+##### 🆔 AC-ST-404: Interactive Sanitization Pipeline Sandbox
+* **Priority:** High
+* **Status:** In Progress
+* **Assigned Sprint:** Sprint 4
+* **Description:** As an open-source contributor, I want to locally simulate the secret scrubber, prompt injection detector, and ReDoS circuit breaker triggers so that I can verify the UI states and safety gates offline.
+* **Acceptance Criteria:**
+  1. [ ] Exposes standard credential signatures (AWS, Slack Bot token, GCP private key block) and verifies they are scrubbed to `[REDACTED_SECRET]`.
+  2. [ ] Injects an artificial 505ms delay in `scrubSecrets` if `TRIGGER_REDOS_TIMEOUT` is matched in the diff (quarantined strictly to non-production environments).
+  3. [ ] Catches ReDoS timeout rejections in webhook routes to transition status checks to `success` (fail-open) with the description: `"⚠️ Custom secret sanitizer timed out. Gate bypassed."` and posts a PR warning comment.
+  4. [ ] Blocks prompt injection replies case-insensitively using substring filters, returning a score of 4 and reasoning: `"Security anomaly detected in response. Please provide a genuine architectural justification."`.
+* **Dependencies / Blockers:** Relies on AC-ST-403
 
 ---
 
