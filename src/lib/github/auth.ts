@@ -1,6 +1,8 @@
 import { App } from '@octokit/app';
 import { Octokit } from '@octokit/rest';
 import { env } from '@/config/env';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Handles GitHub App JWT authentication and generates short-lived Installation Octokit instances.
@@ -42,6 +44,35 @@ export class GitHubAuthService {
       return {
         request: async (options: any) => {
           console.log('[Mock GitHub] request called:', options);
+          const urlStr = options.url || '';
+          
+          if (urlStr.includes('/pulls/402')) {
+            // Flow 4 - Ignored paths: 60 lines of additions inside src/ignored-dir/file.ts
+            let diffLines = `diff --git a/src/ignored-dir/file.ts b/src/ignored-dir/file.ts
+index 123456..789012 100644
+--- a/src/ignored-dir/file.ts
++++ b/src/ignored-dir/file.ts
+@@ -1,1 +1,60 @@\n`;
+            for (let i = 0; i < 60; i++) {
+              diffLines += `+const ignored_${i} = "this path is ignored";\n`;
+            }
+            return { data: diffLines };
+          }
+          
+          if (urlStr.includes('/pulls/403')) {
+            // Flow 4 - Gated paths: 60 lines of additions inside src/main.ts
+            let diffLines = `diff --git a/src/main.ts b/src/main.ts
+index 123456..789012 100644
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -1,1 +1,60 @@\n`;
+            for (let i = 0; i < 60; i++) {
+              diffLines += `+const gated_${i} = "this path is gated";\n`;
+            }
+            return { data: diffLines };
+          }
+          
+          // Default 315 lines of provider.ts
           let diffLines = `diff --git a/src/lib/llm/provider.ts b/src/lib/llm/provider.ts
 index 123456..789012 100644
 --- a/src/lib/llm/provider.ts
@@ -62,6 +93,25 @@ index 123456..789012 100644
               console.log('[Mock GitHub] getCollaboratorPermissionLevel called:', params);
               return { data: { permission: 'admin' } };
             },
+            getContent: async (params: any) => {
+              console.log('[Mock GitHub] getContent called:', params);
+              const localFilePath = path.resolve(process.cwd(), params.path);
+              if (fs.existsSync(localFilePath)) {
+                const content = fs.readFileSync(localFilePath, 'utf8');
+                return {
+                  data: {
+                    content: Buffer.from(content, 'utf8').toString('base64'),
+                    encoding: 'base64',
+                    type: 'file',
+                    name: params.path,
+                    path: params.path
+                  }
+                };
+              }
+              const err = new Error(`File Not Found at local path: ${localFilePath}`);
+              (err as any).status = 404;
+              throw err;
+            }
           },
           pulls: {
             listCommits: async (params: any) => {

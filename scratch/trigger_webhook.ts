@@ -78,7 +78,7 @@ async function run() {
       },
       comment: {
         id: 999999,
-        body: '1. The 300 identical constant declarations are added as local testing data to trigger the developer velocity gating heuristic during end-to-end integration simulation testing.\n2. This addition does not imply any new runtime state management logic or dynamic configuration toggles within the LLM provider.\n3. The bundle size increase is minor (~15KB) and does not violate our serverless cold start limits or performance budget.',
+        body: process.argv[3] || '1. The 300 identical constant declarations are added as local testing data to trigger the developer velocity gating heuristic during end-to-end integration simulation testing.\n2. This addition does not imply any new runtime state management logic or dynamic configuration toggles within the LLM provider.\n3. The bundle size increase is minor (~15KB) and does not violate our serverless cold start limits or performance budget.',
         user: {
           login: 'junior-dev',
         },
@@ -118,15 +118,16 @@ async function run() {
       },
     };
   } else {
-    // Default pull_request.opened
+    // Default pull_request.opened (supports 'opened', 'opened-ignored', 'opened-gated')
+    const prNum = action === 'opened-ignored' ? 402 : action === 'opened-gated' ? 403 : 101;
     payload = {
       action: 'opened',
-      number: 101,
+      number: prNum,
       installation: {
         id: 123456,
       },
       pull_request: {
-        number: 101,
+        number: prNum,
         head: {
           sha: 'dummy-sha-commit-12345',
         },
