@@ -12,8 +12,8 @@ const envSchema = z
     UPSTASH_REDIS_REST_URL: z.string().url('UPSTASH_REDIS_REST_URL must be a valid URL'),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1, 'UPSTASH_REDIS_REST_TOKEN is required'),
     LLM_PROVIDER: z.enum(['gemini', 'claude']).default('gemini'),
-    LLM_PROVIDER_TYPE: z.enum(['gemini-developer', 'vertex']).default('gemini-developer'),
-    LLM_API_KEY: z.string().min(1, 'LLM_API_KEY is required'),
+    LLM_PROVIDER_TYPE: z.enum(['gemini-developer', 'vertex', 'mock']).default('gemini-developer'),
+    LLM_API_KEY: z.string().default('mock-api-key'),
     GOOGLE_CREDS_JSON: z.string().optional(),
     COMPLEXITY_THRESHOLD: z
       .string()
@@ -24,18 +24,40 @@ const envSchema = z
       .default('0.7')
       .transform((val) => parseFloat(val)),
   })
-  .refine(
-    (data) => {
-      if (data.LLM_PROVIDER_TYPE === 'vertex') {
-        return !!data.GOOGLE_CREDS_JSON && data.GOOGLE_CREDS_JSON.trim().length > 0;
-      }
-      return true;
-    },
-    {
-      message: 'GOOGLE_CREDS_JSON is strictly required when LLM_PROVIDER_TYPE is set to vertex',
-      path: ['GOOGLE_CREDS_JSON'],
+  .superRefine((data, ctx) => {
+    const isProd = process.env.NODE_ENV === 'production';
+    if (isProd && data.LLM_PROVIDER_TYPE === 'mock') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'CRITICAL: Mock provider is strictly prohibited in production environments.',
+        path: ['LLM_PROVIDER_TYPE'],
+      });
     }
-  );
+    if (isProd) {
+      if (data.LLM_PROVIDER_TYPE === 'gemini-developer' && (!data.LLM_API_KEY || data.LLM_API_KEY === 'mock-api-key')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'LLM_API_KEY is required for gemini-developer in production.',
+          path: ['LLM_API_KEY'],
+        });
+      }
+      if (data.LLM_PROVIDER_TYPE === 'vertex' && (!data.GOOGLE_CREDS_JSON || data.GOOGLE_CREDS_JSON.trim().length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'GOOGLE_CREDS_JSON is required for vertex in production.',
+          path: ['GOOGLE_CREDS_JSON'],
+        });
+      }
+    } else {
+      if (data.LLM_PROVIDER_TYPE === 'vertex' && (!data.GOOGLE_CREDS_JSON || data.GOOGLE_CREDS_JSON.trim().length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'GOOGLE_CREDS_JSON is recommended when LLM_PROVIDER_TYPE is set to vertex',
+          path: ['GOOGLE_CREDS_JSON'],
+        });
+      }
+    }
+  });
 
 // Validate environment variables. In production/test we validate, in local development we fall back or warn.
 let parsedEnv: z.infer<typeof envSchema>;
@@ -54,7 +76,7 @@ try {
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL || 'https://mock.upstash.io',
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN || 'mock-token',
     LLM_PROVIDER: (process.env.LLM_PROVIDER as 'gemini' | 'claude') || 'gemini',
-    LLM_PROVIDER_TYPE: (process.env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex') || 'gemini-developer',
+    LLM_PROVIDER_TYPE: (process.env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex' | 'mock') || 'gemini-developer',
     LLM_API_KEY: process.env.LLM_API_KEY || 'mock-api-key',
     GOOGLE_CREDS_JSON: process.env.GOOGLE_CREDS_JSON || undefined,
     COMPLEXITY_THRESHOLD: parseInt(process.env.COMPLEXITY_THRESHOLD || '5', 10),
@@ -63,4 +85,5 @@ try {
 }
 
 export const env = parsedEnv;
+export { envSchema };
 export type EnvType = z.infer<typeof envSchema>;

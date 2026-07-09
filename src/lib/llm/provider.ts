@@ -3,6 +3,7 @@ import { QuizPayload, EvaluationResult } from '@/types/archicheck';
 import { PROMPTS } from './prompts';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VertexAI } from '@google-cloud/vertexai';
+import { MockLLMProvider } from './mock_llm';
 
 // Manual JSON schema definitions matching our Zod schema structure in schema.ts
 const QUIZ_SCHEMA = {
@@ -39,15 +40,19 @@ const EVAL_SCHEMA = {
 
 export class LLMProvider {
   private provider: 'gemini' | 'claude';
-  private providerType: 'gemini-developer' | 'vertex';
+  private providerType: 'gemini-developer' | 'vertex' | 'mock';
   private apiKey: string;
   private googleCredsJson?: string;
+  private mockProvider?: MockLLMProvider;
 
   constructor() {
     this.provider = env.LLM_PROVIDER as 'gemini' | 'claude';
-    this.providerType = env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex';
+    this.providerType = env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex' | 'mock';
     this.apiKey = env.LLM_API_KEY;
     this.googleCredsJson = env.GOOGLE_CREDS_JSON;
+    if (this.providerType === 'mock') {
+      this.mockProvider = new MockLLMProvider();
+    }
   }
 
   /**
@@ -67,6 +72,10 @@ export class LLMProvider {
    * Generates a quiz from a git diff payload.
    */
   async generateQuiz(diff: string): Promise<QuizPayload> {
+    if (this.providerType === 'mock' && this.mockProvider) {
+      return this.mockProvider.generateQuiz(diff);
+    }
+
     const prompt = PROMPTS.QUIZ_GENERATION_V1.replace('{{diff}}', this.sanitizePromptInput(diff));
 
     try {
@@ -99,6 +108,10 @@ export class LLMProvider {
     questions: QuizPayload,
     answers: string[]
   ): Promise<EvaluationResult> {
+    if (this.providerType === 'mock' && this.mockProvider) {
+      return this.mockProvider.validateAnswers(diff, questions, answers);
+    }
+
     const prompt = PROMPTS.ANSWER_VALIDATION_V1
       .replace('{{diff}}', this.sanitizePromptInput(diff))
       .replace('{{questions}}', this.sanitizePromptInput(JSON.stringify(questions)))
