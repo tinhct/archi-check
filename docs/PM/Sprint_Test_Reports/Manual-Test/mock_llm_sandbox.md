@@ -120,3 +120,77 @@ Verify the complete, clean PR developer lifecycle under normal circumstances.
      ✅ Verification complete!
      Reasoning: ✅ Mock evaluation passed: Your justification is sufficiently detailed (length > 20 characters).
      ```
+
+---
+
+## 🔬 Advanced QA & Negative Test Cases
+
+As a Senior QA Engineer, verify these additional edge-case scenarios to ensure total sandbox resiliency:
+
+### 📋 Test Case 5: Fast-Fail on Malformed Local Configurations
+Ensure sandbox configuration parse failures abort immediately during startup to prevent silent fallback issues.
+
+1. **Create Malformed Local Configuration**:
+   Create a `.archicheck.mock.local.json` file in the root workspace directory with syntax errors:
+   ```json
+   {
+     "trigger_keywords": ["malformed"],
+     "force_fail": true,
+     "questions": [
+   ```
+2. **Trigger any Webhook Event**:
+   ```bash
+   npx vite-node scratch/trigger_webhook.ts opened-504
+   ```
+3. **Expected Result**:
+   * Dev server logs throw a fatal exception: `Archicheck Sandbox Error: Invalid JSON in .archicheck.mock.json. Please fix syntax errors to continue.`
+   * The webhook route fails with `500 Internal Server Error`, proving that the sandbox executes strict fast-fail governance instead of silent fallback.
+4. **Cleanup**: Remove `.archicheck.mock.local.json` to restore baseline testing.
+
+---
+
+### 📋 Test Case 6: Boundary Check on Answer Length
+Verify that answer evaluation precisely aligns with minimum character threshold boundaries.
+
+1. **Trigger Webhook Open Event**:
+   ```bash
+   npx vite-node scratch/trigger_webhook.ts opened-504
+   ```
+2. **Boundary Test A (Exactly 20 Characters - Failure)**:
+   ```bash
+   npx vite-node scratch/trigger_webhook.ts comment-504 "12345678901234567890"
+   ```
+   * **Expected Status**: Fails. Reasoning message nudges you to exceed 20 characters.
+3. **Boundary Test B (Exactly 21 Characters - Success)**:
+   ```bash
+   npx vite-node scratch/trigger_webhook.ts comment-504 "123456789012345678901"
+   ```
+   * **Expected Status**: Passes. Status check is unlocked.
+
+---
+
+### 📋 Test Case 7: Key-Value Assignments Lookbehind Matching
+Verify that only credentials assigned to matching variables are scrubbed, while standard prose references are left intact.
+
+1. **Trigger PR 501 Webhook Open Event**:
+   Verify AWS Access key and Slack Bot token lookbehinds:
+   * String `"AKIAIOSFODNN7EXAMPLE"` is scrubbed to `"[REDACTED_SECRET]"`.
+   * String `"xoxb-123456-abc"` is scrubbed to `"[REDACTED_SECRET]"`.
+2. **Test Non-Scrubbed Text Prose**:
+   * Any generic text assignment like `const myName = "junior-dev";` should remain unmodified.
+   * Verify that keys matching generic patterns inside quotes (like `api_key = "some-key"`) are scrubbed, but simple declarations like `const tokenCount = 10;` are untouched.
+
+---
+
+### 📋 Test Case 8: Redis Cache Failure Resilience (Fail-Open)
+Verify that if Upstash Redis connectivity fails, the gating transaction fails open safely to prevent build blocks.
+
+1. **Disable Redis Credentials**: Ensure `UPSTASH_REDIS_REST_URL` in `.env.local` contains a dummy or empty connection string.
+2. **Trigger Webhook Open Event**:
+   ```bash
+   npx vite-node scratch/trigger_webhook.ts opened-504
+   ```
+3. **Expected Result**:
+   * Console logs output redis connectivity failure warnings.
+   * Webhook gracefully falls back to unlocking the status check: `description: "Bypassed: Cache connection failed."` (or success).
+   * This proves the fail-open architecture operates as intended during downstream service degradation.
