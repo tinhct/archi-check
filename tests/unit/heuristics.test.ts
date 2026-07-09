@@ -58,4 +58,30 @@ describe('HeuristicsService Unit Tests', () => {
     const result = heuristicsService.shouldGate(mockHighComplexity, 0.2, 5);
     expect(result).toBe(false);
   });
+
+  it('should respect custom config overrides for complexity score gating', () => {
+    // Standard high complexity (8) with high AI reliance (0.8) normally gates (true)
+    // Overriding complexity threshold score to 9 should bypass gating (false)
+    const customConfig = {
+      lines_added_threshold: 300,
+      algorithmic_complexity_score: 9,
+      ai_reliance_ratio: 0.7,
+      excluded_paths: []
+    };
+    const result = heuristicsService.shouldGate(mockHighComplexity, 0.8, undefined, customConfig);
+    expect(result).toBe(false);
+  });
+
+  it('should respect custom config overrides for lines added volume gating', () => {
+    // mockSprayVolume has 350 lines, time delta is 10 minutes. Under default settings (300 lines) it gates (true).
+    // Overriding lines added threshold to 400 lines should bypass gating (false).
+    const customConfig = {
+      lines_added_threshold: 400,
+      algorithmic_complexity_score: 5,
+      ai_reliance_ratio: 0.7,
+      excluded_paths: []
+    };
+    const result = heuristicsService.shouldGate(mockSprayVolume, 0.2, 10, customConfig);
+    expect(result).toBe(false);
+  });
 });

@@ -72,4 +72,27 @@ diff --git a/src/test.ts b/src/test.ts
     const cleanCode = diffParserService.extractAddedCode(rawDiff);
     expect(cleanCode).toBe('const addedLine = true;');
   });
+
+  it('should skip custom excluded paths when parsed with custom excluded glob patterns', () => {
+    const mockDiff = `
+diff --git a/src/exclude-me/file.ts b/src/exclude-me/file.ts
+--- a/src/exclude-me/file.ts
++++ b/src/exclude-me/file.ts
+@@ -1,1 +1,2 @@
++const hiddenVar = 'skip this';
++
+diff --git a/src/include-me/file.ts b/src/include-me/file.ts
+--- a/src/include-me/file.ts
++++ b/src/include-me/file.ts
+@@ -1,1 +1,2 @@
++const visibleVar = 'keep this';
+`.trim();
+
+    // With exclusion pattern
+    const excludedPatterns = ['**/exclude-me/**'];
+    const analysis = diffParserService.parseDiff(mockDiff, excludedPatterns);
+    
+    // Only src/include-me/file.ts (1 line added) should count. src/exclude-me/file.ts should be ignored.
+    expect(analysis.linesAdded).toBe(1);
+  });
 });

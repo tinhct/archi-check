@@ -8,6 +8,8 @@ import { llmProvider } from '@/lib/llm/provider';
 import { setPRState, getPRState } from '@/lib/redis/client';
 import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarningComment } from '@/lib/github/comments';
 import { parseDeveloperReply } from '@/lib/github/comment-parser';
+import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
+import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 // @ts-expect-error next/server does not export waitUntil in older next typings
 import { waitUntil } from 'next/server';
 
@@ -60,13 +62,17 @@ export async function POST(req: NextRequest) {
         // [UNLOCK FAST] Run gating heuristics and LLM evaluation asynchronously in the background
         const gatingTask = (async () => {
           try {
-            // A. Fetch Diff
+            // A. Fetch repository configuration (.archicheck.yml/yaml)
+            const configString = await fetchRepositoryConfig(octokit, repoOwner, repoName, headSha);
+            const config = parseAndValidateConfig(configString);
+
+            // B. Fetch Diff
             const rawDiff = await diffParserService.fetchPRDiff(octokit, repoOwner, repoName, prNumber);
             
-            // B. Extract Complexity Metrics
-            const analysis = diffParserService.parseDiff(rawDiff);
+            // C. Extract Complexity Metrics using custom excluded paths
+            const analysis = diffParserService.parseDiff(rawDiff, config.excluded_paths);
 
-            // C. Fetch First Commit (First Commit Proxy)
+            // D. Fetch First Commit (First Commit Proxy)
             const commitsList = await octokit.rest.pulls.listCommits({
               owner: repoOwner,
               repo: repoName,
@@ -80,9 +86,9 @@ export async function POST(req: NextRequest) {
               timeDeltaMinutes = Math.max(0, diffMs / 1000 / 60);
             }
 
-            // D. Evaluate Heuristics (Check if gating is needed)
+            // E. Evaluate Heuristics (Check if gating is needed using config thresholds)
             const aiRelianceRatio = 0.0; // MVP default baseline; dynamic parsing in Story 3.2
-            const requiresGate = heuristicsService.shouldGate(analysis, aiRelianceRatio, timeDeltaMinutes);
+            const requiresGate = heuristicsService.shouldGate(analysis, aiRelianceRatio, timeDeltaMinutes, config);
 
             if (!requiresGate) {
               // Heuristic bypass: immediately set status check to Success

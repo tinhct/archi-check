@@ -32,6 +32,40 @@ export class DiffParserService {
   }
 
   /**
+   * Helper to convert standard glob strings to RegExp patterns.
+   */
+  private globToRegex(glob: string): RegExp {
+    const escaped = glob.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+    const globRegex = escaped
+      .replace(/\*\*/g, '___ANY___')
+      .replace(/\*/g, '[^/]*')
+      .replace(/___ANY___/g, '.*');
+    return new RegExp(`^${globRegex}$`);
+  }
+
+  /**
+   * Checks if a file path matches the exclusion blocklist or custom excluded paths.
+   */
+  isExcluded(filePath: string, excludedPaths?: string[]): boolean {
+    if (this.isBlocklisted(filePath)) {
+      return true;
+    }
+    if (excludedPaths && excludedPaths.length > 0) {
+      for (const pattern of excludedPaths) {
+        try {
+          const regex = this.globToRegex(pattern);
+          if (regex.test(filePath) || regex.test('/' + filePath)) {
+            return true;
+          }
+        } catch (e) {
+          console.warn(`[ArchiCheck] Invalid exclusion pattern: ${pattern}`, (e as Error).message);
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * Checks if a file path matches the exclusion blocklist.
    */
   isBlocklisted(filePath: string): boolean {
@@ -42,7 +76,7 @@ export class DiffParserService {
    * Parses a raw Git unified diff string, skipping blocklisted files.
    * Extracts structural metrics (lines added/removed, complexity keyword indicators).
    */
-  parseDiff(rawDiff: string): ComplexityAnalysis {
+  parseDiff(rawDiff: string, excludedPaths?: string[]): ComplexityAnalysis {
     let linesAdded = 0;
     let linesRemoved = 0;
     let complexityIndicators = 0;
@@ -50,7 +84,7 @@ export class DiffParserService {
     const hunks = this.splitIntoFiles(rawDiff);
 
     for (const hunk of hunks) {
-      if (this.isBlocklisted(hunk.filePath)) {
+      if (this.isExcluded(hunk.filePath, excludedPaths)) {
         continue;
       }
 
