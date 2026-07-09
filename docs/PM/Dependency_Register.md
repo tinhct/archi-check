@@ -1,6 +1,6 @@
 # Master Dependency Register
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 **Owner:** Senior Project Manager
 
@@ -18,13 +18,13 @@ graph TD
 ```
 ## 🔗 Active Dependencies
 
-| Dep ID | Type (Internal/External/AI) | Description & Impact | Blocked Item (Story/Epic) | Blocking Item / Owner | Target Resolution Date | Status (Open/At Risk/Resolved) |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **DEP-01** | External | Upstash Redis connection setup for persistence of PR Quiz states. | Epic 2: Webhook Gating | Upstash REST Database / Tech Lead | 2026-07-07 | Resolved |
-| **DEP-02** | AI | Google Cloud Vertex AI credentials authentication JSON. | Epic 1: Diff Scorer | Vertex API Access / AI Engineer | 2026-07-07 | Resolved |
-| **DEP-03** | External | GitHub App permission token exchange for comment posting. | Epic 2: Webhook Gating | GitHub Developer Settings / PM | 2026-07-07 | Resolved |
-| **DEP-04** | AI | Defensive Prompt-Injection Prompt Specifications approval. | Epic 1: Diff Scorer | Prompt Specifications / QA Lead | 2026-07-08 | Resolved |
-| **DEP-05** | Internal / AI | Telemetry collection logs and Redis budget cap triggers. | Epic 3: Staging Polish | State telemetry audit / Tech Lead | 2026-07-15 | Open |
+| Dep ID | Type (Internal/External/AI) | Description & Impact | Blocked Item (Story/Epic) | Blocking Item / Owner | Target Resolution Date | Status (Open/At Risk/Resolved) | Date Logged / Updated |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **DEP-01** | External | Upstash Redis connection setup for persistence of PR Quiz states. | Epic 2: Webhook Gating | Upstash REST Database / Tech Lead | 2026-07-07 | Resolved | 2026-07-06 |
+| **DEP-02** | AI | Google Cloud Vertex AI credentials authentication JSON. | Epic 1: Diff Scorer | Vertex API Access / AI Engineer | 2026-07-07 | Resolved | 2026-07-06 |
+| **DEP-03** | External | GitHub App permission token exchange for comment posting. | Epic 2: Webhook Gating | GitHub Developer Settings / PM | 2026-07-07 | Resolved | 2026-07-06 |
+| **DEP-04** | AI | Defensive Prompt-Injection Prompt Specifications approval. | Epic 1: Diff Scorer | Prompt Specifications / QA Lead | 2026-07-08 | Resolved | 2026-07-08 |
+| **DEP-05** | Internal / AI | Telemetry collection logs and Redis budget cap triggers. | Epic 3: Staging Polish | State telemetry audit / Tech Lead | 2026-07-15 | Open | 2026-07-09 |
 
 ## 🤖 AI & Agentic Blockers
 

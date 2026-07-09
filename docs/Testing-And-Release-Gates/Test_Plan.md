@@ -1,6 +1,6 @@
 # Current Phase/Release Test Plan
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-09
 
 **Target Release Version:** v1.0.0-alpha
 
@@ -52,17 +52,17 @@
 
 ## 🔗 Traceability & Execution Matrix
 
-| Story ID | Feature / Component | Test Type | Execution Status | Pass/Fail | Linked Defect ID |
-|----------|---------------------|-----------|------------------|-----------|------------------|
-| **AC-ST-101** | Diff Complexity Scoring | Unit | Run | Pass | None |
-| **AC-ST-102** | Payload Sanitization & ReDoS Shield | Unit | Run | Pass | BUG-01 (ReDoS Regex timeout) |
-| **AC-ST-103** | Resilient LLM Connection | Unit | Run | Pass | None |
-| **AC-ST-104** | LLM Contract Testing & Resiliency | Unit / Contract | Run | Pass | None |
-| **AC-ST-201** | Synchronous Gate Lock & Markdown UI | Integration | Run | Pass | BUG-02 (WaitUntil mock) |
-| **AC-ST-202** | Author Answer Validation | Integration | Run | Pass | None |
-| **AC-ST-203** | Break-Glass Slash Command | Integration | Run | Pass | BUG-03 (Bypass status check context) |
-| **AC-ST-401** | Local Mock LLM Service | Integration / Unit | To Do | N/A | None |
-| **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | To Do | N/A | None |
+| Story ID | Feature / Component | Test Type | Execution Status | Pass/Fail | Linked Defect ID | Date Logged / Updated |
+|----------|---------------------|-----------|------------------|-----------|------------------|-----------------------|
+| **AC-ST-101** | Diff Complexity Scoring | Unit | Run | Pass | None | 2026-07-06 |
+| **AC-ST-102** | Payload Sanitization & ReDoS Shield | Unit | Run | Pass | BUG-01 (ReDoS Regex timeout) | 2026-07-06 |
+| **AC-ST-103** | Resilient LLM Connection | Unit | Run | Pass | None | 2026-07-06 |
+| **AC-ST-104** | LLM Contract Testing & Resiliency | Unit / Contract | Run | Pass | None | 2026-07-08 |
+| **AC-ST-201** | Synchronous Gate Lock & Markdown UI | Integration | Run | Pass | BUG-02 (WaitUntil mock) | 2026-07-07 |
+| **AC-ST-202** | Author Answer Validation | Integration | Run | Pass | None | 2026-07-07 |
+| **AC-ST-203** | Break-Glass Slash Command | Integration | Run | Pass | BUG-03 (Bypass status check context) | 2026-07-07 |
+| **AC-ST-401** | Local Mock LLM Service | Integration / Unit | To Do | N/A | None | 2026-07-09 |
+| **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | To Do | N/A | None | 2026-07-09 |
 
 ## 🚨 Risk-Based Testing Priorities
 

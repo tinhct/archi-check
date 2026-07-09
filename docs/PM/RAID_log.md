@@ -1,6 +1,6 @@
 # RAID Log
 
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-09
 
 ## ⚠️ Risks (Potential future problems)
 
@@ -16,6 +16,8 @@
 | R8 | 2026-07-07 | Upstash Redis database timeout/failure deadlocking gated PRs. | H | Wrap state cache in 1000ms timeout, fail-open to Success, and warn in PR comment. | Closed |
 | R9 | 2026-07-07 | Out-of-order status check race condition (Success finishes before Pending). | H | Await the initial Pending status check synchronously before starting async heuristics. | Closed |
 | R10 | 2026-07-07 | Vercel execution context freeze during async waitUntil background task. | H | Handle errors cleanly, minimize payload size, and trace worker lifecycle. | Closed |
+| R11 | 2026-07-09 | YAML configuration parsing vulnerabilities or memory exhaustion. | M | Enforce 50KB maximum size constraints and wrap parsing in try/catch. | Open |
+| R12 | 2026-07-09 | Accidental mock provider activation in live production environments. | H | Enforce strict Zod discriminated union validation checks in production. | Open |
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
@@ -45,6 +47,9 @@
 | D13 | 2026-07-07 | Language-Agnostic Intent-Based LLM Scoring. | Instructs LLM to evaluate raw technical correctness, accepting multilingual responses. |
 | D14 | 2026-07-07 | Simple argument-free /archicheck bypass command. | Reduces friction and regex parse failure risks during P0 incidents. |
 | D15 | 2026-07-07 | Mutate commit status check description on bypass. | Retains context `archicheck/verification` to unlock merge while leaving audit trails in UI. |
+| D16 | 2026-07-09 | Migrate base model to Gemini 2.5 Flash. | Newer AI Studio API keys (AQ.) throw 404 Not Found errors on older 1.5 models. |
+| D17 | 2026-07-09 | Environment-Driven Factory & Discriminated Union. | Permits mock local testing DX while structurally blocking mock activations in production. |
+| D18 | 2026-07-09 | Implement 50KB size cap limit for .archicheck.yml parsing. | Enables user customizations while eliminating parsing DoS risks on live webhooks. |
 
 ## 🐛 Issues (Current problems occurring right now)
 
@@ -57,3 +62,5 @@
 | I5 | 2026-07-07 | ReDoS test triggers Vitest watchdog timeouts. | Optimize test string to 26 characters to run under 1.5s. | Resolved |
 | I6 | 2026-07-07 | CI fails to cache packages / incorrect paths. | Remove `working-directory` path prefixes from `.github/workflows/ci.yml`. | Resolved |
 | I7 | 2026-07-07 | GitGuardian Scan fails on missing api-key. | Add `continue-on-error: true` to ggshield CI step. | Resolved |
+| I8 | 2026-07-08 | Header `x-github-event` hardcoded to `pull_request` inside trigger tool. | Corrected header key to reference dynamic `eventType` variable. | Resolved |
+| I9 | 2026-07-09 | Newly generated Gemini keys starting with `AQ.` throw 404 on `gemini-1.5`. | Migrated base model configuration to `gemini-2.5-flash`. | Resolved |
