@@ -63,17 +63,18 @@ async function run() {
   let payload: any = {};
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
-  if (action === 'comment') {
+  if (action.startsWith('comment')) {
     eventType = 'issue_comment';
+    const prNum = parseInt(action.split('-')[1] || '101', 10);
     payload = {
       action: 'created',
       installation: {
         id: 123456,
       },
       issue: {
-        number: 101,
+        number: prNum,
         pull_request: {
-          url: `https://api.github.com/repos/${owner}/${repo}/pulls/101`,
+          url: `https://api.github.com/repos/${owner}/${repo}/pulls/${prNum}`,
         },
       },
       comment: {
@@ -90,17 +91,18 @@ async function run() {
         },
       },
     };
-  } else if (action === 'bypass') {
+  } else if (action.startsWith('bypass')) {
     eventType = 'issue_comment';
+    const prNum = parseInt(action.split('-')[1] || '101', 10);
     payload = {
       action: 'created',
       installation: {
         id: 123456,
       },
       issue: {
-        number: 101,
+        number: prNum,
         pull_request: {
-          url: `https://api.github.com/repos/${owner}/${repo}/pulls/101`,
+          url: `https://api.github.com/repos/${owner}/${repo}/pulls/${prNum}`,
         },
       },
       comment: {
