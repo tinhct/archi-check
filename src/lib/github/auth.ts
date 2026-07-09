@@ -42,11 +42,26 @@ export class GitHubAuthService {
       console.log('[Mock GitHub] Returning mocked Octokit client for offline development.');
       /* eslint-disable @typescript-eslint/no-explicit-any */
       return {
-        request: async (options: any) => {
-          console.log('[Mock GitHub] request called:', options);
-          const urlStr = options.url || '';
+        request: async (routeOrOptions: any, parameters?: any) => {
+          console.log('[Mock GitHub] request called:', routeOrOptions, parameters);
           
-          if (urlStr.includes('/pulls/402')) {
+          let pullNumber: number | undefined;
+          if (typeof routeOrOptions === 'string') {
+            pullNumber = parameters?.pull_number;
+            const match = routeOrOptions.match(/\/pulls\/(\d+)/);
+            if (match) {
+              pullNumber = parseInt(match[1], 10);
+            }
+          } else if (routeOrOptions && typeof routeOrOptions === 'object') {
+            pullNumber = routeOrOptions.pull_number || routeOrOptions.pull_request?.number;
+            const urlStr = routeOrOptions.url || '';
+            const match = urlStr.match(/\/pulls\/(\d+)/);
+            if (match) {
+              pullNumber = parseInt(match[1], 10);
+            }
+          }
+
+          if (pullNumber === 402) {
             // Flow 4 - Ignored paths: 60 lines of additions inside src/ignored-dir/file.ts
             let diffLines = `diff --git a/src/ignored-dir/file.ts b/src/ignored-dir/file.ts
 index 123456..789012 100644
@@ -59,7 +74,7 @@ index 123456..789012 100644
             return { data: diffLines };
           }
           
-          if (urlStr.includes('/pulls/403')) {
+          if (pullNumber === 403) {
             // Flow 4 - Gated paths: 60 lines of additions inside src/main.ts
             let diffLines = `diff --git a/src/main.ts b/src/main.ts
 index 123456..789012 100644
