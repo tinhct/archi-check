@@ -1,0 +1,48 @@
+[
+  {
+    "trigger_keywords": ["useState", "useEffect"],
+    "minimum_answer_length": 25,
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Why is local useState state synchronization chosen over global state context?",
+        "targetFile": "src/components/Dashboard.tsx",
+        "codeSnippet": "const [data, setData] = useState(null);",
+        "rationale": "Verify client-side local UI state boundaries."
+      }
+    ]
+  },
+  {
+    "trigger_keywords": ["sql", "SELECT", "INSERT"],
+    "force_fail": true,
+    "questions": [
+      {
+        "id": "q1",
+        "question": "What security mitigations prevent SQL injection attacks in this raw query?",
+        "targetFile": "src/lib/db/query.ts",
+        "codeSnippet": "const result = await db.query('SELECT * FROM users');",
+        "rationale": "Verify SQL parametrization sanitization rules."
+      }
+    ]
+  },
+  {
+    "default_fallback": true,
+    "minimum_answer_length": 20,
+    "questions": [
+      {
+        "id": "q1",
+        "question": "Mock Question 1: What is the architectural purpose of these changes?",
+        "targetFile": "src/lib/llm/provider.ts",
+        "codeSnippet": "const provider = \"mock\";",
+        "rationale": "Validating factory selection."
+      },
+      {
+        "id": "q2",
+        "question": "Mock Question 2: Why are we bypassing API endpoints locally?",
+        "targetFile": "src/lib/llm/provider.ts",
+        "codeSnippet": "if (LLM_PROVIDER_TYPE === \"mock\")",
+        "rationale": "Evaluating token cost mitigation."
+      }
+    ]
+  }
+]

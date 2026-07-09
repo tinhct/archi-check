@@ -42,3 +42,6 @@ next-env.d.ts
 
 # test execution logs
 docs/**/Test-Execution-Logs/
+
+# local mock LLM sandbox overrides
+.archicheck.mock.local.json
