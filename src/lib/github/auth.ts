@@ -81,9 +81,10 @@ index 123456..789012 100644
 --- a/src/main.ts
 +++ b/src/main.ts
 @@ -1,1 +1,60 @@\n`;
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 59; i++) {
               diffLines += `+const gated_${i} = "this path is gated";\n`;
             }
+            diffLines += `+const [state, setState] = useState(0);\n`;
             return { data: diffLines };
           }
           
