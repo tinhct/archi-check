@@ -2,9 +2,9 @@
 
 **Target Story/Epic:** Epic-04 / AC-ST-401 & AC-ST-402
 
-**Status:** Draft
+**Status:** Approved
 
-**Approved By:** [Pending Review] | **Approval Date:** [Pending Review]
+**Approved By:** tinhct/User | **Approval Date:** 2026-07-09
 
 ## 🎯 Execution Scope
 
