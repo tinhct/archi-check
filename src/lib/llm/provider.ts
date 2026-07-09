@@ -140,7 +140,7 @@ export class LLMProvider {
   private async callGeminiDeveloper(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
     const genAI = new GoogleGenerativeAI(this.apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -191,7 +191,7 @@ export class LLMProvider {
     });
 
     const model = vertexAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         responseMimeType: 'application/json',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
