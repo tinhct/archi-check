@@ -1,8 +1,8 @@
 # Alpha Release: Manual End-to-End Test Plan
 
-**Target Version:** [v1.0.0-alpha] | **Execution Date:** 2026-07-08
+**Target Version:** [v1.0.0-alpha] | **Execution Date:** 2026-07-08 - 2026-07-09
 
-**Tester / Developer:** Tech Lead / QA Engineer
+**Tester / Developer:** tinhct
 
 ## 🎯 Testing Objective
 
