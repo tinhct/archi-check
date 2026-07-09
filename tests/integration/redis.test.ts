@@ -29,10 +29,6 @@ describe('Upstash Redis Cache Integration Tests', () => {
   });
 
   it('should perform CRUD operations successfully and handle fail-open strategy', async () => {
-    if (process.env.UPSTASH_REDIS_REST_URL === 'https://mock.upstash.io' || !process.env.UPSTASH_REDIS_REST_URL) {
-      return;
-    }
-
     const mockPRId = 999;
     const mockState: QuizState = {
       prId: mockPRId,

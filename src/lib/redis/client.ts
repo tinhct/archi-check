@@ -2,10 +2,37 @@ import { Redis } from '@upstash/redis';
 import { env } from '@/config/env';
 import { QuizState } from '@/types/archicheck';
 
-export const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
+const isMock = env.UPSTASH_REDIS_REST_URL.includes('mock') || process.env.MOCK_GITHUB === 'true';
+
+const memoryStore = new Map<string, string>();
+
+const mockRedis = {
+  ping: async () => 'PONG',
+  set: async (key: string, value: unknown) => {
+    memoryStore.set(key, typeof value === 'string' ? value : JSON.stringify(value));
+    return 'OK';
+  },
+  get: async <TData = unknown>(key: string): Promise<TData | null> => {
+    const data = memoryStore.get(key);
+    if (!data) return null;
+    try {
+      return JSON.parse(data) as TData;
+    } catch {
+      return data as unknown as TData;
+    }
+  },
+  del: async (key: string) => {
+    memoryStore.delete(key);
+    return 1;
+  },
+};
+
+export const redis = isMock
+  ? (mockRedis as unknown as Redis)
+  : new Redis({
+      url: env.UPSTASH_REDIS_REST_URL,
+      token: env.UPSTASH_REDIS_REST_TOKEN,
+    });
 
 /**
  * Saves the state of a pull request quiz to Redis with a 1,000ms timeout circuit breaker.
