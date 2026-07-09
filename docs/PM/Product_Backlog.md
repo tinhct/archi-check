@@ -6,9 +6,9 @@
 
 ## 📊 Backlog Health Summary
 
-| Total Epics | Total Stories | To Do | In Progress | Done | Completion % |
-|-------------|---------------|-------|-------------|------|--------------|
-| 4           | 11            | 4     | 0           | 7    | 63.6%        |
+| Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
+|-------------|---------------|-------|-------------|------|--------------|----------------------|
+| 4           | 12            | 2     | 1           | 9    | 75.0%        | 2026-07-09           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -130,35 +130,47 @@
 ---
 
 ### Epic-04: Repository Customization & Developer Experience (DX)
-* **Status:** To Do
+* **Status:** In Progress
 * **Description:** Enable seamless local contribution workflows without incurring API costs, and allow repository maintainers to customize ArchiCheck’s threshold logic.
-* **Progress:** `[░░░░░░░░░░] 0%`
+* **Progress:** `[▓▓▓▓▓▓▓░░░] 66%`
 
 #### 📋 User Stories
 
 ##### 🆔 AC-ST-401: Local Mock LLM Service
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 4
 * **Description:** As an open-source contributor, I want a local mock LLM service that intercepts prompt requests and returns a schema-compliant mock response so that I can test UI and comprehension gates offline without API keys.
 * **Acceptance Criteria:**
-  1. [ ] Returns strict JSON schema defined in `src/lib/llm/schema.ts` (`{ passed: boolean, reasoning: string }` or `{ questions: Array }`).
-  2. [ ] Activated via environment variable `LLM_PROVIDER_TYPE=mock`.
-  3. [ ] Restricts execution to non-production environments (`NODE_ENV !== 'production'`).
-  4. [ ] Implements a string-length evaluation heuristic (justifications $\le 20$ chars fail with a nudge comment, $> 20$ chars pass).
+  1. [x] Returns strict JSON schema defined in `src/lib/llm/schema.ts` (`{ passed: boolean, reasoning: string }` or `{ questions: Array }`).
+  2. [x] Activated via environment variable `LLM_PROVIDER_TYPE=mock`.
+  3. [x] Restricts execution to non-production environments (`NODE_ENV !== 'production'`).
+  4. [x] Implements a string-length evaluation heuristic (justifications $\le 20$ chars fail with a nudge comment, $> 20$ chars pass).
 * **Dependencies / Blockers:** None
 
 ##### 🆔 AC-ST-402: Robust .archicheck.yml Configuration Parser
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 4
 * **Description:** As a Repository Administrator, I want to define custom complexity thresholds and prompt parameters in a `.archicheck.yml` or `.archicheck.yaml` file so that ArchiCheck’s cognitive gate matches my team's standards.
 * **Acceptance Criteria:**
-  1. [ ] Fetches configuration file sequentially from HEAD commit (`.archicheck.yml` first, then fallback to `.archicheck.yaml`).
-  2. [ ] Limits fetched config file size to 50KB to protect against memory DoS.
-  3. [ ] Gracefully falls back to system defaults on 404, parsing errors, or validation failures without throwing or crashing the webhook.
-  4. [ ] Validates inputs via Zod schema containing `lines_added_threshold`, `algorithmic_complexity_score`, `ai_reliance_ratio`, and `excluded_paths` with strict defaults.
+  1. [x] Fetches configuration file sequentially from HEAD commit (`.archicheck.yml` first, then fallback to `.archicheck.yaml`).
+  2. [x] Limits fetched config file size to 50KB to protect against memory DoS.
+  3. [x] Gracefully falls back to system defaults on 404, parsing errors, or validation failures without throwing or crashing the webhook.
+  4. [x] Validates inputs via Zod schema containing `lines_added_threshold`, `algorithmic_complexity_score`, `ai_reliance_ratio`, and `excluded_paths` with strict defaults.
 * **Dependencies / Blockers:** None
+
+##### 🆔 AC-ST-403: Evolving Local Mock LLM Service into a Dynamic Developer Sandbox
+* **Priority:** High
+* **Status:** In Progress
+* **Assigned Sprint:** Sprint 4
+* **Description:** As an open-source contributor, I want to configure custom trigger keywords and validation parameters (minimum length, force fail) in `.archicheck.mock.json` / `.archicheck.mock.local.json` files so that I can test diverse gating scenarios and reply validations offline.
+* **Acceptance Criteria:**
+  1. [ ] Priority lookup evaluates `.archicheck.mock.local.json` before falling back to `.archicheck.mock.json`.
+  2. [ ] Halts execution and throws fatal exception if files exist but contain malformed JSON, and gracefully falls back to default hardcoded questions on missing files.
+  3. [ ] Routes incoming PR diffs to specific mock quiz templates based on `trigger_keywords` matches against added code lines.
+  4. [ ] Statelessly matches diff contents to evaluate developer responses against configurable `minimum_answer_length` and `force_fail` parameters.
+* **Dependencies / Blockers:** Relies on AC-ST-401
 
 ---
 

@@ -40,4 +40,5 @@ flowchart TD
 | **LLM Inference** | Yes | No | No | Yes | Yes | No | **Defensive System Prompts & Compliance**: Inject strict security instructions directing the model to ignore injected commands inside diff/answers blocks. Call GCP Vertex AI endpoints (zero data retention policy) with 15s timeouts. | 2026-07-08 |
 | **Mock LLM Activation** | No | Yes | No | No | No | Yes | **Production Block Constraint**: Zod schema in `env.ts` explicitly rejects `LLM_PROVIDER_TYPE=mock` when `NODE_ENV === 'production'` to prevent mock bypass in production. | 2026-07-09 |
 | **YAML Config Parser** | No | Yes | No | No | Yes | No | **Size Limiter & Graceful Fallback**: Enforce 50KB maximum size check on fetched `.archicheck.yml` string. Wrap YAML parsing in `try/catch` and validate schemas via Zod defaults. | 2026-07-09 |
+| **Local Mock LLM Sandbox** | No | Yes | No | No | Yes | No | **Fast-Fail & Quarantine**: Throw fatal exceptions on malformed config JSON to prevent phantom bugs; keep loading logic strictly quarantined from production runs. | 2026-07-09 |
 

@@ -61,8 +61,9 @@
 | **AC-ST-201** | Synchronous Gate Lock & Markdown UI | Integration | Run | Pass | BUG-02 (WaitUntil mock) | 2026-07-07 |
 | **AC-ST-202** | Author Answer Validation | Integration | Run | Pass | None | 2026-07-07 |
 | **AC-ST-203** | Break-Glass Slash Command | Integration | Run | Pass | BUG-03 (Bypass status check context) | 2026-07-07 |
-| **AC-ST-401** | Local Mock LLM Service | Integration / Unit | To Do | N/A | None | 2026-07-09 |
-| **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | To Do | N/A | None | 2026-07-09 |
+| **AC-ST-401** | Local Mock LLM Service | Integration / Unit | Run | Pass | None | 2026-07-09 |
+| **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | Run | Pass | None | 2026-07-09 |
+| **AC-ST-403** | Local Mock LLM Sandbox | Unit / Integration | Run | Pass | None | 2026-07-09 |
 
 ## 🚨 Risk-Based Testing Priorities
 
