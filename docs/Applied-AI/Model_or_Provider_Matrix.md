@@ -6,7 +6,7 @@
 
 | Capability | Primary Model | Provider | Context Window | Max Output Tokens | Justification |
 |------------|---------------|----------|----------------|-------------------|---------------|
-| **Heavy Reasoning & Diff Parsing** | `gemini-1.5-pro` | Google / Vertex AI | 2M Tokens | 8k | Complex code pattern analysis, massive context limits (ideal for Git diffs), native JSON schemas. |
+| **Heavy Reasoning & Diff Parsing** | `gemini-2.5-flash` | Google / Vertex AI | 1M Tokens | 8k | High-speed code pattern analysis, large context limits (ideal for Git diffs), native JSON schemas, fully compatible with newest AQ. keys. |
 
 ## 💸 Cost & QuQuota Constraints
 

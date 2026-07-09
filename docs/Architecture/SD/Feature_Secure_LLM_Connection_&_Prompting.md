@@ -2,7 +2,7 @@
 Secure LLM API Connection & Prompting (Story 2.3)
 
 # Business Context & Value
-To generate interactive, high-value architectural quizzes and evaluate developer answers, ArchiCheck connects to frontier LLM APIs (Gemini 1.5 Pro and Claude 3.5 Sonnet). This feature ensures that connections are establishable securely, comply with enterprise zero-data-retention training mandates, and are resilient to LLM latency or service outages. By implementing factory patterns, we decouple OSS developer key configurations from our internal enterprise GCP Vertex AI deployments.
+To generate interactive, high-value architectural quizzes and evaluate developer answers, ArchiCheck connects to frontier LLM APIs (Gemini 2.5 Flash and Claude 3.5 Sonnet). This feature ensures that connections are establishable securely, comply with enterprise zero-data-retention training mandates, and are resilient to LLM latency or service outages. By implementing factory patterns, we decouple OSS developer key configurations from our internal enterprise GCP Vertex AI deployments.
 
 # Architecture Diagram
 ```mermaid

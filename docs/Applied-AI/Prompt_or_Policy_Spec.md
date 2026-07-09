@@ -12,7 +12,7 @@
 ## 🧬 Prompt Architecture Structure
 
 * **Context Injection:** Raw template replacement replacing placeholder tags (e.g. `{{diff}}`, `{{questions}}`, `{{answers}}`) with the scrubbed code diff, generated questions, and user replies.
-* **Few-Shot Examples:** None in MVP. Zero-shot structured prompting is used due to the high quality of Gemini 1.5 Pro.
+* **Few-Shot Examples:** None in MVP. Zero-shot structured prompting is used due to the high quality of Gemini 2.5 Flash.
 * **Output Schema Enforcement:** Handled natively by the SDK using the `responseSchema` configuration parameter (derived from Zod models in `src/lib/llm/schema.ts`):
   * Quiz Schema: `{ questions: Array<{ id: string, question: string, targetFile: string, codeSnippet: string, rationale: string }> }`
   * Validation Schema: `{ passed: boolean, score: number, reasoning: string }`
