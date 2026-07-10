@@ -30,7 +30,25 @@ To manually validate that the Playwright End-to-End testing framework has been s
 | 2.   | Run `npx playwright test` | Terminal displays the test runner UI, executes baseline smoke tests, and reports `[X] passed`. | |
 | 3.   | Run `npx playwright show-report` | Local browser automatically opens displaying the Playwright HTML test report. | |
 | 4.   | Inspect `playwright.config.ts` | File exists at root. Contains configurations for Chromium, Firefox, and WebKit. Base URL points to local server. | |
-| 5.   | Force a failing test (temporarily break a locator in a spec file) and run `npx playwright test` | Test fails. Terminal displays exact line of failure. HTML report captures screenshot/trace of the failure. | |
+| 5.   | Force a failing test (temporarily break a locator in a spec file) and run `npx playwright test` | Test fails. Terminal displays exact line of failure. HTML report captures screenshot/trace of the failure. (See detailed guide below). | |
+
+#### 💡 Detailed Guide for Step 5 (Forcing a test failure):
+1. Open the E2E script **[scenario4.test.ts](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/tests/e2e/scenario4.test.ts)**.
+2. Temporarily break a text locator assertion by editing a line like:
+   ```typescript
+   const pendingStatus = page.locator('text=Verification quiz pending');
+   ```
+   To a non-existent string:
+   ```typescript
+   const pendingStatus = page.locator('text=Verification quiz invalid-broken-text');
+   ```
+3. Run `npx playwright test` in the terminal.
+4. Confirm that the test suite fails, showing the timeout stack trace for the broken selector.
+5. Run `npx playwright show-report` and verify that the HTML report contains a trace and screenshots of the failed Chromium run.
+6. Discard the temporary file modification to return the test to a clean state:
+   ```bash
+   git checkout tests/e2e/scenario4.test.ts
+   ```
 
 ---
 
