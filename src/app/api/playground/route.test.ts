@@ -26,6 +26,17 @@ vi.mock('@/lib/llm/provider', () => ({
   },
 }));
 
+vi.mock('@/lib/analyzer/diff-parser', () => ({
+  diffParserService: {
+    parseDiff: vi.fn((content: string) => {
+      if (content.trim() === '-' || content.includes('invalid_diff')) {
+        return { score: 0, linesAdded: 0, linesRemoved: 0 };
+      }
+      return { score: 5, linesAdded: 1, linesRemoved: 0 };
+    }),
+  },
+}));
+
 // ─── Mock next/navigation to avoid Next.js context requirement ───────────────
 vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
@@ -124,6 +135,14 @@ describe('POST /api/playground', () => {
     expect(res.status).toBe(500);
     const body = await res.json();
     expect(body.error).toContain('LLM upstream error');
+  });
+
+  it('returns 400 when diff has an invalid structure or no changes', async () => {
+    const req = makeRequest({ diff: '-', provider: 'mock' });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain('Invalid Git diff');
   });
 
   it('does NOT call notFound() when NODE_ENV is "test"', async () => {

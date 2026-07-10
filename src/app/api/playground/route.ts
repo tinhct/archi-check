@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { notFound } from 'next/navigation';
 import { scrubSecrets } from '@/lib/security/sanitizer';
 import { LLMProvider } from '@/lib/llm/provider';
+import { diffParserService } from '@/lib/analyzer/diff-parser';
 
 /**
  * POST /api/playground — AC-ST-501 / Epic-05
@@ -29,6 +30,15 @@ export async function POST(request: NextRequest) {
 
   if (!diff || typeof diff !== 'string' || diff.trim().length === 0) {
     return NextResponse.json({ error: 'Request body must include a non-empty "diff" string.' }, { status: 400 });
+  }
+
+  // Validate Git diff structure/modifications using the same parser as webhooks
+  const parsed = diffParserService.parseDiff(diff);
+  if (parsed.linesAdded === 0 && parsed.linesRemoved === 0) {
+    return NextResponse.json(
+      { error: 'Invalid Git diff. The input must contain a valid unified git diff format (e.g. lines starting with "diff --git").' },
+      { status: 400 }
+    );
   }
 
   try {
