@@ -43,7 +43,14 @@ To manually validate that the Playwright End-to-End testing framework has been s
    const pendingStatus = page.locator('text=Verification quiz invalid-broken-text');
    ```
 3. Run `npx playwright test` in the terminal.
-4. Confirm that the test suite fails, showing the timeout stack trace for the broken selector.
+   * **Note on Local Execution**: If running locally without a `GITHUB_TOKEN` configured, the test will skip itself by default and not record a failure. To force the test to run and fail (capturing the trace/screenshot), temporarily comment out the skip guard check at the beginning of the test:
+     ```typescript
+     // if (!token) {
+     //   test.skip(true, 'GITHUB_TOKEN not provided. Skipping E2E test.');
+     //   return;
+     // }
+     ```
+4. Confirm that the test suite fails, showing the timeout or credentials stack trace.
 5. Run `npx playwright show-report` and verify that the HTML report contains a trace and screenshots of the failed Chromium run.
 6. Discard the temporary file modification to return the test to a clean state:
    ```bash
