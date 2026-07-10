@@ -33,8 +33,10 @@ Equip the ArchiCheck project with a robust local developer experience (DX) and a
 * **OTPLib fallback**: Bypassed GitHub 2FA UI limits using programmatic OTP code generation.
 
 # Lessons Learned
-* **Vitest Import Conflicts**: Vitest attempts to scan Playwright E2E files by default, causing test crashes on Playwright-specific constructs. Solved by adding E2E paths to Vitest's config `exclude` array.
-* **Mock Diff Complexity volume**: Webhook heuristics bypass diffs under 300 lines by default. Mock PR diffs 501-504 were updated to dynamically append 310 filler lines to satisfy complexity volumes and trigger gate checks.
+* **Vitest Import Conflicts**: Vitest attempts to scan Playwright E2E files by default, causing test crashes on Playwright-specific constructs. Solved by adding E2E paths to Vitest's config `exclude` array. Moving forward, E2E tests should be named with `.spec.ts` or `.e2e.ts` extensions to keep them structurally separated from unit files (`.test.ts`).
+* **Mock Diff Complexity volume**: Webhook heuristics bypass diffs under 300 lines by default. Mock PR diffs 501-504 were updated to dynamically append 310 filler lines to satisfy complexity volumes and trigger gate checks. In future sprints, we should implement a testing override for config variables (e.g. `lines_added_threshold: 0`) in the test harness rather than mutating diff outputs.
+* **Fs Mocking Leaks**: Unit tests using `fs.existsSync` or `fs.readFileSync` can leak and read real local files on disk (like `.archicheck.mock.local.json`), causing tests to fail when custom developer configs exist. We must systematically mock `fs` calls or use virtual file systems (like `memfs`) to guarantee test isolation.
+* **Database State Pollution**: Integration tests against Redis can leave stale records behind, affecting concurrent runs. Implementing strict teardown hooks (`afterEach`) to clear keys generated during tests is vital for pipeline repeatability.
 
 # Pending & Open Items
 * **Unfinished Tasks/Stories:** None. All Sprint 4 stories completed.
