@@ -79,6 +79,6 @@
 
 ## 📝 Release Sign-Off
 
-*   **QA Persona Approval:** Approved
-*   **Date of Sign-Off:** 2026-07-10
-*   **Release Notes Link:** [Release Notes / Sprint Report 4](../PM/Sprint_Reports/Sprint_4.md)
+*   **QA Persona Approval:** ⏳ Pending — Epic 5 (Sprint 5) in active development
+*   **Date of Sign-Off:** N/A
+*   **Release Notes Link:** [Release Notes / Sprint Report 4](../PM/Sprint_Reports/Sprint_4.md) *(Sprint 5 report pending)*
