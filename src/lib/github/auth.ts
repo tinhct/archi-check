@@ -3,6 +3,7 @@ import { Octokit } from '@octokit/rest';
 import { env } from '@/config/env';
 import fs from 'fs';
 import path from 'path';
+import { logIntercepted } from '@/lib/shadow/shadowLogger';
 
 /**
  * Handles GitHub App JWT authentication and generates short-lived Installation Octokit instances.
@@ -210,8 +211,26 @@ index 123456..789012 100644
     }
 
     const octokitInstance = await this.app.getInstallationOctokit(installationId);
-    // Cast to Octokit (Octokit/Rest wrapper client)
-    return octokitInstance as unknown as Octokit;
+    const octokit = octokitInstance as unknown as Octokit;
+
+    // AC-ST-502: Shadow Mode — intercept all outbound GitHub write operations
+    if (process.env.ARCHICHECK_MODE === 'shadow') {
+      const originalCreateComment = octokit.rest.issues.createComment.bind(octokit.rest.issues);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      octokit.rest.issues.createComment = async (params: any) => {
+        logIntercepted('createComment', params);
+        return { data: { html_url: '[SHADOW MODE — no comment posted]' } } as ReturnType<typeof originalCreateComment> extends Promise<infer R> ? Promise<R> : never;
+      };
+
+      const originalCreateCommitStatus = octokit.rest.repos.createCommitStatus.bind(octokit.rest.repos);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      octokit.rest.repos.createCommitStatus = async (params: any) => {
+        logIntercepted('createCommitStatus', params);
+        return { data: {} } as ReturnType<typeof originalCreateCommitStatus> extends Promise<infer R> ? Promise<R> : never;
+      };
+    }
+
+    return octokit;
   }
 }
 

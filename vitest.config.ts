@@ -13,6 +13,8 @@ export default defineConfig({
       '**/dist/**',
       '**/.next/**',
       '**/tests/e2e/**',
+      '**/*.spec.ts',
+      '**/*.e2e.ts',
       '**/.{idea,git,cache,output,temp}**'
     ],
     coverage: {

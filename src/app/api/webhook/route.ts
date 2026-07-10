@@ -8,6 +8,7 @@ import { llmProvider } from '@/lib/llm/provider';
 import { setPRState, getPRState } from '@/lib/redis/client';
 import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarningComment } from '@/lib/github/comments';
 import { parseDeveloperReply } from '@/lib/github/comment-parser';
+import { logIntercepted } from '@/lib/shadow/shadowLogger';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 import { scrubSecrets } from '@/lib/security/sanitizer';
@@ -228,6 +229,12 @@ export async function POST(req: NextRequest) {
         const octokit = await gitHubAuthService.getInstallationClient(installation.id);
 
         if (isBypassCommand) {
+          // AC-ST-502: Shadow Mode guard — intercept bypass, do not mutate GitHub state
+          if (process.env.ARCHICHECK_MODE === 'shadow') {
+            logIntercepted('bypassCommand', { prNumber, commentAuthor, commentBody });
+            return NextResponse.json({ message: '[Shadow Mode] Bypass command intercepted — no GitHub state mutated.' }, { status: 200 });
+          }
+
           // Fetch Current Quiz State to verify the PR is tracked
           const state = await getPRState(prNumber);
           if (!state) {

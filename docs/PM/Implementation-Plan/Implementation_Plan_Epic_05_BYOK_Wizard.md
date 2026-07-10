@@ -2,9 +2,9 @@
 
 **Target Story/Epic:** AC-ST-503 / Epic-05
 
-**Status:** Draft
+**Status:** Approved
 
-**Approved By:** _Pending_ | **Approval Date:** _Pending_
+**Approved By:** Product Owner | **Approval Date:** 2026-07-10
 
 ---
 

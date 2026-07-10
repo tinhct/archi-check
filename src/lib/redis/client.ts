@@ -1,7 +1,9 @@
 import { Redis } from '@upstash/redis';
 import { env } from '@/config/env';
 import { QuizState } from '@/types/archicheck';
+import { InMemoryCache } from '@/lib/cache/inMemoryCache';
 
+const isShadowMode = process.env.ARCHICHECK_MODE === 'shadow';
 const isMock = env.UPSTASH_REDIS_REST_URL.includes('mock') || process.env.MOCK_GITHUB === 'true';
 
 const memoryStore = new Map<string, string>();
@@ -27,7 +29,9 @@ const mockRedis = {
   },
 };
 
-export const redis = isMock
+export const redis: Redis | InMemoryCache = isShadowMode
+  ? new InMemoryCache()
+  : isMock
   ? (mockRedis as unknown as Redis)
   : new Redis({
       url: env.UPSTASH_REDIS_REST_URL,
