@@ -69,41 +69,45 @@
 | 2 | Type a diff manually, then click "Clear" | Textarea clears, dropdown resets, output clears |
 | 3 | Submit a diff with only whitespace | Button remains disabled |
 
----
-
 ## 🧪 Section 2 — AC-ST-502: Shadow Mode
 
 ### Prerequisites
 - Add `ARCHICHECK_MODE=shadow` to `.env.local`
 - Restart dev server: `npm run dev`
-- Set `MOCK_GITHUB=true` (for offline simulation)
+- Ensure `.env.local` contains `MOCK_GITHUB=true` (forces offline client mockup)
+- Ensure `.env.local` contains `GITHUB_WEBHOOK_SECRET` (e.g. `mock-secret`)
 
-### Test 2.1 — Shadow Mode Redis Isolation
+---
 
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | Send a PR open webhook payload to `/api/webhook` | Request completes successfully |
-| 2 | Check server terminal output | **No Upstash Redis connection attempt** logged |
-| 3 | Check terminal for `[SHADOW MODE] 🟡` lines | Colorized shadow log lines visible for write operations |
-| 4 | Check GitHub | **No comment posted** to any PR |
-| 5 | Check GitHub | **No commit status created** on any PR |
+### Test 2.1 — Shadow Mode Redis Isolation & Outbound Writes Interception
+
+| Step | Action Details | Expected Result |
+|------|----------------|-----------------|
+| 1 | Trigger a Pull Request `opened` event by running this signed webhook command in a new terminal window:<br/><br/>```bash\nnode -e '\nconst crypto = require("crypto");\nconst secret = "mock-secret"; // Must match GITHUB_WEBHOOK_SECRET in .env.local\nconst payload = {\n  action: "opened",\n  pull_request: { number: 501, head: { sha: "shadow-test-sha" } },\n  repository: { name: "archi-check", owner: { login: "tinhct" } },\n  installation: { id: 12345 }\n};\nconst body = JSON.stringify(payload);\nconst hmac = crypto.createHmac("sha256", secret).update(body).digest("hex");\nfetch("http://localhost:3000/api/webhook", {\n  method: "POST",\n  headers: {\n    "content-type": "application/json",\n    "x-github-event": "pull_request",\n    "x-hub-signature-256": "sha256=" + hmac\n  },\n  body\n}).then(r => r.json()).then(console.log).catch(console.error);\n'\n``` | Returns `{"message":"Webhook received and verification initiated"}` (HTTP 202) |
+| 2 | Check the `npm run dev` server log output. | **No connection attempts** or read/write operations to Upstash Redis (the console logs will verify this since `InMemoryCache` is active). |
+| 3 | Check the server logs for colorized trace outputs. | Visual output includes:<br/>`[SHADOW MODE] 🟡 createCommitStatus intercepted`<br/>`[SHADOW MODE] 🟡 createComment intercepted` |
+| 4 | Verify GitHub client remains passive. | **No live comments** or status checks are actually posted on GitHub (verifies absolute read-only safety). |
+
+---
 
 ### Test 2.2 — Shadow Log Output Formats
 
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | With `ARCHICHECK_SHADOW_FORMAT` unset, trigger a webhook | Terminal shows colorized: `[SHADOW MODE] 🟡 createCommitStatus intercepted` |
-| 2 | Add `ARCHICHECK_SHADOW_FORMAT=json` to `.env.local`, restart, trigger webhook | Terminal shows a single-line minified JSON: `{"mode":"shadow","timestamp":"...","action":"createCommitStatus","payload":{...}}` |
-| 3 | Pipe output: `npm run dev 2>&1 \| grep '{"mode"'` | JSON lines can be grep'd and piped cleanly |
+| Step | Action Details | Expected Result |
+|------|----------------|-----------------|
+| 1 | Trigger the PR `opened` event (using the Node command from Test 2.1) while `ARCHICHECK_SHADOW_FORMAT` is **unset** in `.env.local`. | Dev console prints a colorized, multi-line human-readable trace. |
+| 2 | Add `ARCHICHECK_SHADOW_FORMAT=json` to `.env.local`, restart your server, and trigger the webhook event again. | Dev console prints a minified single-line JSON string containing the fields `mode`, `timestamp`, `action`, and the structured `payload`. |
+| 3 | Confirm piping works: Run a trigger while grepping for the shadow mode prefix:<br/>`npm run dev 2>&1 | grep '{"mode":"shadow"'` | Single-line JSON messages can be filtered, grep'd, and piped cleanly to other shells or diagnostic scripts. |
+
+---
 
 ### Test 2.3 — Bypass Command Shadow Interception
 
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | Send a webhook simulating `/archicheck bypass` comment | Returns HTTP 200 |
-| 2 | Verify terminal shows `bypassCommand intercepted` | Shadow log line appears |
-| 3 | Verify GitHub | **No commit status change** on the PR |
-| 4 | Remove `ARCHICHECK_MODE=shadow` from `.env.local`, restart | Normal bypass flow resumes |
+| Step | Action Details | Expected Result |
+|------|----------------|-----------------|
+| 1 | Trigger a `/archicheck bypass` comment event by running this signed webhook command in a new terminal window:<br/><br/>```bash\nnode -e '\nconst crypto = require("crypto");\nconst secret = "mock-secret";\nconst payload = {\n  action: "created",\n  issue: { number: 501, pull_request: {} },\n  comment: { user: { login: "techlead-admin" }, body: "/archicheck bypass" },\n  repository: { name: "archi-check", owner: { login: "tinhct" } },\n  installation: { id: 12345 }\n};\nconst body = JSON.stringify(payload);\nconst hmac = crypto.createHmac("sha256", secret).update(body).digest("hex");\nfetch("http://localhost:3000/api/webhook", {\n  method: "POST",\n  headers: {\n    "content-type": "application/json",\n    "x-github-event": "issue_comment",\n    "x-hub-signature-256": "sha256=" + hmac\n  },\n  body\n}).then(r => r.json()).then(console.log).catch(console.error);\n'\n``` | Returns `{"message":"[Shadow Mode] Bypass command intercepted — no GitHub state mutated."}` (HTTP 200) |
+| 2 | Check the server logs. | Dev console displays `bypassCommand intercepted` log lines containing the payload: `{ prNumber: 501, commentAuthor: 'techlead-admin', commentBody: '/archicheck bypass' }`. |
+| 3 | Verify state integrity. | No commit status updates are executed. |
+| 4 | Remove `ARCHICHECK_MODE=shadow` from `.env.local` and restart your dev server. | Bypass gate is restored to normal stateful operation. |
 
 ---
 
