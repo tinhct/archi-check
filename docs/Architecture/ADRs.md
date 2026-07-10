@@ -1,8 +1,27 @@
 # Architecture Decision Records (ADRs)
 
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-10
 
 *Note: Add new decisions at the top.*
+
+## ADR-010: Playwright Staging E2E Sandbox Integration
+* **Date:** 2026-07-10
+* **Status:** Accepted
+
+### Context
+We need to test the entire end-to-end developer experience (PR locks, markdown quiz comments, validation triggers, and bypasses) in staging. Running live LLM queries in staging previews burns budget ($3,500 token budget) and is non-deterministic, while local unit tests do not validate real browser-level UI changes on GitHub.
+
+### Decision
+1. **Model Mocking**: Deploy Vercel Staging/Preview environments with `LLM_PROVIDER_TYPE=mock` to utilize `.archicheck.mock.json` golden fixtures deterministically without token cost.
+2. **Session Caching & TOTP Fallback**: Configure Playwright to load GitHub authenticated states from `storageState` JSON cookies, falling back to programmatic TOTP code generation using `otplib` if the session expires.
+3. **Dynamic Webhook Routing**: Have the CI pipeline dynamically update the webhook URL of a dedicated QA GitHub App to target the current Vercel preview domain before executing the tests.
+4. **Programmatic Teardown**: Build an API teardown script using `@octokit/rest` that runs unconditionally in Playwright `afterEach`/`globalTeardown` to close testing PRs and force-delete temporary branches (`archicheck-qa-test-[timestamp]`).
+
+### Consequences
+* **Positive:** Fast, deterministic, and zero-cost browser-level integration testing. Eliminates staging repository pollution and bypasses GitHub 2FA challenges.
+* **Negative:** Requires managing credentials and TOTP secrets for a dedicated QA GitHub Machine User account in CI.
+
+---
 
 ## ADR-009: Environment-Driven Provider Factory & Production Discriminated Union
 * **Date:** 2026-07-09
