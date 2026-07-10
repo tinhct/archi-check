@@ -25,6 +25,8 @@ graph TD
 | **DEP-03** | External | GitHub App permission token exchange for comment posting. | Epic 2: Webhook Gating | GitHub Developer Settings / PM | 2026-07-07 | Resolved | 2026-07-06 |
 | **DEP-04** | AI | Defensive Prompt-Injection Prompt Specifications approval. | Epic 1: Diff Scorer | Prompt Specifications / QA Lead | 2026-07-08 | Resolved | 2026-07-08 |
 | **DEP-05** | Internal / AI | Telemetry collection logs and Redis budget cap triggers. | Epic 3: Staging Polish | State telemetry audit / Tech Lead | 2026-07-15 | Open | 2026-07-09 |
+| **DEP-06** | External | Dedicated E2E QA Bot credentials (storageState JSON, user/pass, TOTP secret) | Epic 4: Playwright E2E | GitHub Secrets / PM | 2026-07-10 | Resolved | 2026-07-10 |
+| **DEP-07** | External | Dedicated QA GitHub App instance with dynamic webhook configurations | Epic 4: Playwright E2E | GitHub Dev Settings / Tech Lead | 2026-07-10 | Resolved | 2026-07-10 |
 
 ## 🤖 AI & Agentic Blockers
 

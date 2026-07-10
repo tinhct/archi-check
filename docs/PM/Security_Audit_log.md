@@ -11,6 +11,8 @@
 | V3 | 2026-07-07 | Hardcoded credential exposure during Git commit | C | Codebase / Commits | Configure GitGuardian scanning (GGShield) as an automated CI gating step. | Resolved |
 | V4 | 2026-07-07 | Unauthorized Gate Bypass via issue comments | H | `src/app/api/webhook/route.ts#L225` | Restrict bypass slash command evaluations strictly to collaborators with `admin` or `maintain` roles. | Resolved |
 | V5 | 2026-07-08 | Prompt-Injection & XML tag-escape vulnerability in developer validation replies | H | `src/lib/llm/provider.ts#L84` | Escape XML tag bounds (<diff>, <questions>, <answers>) and inject [SECURITY INSTRUCTION] blocks in system prompts. | Resolved |
+| V6 | 2026-07-09 | Accidental mock provider activation in live production environments | H | `src/config/env.ts` | Implement production schema validation using discriminated union checking `NODE_ENV`. | Resolved |
+| V7 | 2026-07-10 | E2E QA Bot credentials leakage in public build/PR logs | H | `tests/e2e/` | Store session states and credentials exclusively in repository secrets, and mask logs during execution. | Resolved |
 
 ## 📦 Dependency Risks (Simulated SCA)
 

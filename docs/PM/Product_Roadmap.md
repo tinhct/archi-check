@@ -1,6 +1,6 @@
 # Product Roadmap
 
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-10
 
 ## 🎯 Product Vision
 ArchiCheck serves as a cognitive safeguard for software teams. It detects when developers may be "rubber-stamping" complex AI-generated changes, and gates pull requests behind interactive, language-agnostic architectural comprehension quizzes to keep engineering intuition active, preserve accountability, and protect long-term system integrity.
@@ -22,7 +22,8 @@ gantt
     Sprint 3 Webhook Loop & Bypass    :done, sprint3, 2026-07-13, 14d
     
     section Phase 3: Launch
-    dogfooding & Final Polish         :active, launch, after sprint3, 14d
+    Sprint 4 Customization & DX       :done, sprint4, 2026-07-06, 14d
+    Sprint 5 Staging Polish & Telemetry:active, sprint5, after sprint4, 14d
 ```
 
 ## 📍 Milestones & Deliverables
@@ -30,12 +31,12 @@ gantt
 | Milestone | Target Date | Status (Done/Active/Pending) | Key Epics / Features |
 | :---- | :---- | :---- | :---- |
 | **M1: Baseline Infrastructure** | 2026-06-29 | Done | GitHub App registration, HMAC verify, Upstash Redis caching. |
-| **M2: Complexity Scorer & Sanitizer** | 2026-07-13 | Done | Diff parsing rules, lookbehind secret scrubber, ReDoS circuit breakers, Vertex AI dynamic SDK factory. |
-| **M3: Webhook loop & Gate Control** | 2026-07-27 | Done | Lock early commit checks, markdown quiz generator, blockquote reply parser, admin `/archicheck bypass` slash commands. |
-| **M4: Production Dogfooding** | 2026-08-10 | Active | Dogfooding pilots with EU & Vietnam Beta cohorts, telemetry audits, and performance tuning. |
+| **M2: Scorer & Webhook Gate** | 2026-07-13 | Done | Diff parsing, secret scrubber, ReDoS watchdogs, Pending checks, quiz comment, Admin bypass. |
+| **M3: Sandbox & Customization** | 2026-07-10 | Done | Local mock LLM sandbox, config `.archicheck.yml` parser, Playwright E2E GitHub simulation. |
+| **M4: Production Dogfooding** | 2026-08-10 | Active | Dogfooding pilots with EU & Vietnam Beta cohorts, telemetry logs audits, and budget cap alarms. |
 
 ## 📈 Current Focus & Next Steps
 
-* **Currently Building:** Running end-to-end webhook simulations on our staging repository to validate the gate lock and bypass commands, while auditing token consumption logs against our $200 sprint limit.
-* **Up Next:** Preparing documentation and billing alerts on Vertex AI for the initial Alpha pilot launch with Vietnam and EU developer cohorts.
-* **Key Blockers/Risks:** None currently active. All historical ReDoS vulnerabilities, CI path caching blockages, and credential leaks have been fully mitigated and verified green.
+* **Currently Building:** Setting up token burn telemetry logging and Vercel execution stream integrations to generate alarms when billing approaches standard budgets.
+* **Up Next:** Initiating user profile mappings and cohort configurations for the regional developer Alpha trials.
+* **Key Blockers/Risks:** None currently active. All historical local developer credential bypasses and e2e skip guards have been fully mitigated.

@@ -16,8 +16,11 @@
 | R8 | 2026-07-07 | Upstash Redis database timeout/failure deadlocking gated PRs. | H | Wrap state cache in 1000ms timeout, fail-open to Success, and warn in PR comment. | Closed |
 | R9 | 2026-07-07 | Out-of-order status check race condition (Success finishes before Pending). | H | Await the initial Pending status check synchronously before starting async heuristics. | Closed |
 | R10 | 2026-07-07 | Vercel execution context freeze during async waitUntil background task. | H | Handle errors cleanly, minimize payload size, and trace worker lifecycle. | Closed |
-| R11 | 2026-07-09 | YAML configuration parsing vulnerabilities or memory exhaustion. | M | Enforce 50KB maximum size constraints and wrap parsing in try/catch. | Open |
-| R12 | 2026-07-09 | Accidental mock provider activation in live production environments. | H | Enforce strict Zod discriminated union validation checks in production. | Open |
+| R11 | 2026-07-09 | YAML configuration parsing vulnerabilities or memory exhaustion. | M | Enforce 50KB maximum size constraints and wrap parsing in try/catch. | Closed |
+| R12 | 2026-07-09 | Accidental mock provider activation in live production environments. | H | Enforce strict Zod discriminated union validation checks in production. | Closed |
+| R13 | 2026-07-10 | GitHub staging E2E tests blocked by 2FA login prompts or anti-bot captchas. | H | Use Playwright `storageState` session caching + programmatic TOTP fallback. | Closed |
+| R14 | 2026-07-10 | QA E2E test runs pollute staging branch refs and PR history. | M | Unconditional Octokit API teardown scripts deleting branches/PRs. | Closed |
+| R15 | 2026-07-10 | GitHub webhooks fail to route to dynamic Vercel preview environments. | H | Programmatically update QA GitHub App webhook URL to preview URL in CI. | Closed |
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
@@ -50,6 +53,10 @@
 | D16 | 2026-07-09 | Migrate base model to Gemini 2.5 Flash. | Newer AI Studio API keys (AQ.) throw 404 Not Found errors on older 1.5 models. |
 | D17 | 2026-07-09 | Environment-Driven Factory & Discriminated Union. | Permits mock local testing DX while structurally blocking mock activations in production. |
 | D18 | 2026-07-09 | Implement 50KB size cap limit for .archicheck.yml parsing. | Enables user customizations while eliminating parsing DoS risks on live webhooks. |
+| D19 | 2026-07-10 | Run E2E tests against dynamic Vercel previews. | Real GitHub UI validation is only possible if tests run against public URLs. |
+| D20 | 2026-07-10 | Use storageState + otplib for E2E authentication. | Session cookie caching handles 95% of runs, with a programmatic TOTP fallback. |
+| D21 | 2026-07-10 | API-driven global teardown branch cleanup. | Prevents repository branch bloat by closing PRs and deleting branches programmatically. |
+| D22 | 2026-07-10 | Dynamic webhook updates via App API. | Updates the QA GitHub App webhook endpoint to match Vercel Preview dynamically in CI. |
 
 ## 🐛 Issues (Current problems occurring right now)
 
@@ -64,3 +71,7 @@
 | I7 | 2026-07-07 | GitGuardian Scan fails on missing api-key. | Add `continue-on-error: true` to ggshield CI step. | Resolved |
 | I8 | 2026-07-08 | Header `x-github-event` hardcoded to `pull_request` inside trigger tool. | Corrected header key to reference dynamic `eventType` variable. | Resolved |
 | I9 | 2026-07-09 | Newly generated Gemini keys starting with `AQ.` throw 404 on `gemini-1.5`. | Migrated base model configuration to `gemini-2.5-flash`. | Resolved |
+| I10 | 2026-07-10 | Vitest runs Playwright E2E files causing import test crashes. | Exclude `tests/e2e` files in `vitest.config.ts`. | Resolved |
+| I11 | 2026-07-10 | Local E2E runs crash on missing user/password variables. | Output warning logs and write dummy auth states locally. | Resolved |
+| I12 | 2026-07-10 | E2E mock diff volume does not trigger complexity gating. | Added 310 dummy line loops inside mock PR diff returns. | Resolved |
+| I13 | 2026-07-10 | Playwright show-report fails due to missing HTML files. | Update config reporter to `[['list'], ['html', { open: 'never' }]]`. | Resolved |

@@ -130,9 +130,9 @@
 ---
 
 ### Epic-04: Repository Customization & Developer Experience (DX)
-* **Status:** In Progress
+* **Status:** Done
 * **Description:** Enable seamless local contribution workflows without incurring API costs, and allow repository maintainers to customize ArchiCheck’s threshold logic.
-* **Progress:** `[▓▓▓▓▓▓▓▓░░] 75%`
+* **Progress:** `[▓▓▓▓▓▓▓▓▓▓] 100%`
 
 #### 📋 User Stories
 
@@ -174,33 +174,31 @@
 
 ##### 🆔 AC-ST-404: Interactive Sanitization Pipeline Sandbox
 * **Priority:** High
-* **Status:** In Progress
+* **Status:** Done
 * **Assigned Sprint:** Sprint 4
 * **Description:** As an open-source contributor, I want to locally simulate the secret scrubber, prompt injection detector, and ReDoS circuit breaker triggers so that I can verify the UI states and safety gates offline.
 * **Acceptance Criteria:**
-  1. [ ] Exposes standard credential signatures (AWS, Slack Bot token, GCP private key block) and verifies they are scrubbed to `[REDACTED_SECRET]`.
-  2. [ ] Injects an artificial 505ms delay in `scrubSecrets` if `TRIGGER_REDOS_TIMEOUT` is matched in the diff (quarantined strictly to non-production environments).
-  3. [ ] Catches ReDoS timeout rejections in webhook routes to transition status checks to `success` (fail-open) with the description: `"⚠️ Custom secret sanitizer timed out. Gate bypassed."` and posts a PR warning comment.
-  4. [ ] Blocks prompt injection replies case-insensitively using substring filters, returning a score of 4 and reasoning: `"Security anomaly detected in response. Please provide a genuine architectural justification."`.
+  1. [x] Exposes standard credential signatures (AWS, Slack Bot token, GCP private key block) and verifies they are scrubbed to `[REDACTED_SECRET]`.
+  2. [x] Injects an artificial 505ms delay in `scrubSecrets` if `TRIGGER_REDOS_TIMEOUT` is matched in the diff (quarantined strictly to non-production environments).
+  3. [x] Catches ReDoS timeout rejections in webhook routes to transition status checks to `success` (fail-open) with the description: `"⚠️ Custom secret sanitizer timed out. Gate bypassed."` and posts a PR warning comment.
+  4. [x] Blocks prompt injection replies case-insensitively using substring filters, returning a score of 4 and reasoning: `"Security anomaly detected in response. Please provide a genuine architectural justification."`.
 * **Dependencies / Blockers:** Relies on AC-ST-403
 
 ##### 🆔 AC-ST-405: Playwright E2E GitHub Simulation (Staging QA Automation)
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 4
 * **Description:** As an Automation QA Engineer, I want to execute automated end-to-end integration tests on Vercel preview environments using Playwright, a dedicated QA bot account, and programmatically updated webhook URLs, so that we can validate UI gating states headlessly in CI without burning LLM tokens.
 * **Acceptance Criteria:**
-  1. [ ] Playwright config reads `storageState` JSON session files from CI environment parameters, with programmatic fallback generating TOTP tokens via `otplib` (TOTP setup secret stored in GitHub Secrets).
-  2. [ ] The staging preview environment CI dynamically updates the webhook URL of the QA GitHub App instance to target the current Vercel preview URL before execution.
-  3. [ ] Implements an API-driven global teardown (`api-teardown.ts`) using `@octokit/rest` that unconditionally closes the opened pull request and deletes the `archicheck-qa-test-[timestamp]` branch.
-  4. [ ] Playwright executes Scenario 4 (Happy Path validation pass) and asserts commit status locks, quiz comment render, and status check unlocks.
-  5. [ ] Playwright executes Scenario 3 (ReDoS Bomb) and asserts the PR bypasses the gate, showing the fail-open warning message.
+  1. [x] Playwright config reads `storageState` JSON session files from CI environment parameters, with programmatic fallback generating TOTP tokens via `otplib` (TOTP setup secret stored in GitHub Secrets).
+  2. [x] The staging preview environment CI dynamically updates the webhook URL of the QA GitHub App instance to target the current Vercel preview URL before execution.
+  3. [x] Implements an API-driven global teardown (`api-teardown.ts`) using `@octokit/rest` that unconditionally closes the opened pull request and deletes the `archicheck-qa-test-[timestamp]` branch.
+  4. [x] Playwright executes Scenario 4 (Happy Path validation pass) and asserts commit status locks, quiz comment render, and status check unlocks.
+  5. [x] Playwright executes Scenario 3 (ReDoS Bomb) and asserts the PR bypasses the gate, showing the fail-open warning message.
 * **Dependencies / Blockers:** Relies on AC-ST-404
 
 ---
 
 ## 🎯 Next Sprint Priorities (Refinement Queue)
-1. **AC-ST-401: Local Mock LLM Service** (High - Critical for offline testing DX).
-2. **AC-ST-402: Robust .archicheck.yml Configuration Parser** (High - Critical for maintainer custom settings).
-3. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for enterprise trial cohorts).
-4. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required before deploying to regional cohorts).
+1. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for enterprise trial cohorts).
+2. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required before deploying to regional cohorts).
