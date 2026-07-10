@@ -39,10 +39,12 @@ export class GitHubAuthService {
    * @returns A promise resolving to an authenticated Octokit instance.
    */
   async getInstallationClient(installationId: number): Promise<Octokit> {
+    let octokit: Octokit;
+
     if (process.env.MOCK_GITHUB === 'true') {
       console.log('[Mock GitHub] Returning mocked Octokit client for offline development.');
       /* eslint-disable @typescript-eslint/no-explicit-any */
-      return {
+      octokit = {
         request: async (routeOrOptions: any, parameters?: any) => {
           console.log('[Mock GitHub] request called:', routeOrOptions, parameters);
           
@@ -208,10 +210,10 @@ index 123456..789012 100644
         },
       } as unknown as Octokit;
       /* eslint-enable @typescript-eslint/no-explicit-any */
+    } else {
+      const octokitInstance = await this.app.getInstallationOctokit(installationId);
+      octokit = octokitInstance as unknown as Octokit;
     }
-
-    const octokitInstance = await this.app.getInstallationOctokit(installationId);
-    const octokit = octokitInstance as unknown as Octokit;
 
     // AC-ST-502: Shadow Mode — intercept all outbound GitHub write operations
     if (process.env.ARCHICHECK_MODE === 'shadow') {
