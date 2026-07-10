@@ -120,8 +120,18 @@ async function run() {
       },
     };
   } else {
-    // Default pull_request.opened (supports 'opened', 'opened-ignored', 'opened-gated')
-    const prNum = action === 'opened-ignored' ? 402 : action === 'opened-gated' ? 403 : 101;
+    // Default pull_request.opened (supports 'opened', 'opened-ignored', 'opened-gated', or 'opened-XXX' for sandbox testing)
+    let prNum = 101;
+    if (action.startsWith('opened-')) {
+      const suffix = action.split('-')[1];
+      if (/^\d+$/.test(suffix)) {
+        prNum = parseInt(suffix, 10);
+      } else if (suffix === 'ignored') {
+        prNum = 402;
+      } else if (suffix === 'gated') {
+        prNum = 403;
+      }
+    }
     payload = {
       action: 'opened',
       number: prNum,

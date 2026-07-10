@@ -54,7 +54,7 @@ ALPHA MANUAL TESTING GOVERNANCE: During an Alpha phase, before finalizing the 'D
 
 EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE: Whenever a new Epic or User Story is introduced to the ArchiCheck project, you must NEVER begin writing code immediately. You must first execute the 'Impact Analysis Protocol':
 1. **Refine:** Update `/docs/PM/Product_Backlog.md` with properly formatted stories and acceptance criteria.
-2. **Analyze & Update:** Systematically review `/docs/Architecture/`, `/docs/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.
+2. **Analyze & Update:** Systematically review `/docs/Architecture/`, `/docs/Architecture/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.
 3. **Document:** Modify any diagrams, contracts, or threat models impacted by the new requirements, and ensure all new dependencies are logged in the Dependency Register. Only when the architectural and PM documentation is fully synchronized with the new requirements are you authorized to begin technical implementation.
 
 IMPLEMENTATION EXECUTION GOVERNANCE: You must never write feature code directly from a User Story.
