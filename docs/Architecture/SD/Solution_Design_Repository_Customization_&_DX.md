@@ -80,6 +80,12 @@ interface SandboxScenario {
     *   Wire up `scrubSecrets` in both main event routing branches of the Next.js API webhook.
     *   Implement case-insensitive prompt injection triggers (lookbehinds, JSON vectors, and role-override commands) in the sandbox answer validator.
     *   Simulate ReDoS timeout circuit breakers via non-production artificial delays (triggered by `"TRIGGER_REDOS_TIMEOUT"` keyword).
+*   **Phase 5: Playwright Staging E2E Sandbox Integration**
+    *   Provision Vercel Preview environment overrides to bind `LLM_PROVIDER_TYPE=mock`.
+    *   Configure CI script to dynamically update the webhook URL of the QA GitHub App to match the Vercel preview deployment.
+    *   Configure Playwright to load `storageState` session JSON inputs in CI, implementing fallback programmatic 2FA logins via `otplib` OTP generation.
+    *   Build `api-teardown.ts` running unconditionally on test completions (using `@octokit/rest` PAT tokens) to delete staging PRs and testing branches.
+
 
 
 # Security & Performance Risks

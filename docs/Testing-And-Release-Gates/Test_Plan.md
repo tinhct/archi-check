@@ -65,6 +65,7 @@
 | **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | Run | Pass | None | 2026-07-09 |
 | **AC-ST-403** | Local Mock LLM Sandbox | Unit / Integration | Run | Pass | None | 2026-07-09 |
 | **AC-ST-404** | Sanitization Sandbox | Unit / Integration | To Do | N/A | None | 2026-07-09 |
+| **AC-ST-405** | Playwright E2E Sandbox Integration | E2E / Integration | To Do | N/A | None | 2026-07-10 |
 
 ## 🚨 Risk-Based Testing Priorities
 

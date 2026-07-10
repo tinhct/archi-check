@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
 |-------------|---------------|-------|-------------|------|--------------|----------------------|
-| 4           | 13            | 2     | 1           | 10   | 76.9%        | 2026-07-09           |
+| 4           | 14            | 3     | 1           | 10   | 71.4%        | 2026-07-10           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -183,6 +183,19 @@
   3. [ ] Catches ReDoS timeout rejections in webhook routes to transition status checks to `success` (fail-open) with the description: `"⚠️ Custom secret sanitizer timed out. Gate bypassed."` and posts a PR warning comment.
   4. [ ] Blocks prompt injection replies case-insensitively using substring filters, returning a score of 4 and reasoning: `"Security anomaly detected in response. Please provide a genuine architectural justification."`.
 * **Dependencies / Blockers:** Relies on AC-ST-403
+
+##### 🆔 AC-ST-405: Playwright E2E GitHub Simulation (Staging QA Automation)
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 4
+* **Description:** As an Automation QA Engineer, I want to execute automated end-to-end integration tests on Vercel preview environments using Playwright, a dedicated QA bot account, and programmatically updated webhook URLs, so that we can validate UI gating states headlessly in CI without burning LLM tokens.
+* **Acceptance Criteria:**
+  1. [ ] Playwright config reads `storageState` JSON session files from CI environment parameters, with programmatic fallback generating TOTP tokens via `otplib` (TOTP setup secret stored in GitHub Secrets).
+  2. [ ] The staging preview environment CI dynamically updates the webhook URL of the QA GitHub App instance to target the current Vercel preview URL before execution.
+  3. [ ] Implements an API-driven global teardown (`api-teardown.ts`) using `@octokit/rest` that unconditionally closes the opened pull request and deletes the `archicheck-qa-test-[timestamp]` branch.
+  4. [ ] Playwright executes Scenario 4 (Happy Path validation pass) and asserts commit status locks, quiz comment render, and status check unlocks.
+  5. [ ] Playwright executes Scenario 3 (ReDoS Bomb) and asserts the PR bypasses the gate, showing the fail-open warning message.
+* **Dependencies / Blockers:** Relies on AC-ST-404
 
 ---
 
