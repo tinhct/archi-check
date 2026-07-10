@@ -94,7 +94,8 @@ async function validateKey(apiKey) {
   try {
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Align model with core application configuration (gemini-2.5-flash)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     await model.countTokens('ArchiCheck BYOK validation ping.');
     return true;
   } catch {
@@ -153,6 +154,17 @@ async function main() {
 
     if (!isValid) {
       console.log(fmt.err('Key validation failed. The key may be invalid or have no quota.'));
+      console.log();
+      console.log(`${c.bold}${c.yellow}💡 Platform Transition Notice:${c.reset}`);
+      console.log(`  Google has recently transitioned to issuing keys starting with ${c.cyan}"AQ."${c.reset} (instead of ${c.cyan}"AIza"${c.reset}).`);
+      console.log(`  Some environments, proxies, or older SDK integrations might reject the ${c.cyan}"AQ."${c.reset} format.`);
+      console.log();
+      console.log(`${c.bold}🧪 To run a native "Acid Test" direct curl command to verify your key:${c.reset}`);
+      console.log(`${c.dim}  curl -H "Content-Type: application/json" \\`);
+      console.log(`       -d '{"contents":[{"parts":[{"text":"Hello"}]}]}' \\`);
+      console.log(`       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}"${c.reset}`);
+      console.log();
+      
       const override = await prompt('Save this key anyway? (y/N): ');
       if (!override.toLowerCase().startsWith('y')) {
         console.log(fmt.warn('Aborted. .env.local was not modified.'));
