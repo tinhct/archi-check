@@ -24,7 +24,6 @@ interface ShadowLogEntry {
  * @param action - Human-readable action label (e.g. "createComment", "createCommitStatus")
  * @param payload - The full payload that would have been sent to the external system
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function logIntercepted(action: string, payload: unknown): void {
   const entry: ShadowLogEntry = {
     mode: 'shadow',

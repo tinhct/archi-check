@@ -26,7 +26,6 @@ vi.mock('@google/generative-ai', () => ({
 }));
 
 // ─── Import mocked modules ───────────────────────────────────────────────────
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // ─── Helper: extract injectEnvVars logic for isolated unit testing ─────────────

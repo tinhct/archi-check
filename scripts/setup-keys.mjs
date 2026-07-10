@@ -97,7 +97,7 @@ async function validateKey(apiKey) {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     await model.countTokens('ArchiCheck BYOK validation ping.');
     return true;
-  } catch (err) {
+  } catch {
     return false;
   }
 }

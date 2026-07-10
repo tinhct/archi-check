@@ -218,12 +218,14 @@ index 123456..789012 100644
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (octokit.rest.issues as any).createComment = async (params: any) => {
         logIntercepted('createComment', params);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return { data: { html_url: '[SHADOW MODE — no comment posted]' } } as any;
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (octokit.rest.repos as any).createCommitStatus = async (params: any) => {
         logIntercepted('createCommitStatus', params);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return { data: {} } as any;
       };
     }
