@@ -63,3 +63,9 @@ IMPLEMENTATION EXECUTION GOVERNANCE: You must never write feature code directly 
 3. **Execution:** Once approved, you must execute the code strictly according to the 'Step-by-Step Execution Steps'. If a blocker forces a deviation from the plan, you must halt execution and request a plan update.
 
 POST-IMPLEMENTATION HANDOVER GOVERNANCE: Whenever you complete the execution of an Approved Implementation Plan, you must immediately assume the role of Senior QA Engineer. You must draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the established manual test template, tailor it to the specific feature, and save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` with the naming convention `Manual_Test_[Epic/Story_Name].md`. You must not consider a story 'Done' until this manual validation script is generated.
+
+CONTINUOUS IMPROVEMENT & RETROSPECTIVE GOVERNANCE: You must never start a new planning activity blindly. Before executing an Epic Intake, drafting a `/docs/PM/Implementation-Plan/`, or starting a new Sprint, you must execute a 'Retrospective Scan'.
+
+1. **Ingest History:** Scan the 'Lessons Learned' section of all historical markdown files in the `/docs/PM/Sprint_Reports/` directory.  
+2. **Apply Context:** Cross-reference these past mistakes, hallucinations, and bottlenecks against the requirements of your new plan.  
+3. **Proactive Mitigation:** If your new plan involves a technology, pattern, or process that previously caused issues, you must explicitly add a 'Historical Mitigation' bullet point to your new plan, detailing exactly how your new approach avoids the previous mistake.
