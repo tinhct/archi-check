@@ -21,7 +21,10 @@ setup('authenticate', async ({ page }) => {
   const totpSecret = process.env.GITHUB_TOTP_SECRET;
 
   if (!username || !password) {
-    throw new Error('GITHUB_USER and GITHUB_PASSWORD environment variables are required for login fallback.');
+    console.warn('[Auth Setup] Missing GITHUB_USER or GITHUB_PASSWORD. Writing empty storage state and skipping login.');
+    fs.mkdirSync(path.dirname(authFile), { recursive: true });
+    fs.writeFileSync(authFile, JSON.stringify({ cookies: [], origins: [] }), 'utf8');
+    return;
   }
 
   await page.goto('https://github.com/login');
