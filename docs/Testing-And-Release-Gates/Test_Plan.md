@@ -64,17 +64,21 @@
 | **AC-ST-401** | Local Mock LLM Service | Integration / Unit | Run | Pass | None | 2026-07-09 |
 | **AC-ST-402** | Robust .archicheck.yml Parser | Integration / Unit | Run | Pass | None | 2026-07-09 |
 | **AC-ST-403** | Local Mock LLM Sandbox | Unit / Integration | Run | Pass | None | 2026-07-09 |
-| **AC-ST-404** | Sanitization Sandbox | Unit / Integration | To Do | N/A | None | 2026-07-09 |
-| **AC-ST-405** | Playwright E2E Sandbox Integration | E2E / Integration | To Do | N/A | None | 2026-07-10 |
+| **AC-ST-404** | Sanitization Sandbox | Unit / Integration | Run | Pass | None | 2026-07-10 |
+| **AC-ST-405** | Playwright E2E Sandbox Integration | E2E / Integration | Run | Pass | None | 2026-07-10 |
+| **AC-ST-501** | The Local AI Playground (UI & API) | E2E / UI | To Do | N/A | None | 2026-07-10 |
+| **AC-ST-502** | "Shadow Mode" (Read-Only Webhooks) | Integration | To Do | N/A | None | 2026-07-10 |
+| **AC-ST-503** | The "BYOK" Free-Tier Setup Wizard | CLI / Unit | To Do | N/A | None | 2026-07-10 |
 
 ## 🚨 Risk-Based Testing Priorities
 
 *   **Catastrophic backtracking (ReDoS)**: Mitigated by truncating lines >500 characters and running RegExp evaluations inside a 500ms CPU watcher wrapper.
 *   **Auto-merge bot race conditions**: Mitigated by setting status checks to `Pending` synchronously inside the HTTP POST router handler before returning `202 Accepted`.
 *   **Indirect Prompt Injection**: Mitigated by XML tag-escaping regex substitutions (`sanitizePromptInput`) and defensive instruction configurations.
+*   **Playground Security Escape**: Mitigated by Edge Middleware path interceptors blocking `/playground` and `/api/playground` routes in production.
 
 ## 📝 Release Sign-Off
 
 *   **QA Persona Approval:** Approved
-*   **Date of Sign-Off:** 2026-07-08
-*   **Release Notes Link:** [Release Notes / Sprint Report 3](../PM/Sprint_Reports/Sprint_3.md)
+*   **Date of Sign-Off:** 2026-07-10
+*   **Release Notes Link:** [Release Notes / Sprint Report 4](../PM/Sprint_Reports/Sprint_4.md)

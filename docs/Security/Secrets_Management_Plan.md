@@ -15,5 +15,5 @@
 | `GITHUB_WEBHOOK_SECRET` | Validates HMAC signature headers on incoming webhooks | 90 Days | Webhook Route Handler |
 | `GITHUB_APP_PRIVATE_KEY` | Signs JWT certificates to authenticate the GitHub App client | 180 Days | Auth Service |
 | `UPSTASH_REDIS_REST_TOKEN` | Authorizes REST operations on the serverless Redis cache | 90 Days | Redis Client |
-| `GEMINI_API_KEY` | Authorizes developer-tier Gemini model inference queries | 90 Days | LLM Provider Factory |
+| `LLM_API_KEY` | Authorizes developer-tier Gemini model inference queries (configured via BYOK setup wizard) | 90 Days | LLM Provider Factory |
 | `GOOGLE_CREDS_JSON` | GCP Service Account credentials JSON string for Vertex AI | 180 Days | LLM Provider Factory |

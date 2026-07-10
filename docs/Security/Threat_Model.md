@@ -41,4 +41,6 @@ flowchart TD
 | **Mock LLM Activation** | No | Yes | No | No | No | Yes | **Production Block Constraint**: Zod schema in `env.ts` explicitly rejects `LLM_PROVIDER_TYPE=mock` when `NODE_ENV === 'production'` to prevent mock bypass in production. | 2026-07-09 |
 | **YAML Config Parser** | No | Yes | No | No | Yes | No | **Size Limiter & Graceful Fallback**: Enforce 50KB maximum size check on fetched `.archicheck.yml` string. Wrap YAML parsing in `try/catch` and validate schemas via Zod defaults. | 2026-07-09 |
 | **Local Mock LLM Sandbox** | No | Yes | No | No | Yes | No | **Fast-Fail & Quarantine**: Throw fatal exceptions on malformed config JSON to prevent phantom bugs; keep loading logic strictly quarantined from production runs. | 2026-07-09 |
+| **Local Playground Route Escape** | Yes | No | No | Yes | Yes | Yes | **Edge Middleware Blocking & Page Guards**: Impenetrable Next.js Middleware edge path blocking combined with component-level notFound() checks when `process.env.NODE_ENV === 'production'`. | 2026-07-10 |
+| **Shadow Mode Command Leakage** | No | Yes | No | No | No | Yes | **Bypass Disabling**: Hardcode bypass slash command parser execution to immediately abort if `ARCHICHECK_MODE === 'shadow'`. | 2026-07-10 |
 

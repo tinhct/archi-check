@@ -199,6 +199,57 @@
 
 ---
 
+### Epic-05: The "Live-Fire" Developer Toolkit
+* **Status:** To Do
+* **Description:** Empower developers to test real LLM generations locally using their own free-tier API keys, bypassing the need for live GitHub webhooks or staging infrastructure, while strictly protecting corporate token budgets.
+* **Progress:** `[░░░░░░░░░░] 0%`
+
+#### 📋 User Stories
+
+##### 🆔 AC-ST-501: The Local AI Playground (UI & API)
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a Developer or OSS Contributor, I want a local web interface (localhost:3000/playground) to paste PR diffs and test them against live LLMs, so that I can rapidly iterate on AI prompt engineering without triggering GitHub webhooks or polluting remote repositories.
+* **Acceptance Criteria:**
+  1. [ ] Implement Next.js Middleware (`middleware.ts`) to intercept `/playground` and `/api/playground`. If `process.env.NODE_ENV === 'production'`, return an immediate 404 at the Edge.
+  2. [ ] Implement a secondary `notFound()` fallback inside the page and route components.
+  3. [ ] Build the Next.js API route that accepts a raw string diff, runs it through `sanitizer.ts`, sends it to the configured LLM provider, and returns the generated quiz JSON.
+  4. [ ] Build the React UI with a dark-mode developer aesthetic, utilizing a split-pane layout (Input Diff vs. Output JSON / Token Cost Estimate).
+  5. [ ] Implement a "Load Template" dropdown in the UI. Selecting a template must instantly auto-populate the input textarea with the 4 core mock scenarios from Sprint 4 (Clean, Leaky Diff, Prompt Injection, ReDoS).
+* **Dependencies / Blockers:** Relies on Core Parser and Sanitizer configurations
+
+##### 🆔 AC-ST-502: "Shadow Mode" (Read-Only Webhooks)
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a System Administrator, I want a mode that processes real GitHub webhooks but intercepts all outbound write actions, so that I can safely test ArchiCheck against live historical PRs in my repository without posting ghost comments to my team.
+* **Acceptance Criteria:**
+  1. [ ] Update the GitHub App wrapper. If `process.env.ARCHICHECK_MODE === 'shadow'`, intercept and block `octokit.issues.createComment` and `octokit.repos.createCommitStatus`.
+  2. [ ] Intercept the caching utility: instantiate an `InMemoryCache` (using a JS Map) instead of the `UpstashRedisCache` so developers do not need live Redis credentials to run tests.
+  3. [ ] Route intercepted payloads to the local terminal. By default, output a colorized, human-readable trace log.
+  4. [ ] If `ARCHICHECK_SHADOW_FORMAT=json` is present in the environment, suppress all text logs and emit a single, strict, minified JSON object to stdout.
+  5. [ ] Strictly disable the parsing and execution of the `/archicheck bypass` slash command if Shadow Mode is active.
+* **Dependencies / Blockers:** Relies on Webhook Handler
+
+##### 🆔 AC-ST-503: The "BYOK" Free-Tier Setup Wizard
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a New Contributor, I want a CLI script to securely configure my own free-tier API key, so that I can test live-fire scenarios without needing access to the project's guarded Vertex AI staging budget.
+* **Acceptance Criteria:**
+  1. [ ] Write a Node CLI script (`npm run setup:keys`) using inquirer or prompts to guide the user through setup.
+  2. [ ] Prompt the user for their Gemini Developer key, and attempt a real, lightweight API call (e.g. countTokens) to validate the key online.
+  3. [ ] If the user passes the `--offline` flag, skip the ping, display a yellow warning (`⚠️ Offline mode enabled. Skipping Gemini API validation.`), and proceed.
+  4. [ ] If validation fails online, prompt the user: *"Validation failed. Do you want to save this key anyway? (y/N)"*.
+  5. [ ] Upon success (or explicit override), automatically inject `LLM_API_KEY=[key]` and `LLM_PROVIDER_TYPE=gemini-developer` into `.env.local` without corrupting other variables.
+* **Dependencies / Blockers:** None
+
+---
+
 ## 🎯 Next Sprint Priorities (Refinement Queue)
-1. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for enterprise trial cohorts).
-2. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required before deploying to regional cohorts).
+1. **AC-ST-501: Local AI Playground (UI & API)** (High - Critical developer feedback loop DX).
+2. **AC-ST-502: "Shadow Mode" (Read-Only Webhooks)** (High - Real repository safe integration testing).
+3. **AC-ST-503: The "BYOK" Free-Tier Setup Wizard** (High - Frictionless onboarding for external contributors).
+4. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for staging/prod).
+5. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required for Alpha pilots).
