@@ -170,11 +170,12 @@
 
 ### Test 3.4 — Multiline Value Preservation
 
-| Step | Action | Expected Result |
-|------|--------|-----------------|
-| 1 | Confirm `.env.local` contains `GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMII..."` | Note current value |
-| 2 | Run wizard in offline mode with a new key | Wizard completes |
-| 3 | Open `.env.local` | `GITHUB_PRIVATE_KEY` block is **identical** to before — not truncated or corrupted |
+| Step | Action Details | Expected Result |
+|------|----------------|-----------------|
+| 1 | Open your `.env.local` file and verify it contains a multiline private key block (e.g. `GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMII..."`). Note its current format. | Confirm the private key is valid and formatted across multiple lines. |
+| 2 | Run the wizard in offline mode by executing:<br/>`npm run setup:keys -- --offline`<br/>And paste a new test key when prompted (e.g., `another-test-developer-key`). Press **Enter** to complete the wizard. | CLI output confirms setup succeeded: `.env.local updated successfully.` |
+| 3 | Re-open your `.env.local` file and inspect the variables. | `LLM_API_KEY` is successfully updated to `another-test-developer-key`. |
+| 4 | Check the multiline `GITHUB_PRIVATE_KEY` variable. | The entire `GITHUB_PRIVATE_KEY` block is **identical** to step 1 — it has not been modified, truncated, single-lined, or corrupted. |
 
 ---
 
