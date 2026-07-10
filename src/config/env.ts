@@ -65,10 +65,10 @@ let parsedEnv: z.infer<typeof envSchema>;
 try {
   parsedEnv = envSchema.parse(process.env);
 } catch (error) {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && process.env.SKIP_ENV_VALIDATION !== 'true') {
     throw new Error(`Environment validation failed: ${(error as Error).message}`);
   }
-  // In development, mock or parse what we can
+  // In development or build-time validation bypass, mock or parse what we can
   parsedEnv = {
     GITHUB_APP_ID: process.env.GITHUB_APP_ID || 'mock-id',
     GITHUB_PRIVATE_KEY: process.env.GITHUB_PRIVATE_KEY || 'mock-key',

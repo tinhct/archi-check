@@ -215,18 +215,16 @@ index 123456..789012 100644
 
     // AC-ST-502: Shadow Mode — intercept all outbound GitHub write operations
     if (process.env.ARCHICHECK_MODE === 'shadow') {
-      const originalCreateComment = octokit.rest.issues.createComment.bind(octokit.rest.issues);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      octokit.rest.issues.createComment = async (params: any) => {
+      (octokit.rest.issues as any).createComment = async (params: any) => {
         logIntercepted('createComment', params);
-        return { data: { html_url: '[SHADOW MODE — no comment posted]' } } as ReturnType<typeof originalCreateComment> extends Promise<infer R> ? Promise<R> : never;
+        return { data: { html_url: '[SHADOW MODE — no comment posted]' } } as any;
       };
 
-      const originalCreateCommitStatus = octokit.rest.repos.createCommitStatus.bind(octokit.rest.repos);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      octokit.rest.repos.createCommitStatus = async (params: any) => {
+      (octokit.rest.repos as any).createCommitStatus = async (params: any) => {
         logIntercepted('createCommitStatus', params);
-        return { data: {} } as ReturnType<typeof originalCreateCommitStatus> extends Promise<infer R> ? Promise<R> : never;
+        return { data: {} } as any;
       };
     }
 
