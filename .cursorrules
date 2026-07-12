@@ -60,10 +60,17 @@
 * **Phase 1 - Strict Coverage:** Before executing any tests, you must write test cases that strictly adhere to the negative assertions, timeout checks, and boundary rules defined in `/docs/Testing-And-Release-Gates/Test_Governance_Policy.md`. You cannot bypass these requirements.  
 * **Phase 2 - Execution & Audit Logging:** Whenever you execute these unit, integration, or simulation tests locally, you must never leave the results solely in the terminal window. Immediately after the test run completes, you must duplicate `Dev_Test_Log_Template.md` into `/docs/PM/Sprint_Test_Reports/Test-Execution-Logs/Dev-Test-Log/`, renaming it with the current timestamp (e.g., `Dev_Log_YYYYMMDD_HHMM.md`). You must populate this log strictly with the terminal output-including all timings, pass/fail statuses, and error snapshots-**before** you write any new code to fix the failures.
 
-**EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE:** Whenever a new Epic or User Story is introduced to the ArchiCheck project, you must NEVER begin writing code immediately. You must first execute the 'Impact Analysis Protocol':
-1. Refine: Update `/docs/PM/Product_Backlog.md` with properly formatted stories and acceptance criteria.
-2. Analyze & Update: Systematically review `/docs/Architecture/`, `/docs/Architecture/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.
-3. Document: Modify any diagrams, contracts, or threat models impacted by the new requirements, and ensure all new dependencies are logged in the Dependency Register. Only when the architectural and PM documentation is fully synchronized with the new requirements are you authorized to begin technical implementation.
+**REQUIREMENT SCOPING GOVERNANCE:** Whenever you receive a new requirement, feature request, or Epic, you must NEVER begin Impact Analysis or propose an implementation. You must first act as a **Technical Product Manager**:
+
+1. **Draft Scoping Doc:** Create a new file in `/docs/PM/Scoping/` using the `Scoping_Template.md` and standard naming convention (e.g., `Scoping_NewFeature.md`).  
+2. **Structure:** Concisely define the Problem, Constraints, and Success Criteria. Provide 2-3 'Candidate Approaches' with trade-offs. You are strictly forbidden from selecting the final approach.  
+3. **The Approval Gate:** You must stop and wait for human approval. The human must select one of the Candidate Approaches. Once approved, you must immediately proceed to **Epic Intake & Impact Analysis**.
+
+**EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE:** Only *after* a Scoping Document is approved and an approach is selected, you must execute the Impact Analysis Protocol based on the chosen approach:
+
+1. **Refine:** Update `/docs/PM/Product_Backlog.md` with properly formatted stories and acceptance criteria based on the chosen solution.  
+2. **Analyze & Update:** Systematically review and update `/docs/Architecture/`, `/docs/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.  
+3. **Document Dependencies:** Ensure all new dependencies are logged in the Dependency Register. Only when the architectural and PM documentation is fully synchronized are you authorized to move to the Implementation Planning phase.
 
 **IMPLEMENTATION EXECUTION GOVERNANCE:** You must never write feature code directly from a User Story.
 
