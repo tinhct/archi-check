@@ -204,5 +204,83 @@ describe('MockLLMProvider Unit Tests', () => {
         expect(res.reasoning).toContain('Security anomaly detected');
       }
     });
+
+    it('should fallback to hardcoded default questions if config files do not exist', async () => {
+      vi.spyOn(fs, 'existsSync').mockReturnValue(false);
+      const p = new MockLLMProvider();
+      const { quiz } = await p.generateQuiz('some-diff');
+      expect(quiz.questions).toHaveLength(2);
+      expect(quiz.questions[0].question).toContain('purpose of these changes');
+    });
+
+    it('should throw validation error when mock JSON structure is invalid', async () => {
+      vi.spyOn(fs, 'existsSync').mockImplementation((pathStr: string) => pathStr.endsWith('.archicheck.mock.json'));
+      vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify([{ trigger_keywords: "invalid-string-instead-of-array" }]));
+      const p = new MockLLMProvider();
+      await expect(p.generateQuiz('some-diff')).rejects.toThrow('Archicheck Sandbox Error');
+    });
+
+    it('should return default hardcoded questions when config is empty or matches no scenario and has no fallback', async () => {
+      vi.spyOn(fs, 'existsSync').mockImplementation((pathStr: string) => pathStr.endsWith('.archicheck.mock.json'));
+      vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify([]));
+      const p = new MockLLMProvider();
+      const { quiz } = await p.generateQuiz('some-diff');
+      expect(quiz.questions[0].question).toContain('purpose of these changes');
+    });
+
+    it('should return defaults when scenario trigger keywords do not match and fallback is missing', async () => {
+      vi.spyOn(fs, 'existsSync').mockImplementation((pathStr: string) => pathStr.endsWith('.archicheck.mock.json'));
+      vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify([
+        {
+          "trigger_keywords": ["unmatched-keyword"],
+          "questions": [{ "id": "q1", "question": "Unmatched", "targetFile": "f", "codeSnippet": "c", "rationale": "r" }]
+        }
+      ]));
+      const p = new MockLLMProvider();
+      const { quiz } = await p.generateQuiz('some-diff');
+      expect(quiz.questions[0].question).toContain('purpose of these changes');
+    });
+
+    it('should load config from local mock JSON if it exists', async () => {
+      vi.spyOn(fs, 'existsSync').mockImplementation((pathStr: string) => pathStr.endsWith('.archicheck.mock.local.json'));
+      vi.spyOn(fs, 'readFileSync').mockImplementation((pathStr: string) => {
+        if (pathStr.endsWith('.archicheck.mock.local.json')) {
+          return JSON.stringify([
+            {
+              "trigger_keywords": ["local"],
+              "questions": [{ "id": "q1", "question": "Local override", "targetFile": "f", "codeSnippet": "c", "rationale": "r" }]
+            }
+          ]);
+        }
+        return '';
+      });
+      const p = new MockLLMProvider();
+      const { quiz } = await p.generateQuiz('diff\n+const local = 1;');
+      expect(quiz.questions[0].question).toContain('Local override');
+    });
+
+    it('should handle empty answers array gracefully and fail validation', async () => {
+      const mockQuiz = {
+        questions: [{ id: 'q1', question: 'Q1', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }]
+      };
+      const p = new MockLLMProvider();
+      const res = await p.validateAnswers('some-diff', mockQuiz, []);
+      expect(res.passed).toBe(false);
+      expect(res.score).toBe(4);
+    });
+
+    it('should handle empty parsed answers within blocks gracefully', async () => {
+      const mockQuiz = {
+        questions: [
+          { id: 'q1', question: 'Q1', targetFile: 'F', codeSnippet: 'C', rationale: 'R' },
+          { id: 'q2', question: 'Q2', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }
+        ]
+      };
+      const p = new MockLLMProvider();
+      const reply = 'Q1: Q1\nA1: \n\nQ2: Q2\nA2: ';
+      const res = await p.validateAnswers('some-diff', mockQuiz, [reply]);
+      expect(res.passed).toBe(false);
+      expect(res.score).toBe(2);
+    });
   });
 });
