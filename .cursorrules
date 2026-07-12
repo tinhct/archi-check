@@ -57,6 +57,12 @@
 
 **LOCAL DEV TESTING GOVERNANCE:** Whenever you execute unit, integration, or simulation tests in the local or development environment, you must not leave the results solely in the terminal window. Immediately after the test run completes, duplicate `Dev_Test_Log_Template.md` into `/docs/PM/Sprint_Test_Reports/Test-Execution-Logs/Dev-Test-Log/`, renaming it with the current timestamp (e.g., `Dev_Log_YYYYMMDD_HHMM.md`). Populate it strictly with the terminal output, ensuring all timings, pass/fail statuses, and error snapshots are accurately recorded before you write any new code to fix the failures.
 
+**BOUNDARY & REGEX TEST GOVERNANCE:** Whenever you create or modify code containing regular expressions, string parsing, or data sanitizers, you must strictly write unit tests covering all boundary variations. Specifically, you must write test cases that verify:
+1. **Format Variations:** Test camelCase, snake_case, UPPERCASE, and hyphenated variations of target strings.
+2. **Delimiter Variations:** Test assignments using different operators (=, :), space layouts, and tab indents.
+3. **Explicit Negative Exclusions:** Test strings that embed target keywords but are non-sensitive (e.g. testing 'monkey' vs 'key', 'secretary' vs 'secret', 'isAuthorized' vs 'auth') to prevent false-positive match regressions.
+4. **Coverage Reports:** You must run Vitest coverage reports and ensure that high-risk parsing/security files maintain 100% branch and line coverage before declaring a task ready for manual verification.
+
 **EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE:** Whenever a new Epic or User Story is introduced to the ArchiCheck project, you must NEVER begin writing code immediately. You must first execute the 'Impact Analysis Protocol':
 1. Refine: Update `/docs/PM/Product_Backlog.md` with properly formatted stories and acceptance criteria.
 2. Analyze & Update: Systematically review `/docs/Architecture/`, `/docs/Architecture/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.
