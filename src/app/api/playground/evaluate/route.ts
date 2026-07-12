@@ -35,6 +35,7 @@ const RequestBodySchema = z.object({
     .string()
     .min(20, 'reply is too short. Please provide a meaningful architectural justification (minimum 20 characters).')
     .max(10000, 'reply exceeds the maximum allowed length of 10,000 characters.'),
+  provider: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const { diff, quizJson, reply } = validation.data;
+  const { diff, quizJson, reply, provider: providerOverride } = validation.data;
 
   // Step 2: Validate diff structure (ensure it contains actual line changes)
   const parsed = diffParserService.parseDiff(diff);
@@ -130,11 +131,24 @@ export async function POST(request: NextRequest) {
 
   // Step 4: Call validateAnswers (pure function — no Redis/Octokit side effects)
   try {
+    const originalProviderType = process.env.LLM_PROVIDER_TYPE;
+    if (providerOverride && ['mock', 'gemini-developer'].includes(providerOverride)) {
+      process.env.LLM_PROVIDER_TYPE = providerOverride;
+    }
+
     const evaluation = await llmProvider.validateAnswers(
       diff,
       { questions: quizJson },
       [sanitizedReply]
     );
+
+    if (providerOverride) {
+      if (originalProviderType === undefined) {
+        delete process.env.LLM_PROVIDER_TYPE;
+      } else {
+        process.env.LLM_PROVIDER_TYPE = originalProviderType;
+      }
+    }
 
     // Step 5: Validate score is a valid integer in the 0–10 range
     const score = evaluation.score;

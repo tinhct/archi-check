@@ -117,6 +117,29 @@ describe('POST /api/playground/evaluate', () => {
     expect(body.score).toBe(4);
   });
 
+  it('respects provider overrides passed in the request body', async () => {
+    mockValidateAnswers.mockResolvedValue({
+      passed: true,
+      score: 9,
+      reasoning: 'Detailed architectural feedback.',
+      tokens: { input: 120, output: 60, total: 180 },
+    });
+
+    const originalProvider = process.env.LLM_PROVIDER_TYPE;
+    const req = makeRequest({
+      diff: VALID_DIFF,
+      quizJson: VALID_QUIZ,
+      reply: VALID_REPLY,
+      provider: 'gemini-developer',
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.reason).toBe('success');
+    expect(process.env.LLM_PROVIDER_TYPE).toBe(originalProvider);
+  });
+
   // ─── Sanitizer Rejection ────────────────────────────────────────────────────
   it('returns reason: sanitizer_rejection when reply contains a secret', async () => {
     const req = makeRequest({

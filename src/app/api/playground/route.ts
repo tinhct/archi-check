@@ -66,7 +66,11 @@ export async function POST(request: NextRequest) {
 
     // Restore original provider type env var
     if (providerOverride) {
-      process.env.LLM_PROVIDER_TYPE = originalProviderType;
+      if (originalProviderType === undefined) {
+        delete process.env.LLM_PROVIDER_TYPE;
+      } else {
+        process.env.LLM_PROVIDER_TYPE = originalProviderType;
+      }
     }
 
     return NextResponse.json({ sanitizedDiff, quiz, tokens }, { status: 200 });

@@ -242,7 +242,7 @@ export default function PlaygroundPage() {
       const res = await fetch('/api/playground/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ diff, quizJson, reply }),
+        body: JSON.stringify({ diff, quizJson, reply, provider }),
       });
       const data = await res.json();
 
@@ -262,7 +262,7 @@ export default function PlaygroundPage() {
     } finally {
       setIsEvaluating(false);
     }
-  }, [quizJson, perQuestionReplies, isEvaluating, phase, diff]);
+  }, [quizJson, perQuestionReplies, isEvaluating, phase, diff, provider]);
 
   // ── Reset Pipeline ───────────────────────────────────────────────────────────
   const handleReset = useCallback(() => {
