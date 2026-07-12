@@ -9,7 +9,7 @@
 * **Status:** Accepted
 
 ### Context
-We need to test the entire end-to-end developer experience (PR locks, markdown quiz comments, validation triggers, and bypasses) in staging. Running live LLM queries in staging previews burns budget ($3,500 token budget) and is non-deterministic, while local unit tests do not validate real browser-level UI changes on GitHub.
+We need to test the entire end-to-end developer experience (PR locks, markdown quiz comments, validation triggers, and bypasses) in staging. Running live LLM queries in staging previews burns budget and is non-deterministic, while local unit tests do not validate real browser-level UI changes on GitHub.
 
 ### Decision
 1. **Model Mocking**: Deploy Vercel Staging/Preview environments with `LLM_PROVIDER_TYPE=mock` to utilize `.archicheck.mock.json` golden fixtures deterministically without token cost.

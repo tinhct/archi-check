@@ -1,7 +1,7 @@
 # Scoping & Design Framing: Playwright E2E GitHub Simulation
 
 ## 1. Problem
-Developers and QA engineers lack a cost-effective, deterministic, and high-fidelity way to validate the entire end-to-end developer experience (PR gating, markdown quiz rendering, status checks, comment replies, and lock/unlock cycles) in staging. Connecting staging to live LLMs is prohibitively expensive ($3,500 token budget) and non-deterministic, while local unit tests do not validate actual browser-level UI interactions on GitHub.
+Developers and QA engineers lack a cost-effective, deterministic, and high-fidelity way to validate the entire end-to-end developer experience (PR gating, markdown quiz rendering, status checks, comment replies, and lock/unlock cycles) in staging. Connecting staging to live LLMs is prohibitively expensive and non-deterministic, while local unit tests do not validate actual browser-level UI interactions on GitHub.
 
 ## 2. Constraints
 *   **Security Quarantine**: Must strictly prevent `LLM_PROVIDER_TYPE=mock` from executing when `NODE_ENV=production`.
