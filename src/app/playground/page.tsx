@@ -609,7 +609,7 @@ export default function PlaygroundPage() {
                       id="btn-evaluate"
                       className="btn-evaluate"
                       onClick={handleEvaluate}
-                      disabled={phase !== 'quiz_ready' || !allRepliesValid || isEvaluating}
+                      disabled={phase !== 'quiz_ready' || !allRepliesValid || isEvaluating || evalError !== null}
                       title={
                         !allRepliesValid
                           ? `All ${quizJson.length} answer box${quizJson.length !== 1 ? 'es' : ''} must have at least ${MIN_REPLY_LENGTH} characters`
