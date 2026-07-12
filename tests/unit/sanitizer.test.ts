@@ -31,6 +31,20 @@ describe('Secret Sanitizer Unit Tests', () => {
     expect(sanitized).toContain('pem = "[REDACTED_SECRET]"');
   });
 
+  it('should redact secrets assigned with variable prefixes and key configurations', async () => {
+    const input = 'const AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";\nconst awsSecret = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";\nconst aws_key = "some_value";\nconst myKey = "some_value";\nconst monkey = "banana";\nconst whiskey = "jack";';
+    const sanitized = await scrubSecrets(input);
+
+    expect(sanitized).not.toContain('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY');
+    expect(sanitized).not.toContain('some_value');
+    expect(sanitized).toContain('AWS_SECRET = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('awsSecret = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('aws_key = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('myKey = "[REDACTED_SECRET]"');
+    expect(sanitized).toContain('monkey = "banana"');
+    expect(sanitized).toContain('whiskey = "jack"');
+  });
+
   it('should leave non-sensitive code untouched', async () => {
     const input = 'const x = 5;\nconsole.log(x);';
     const sanitized = await scrubSecrets(input);

@@ -8,7 +8,7 @@ export const DEFAULT_PATTERNS = [
   { name: 'JWT_TOKEN', regex: /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*/g },
   { name: 'PRIVATE_KEY_BLOCK', regex: /-----BEGIN [A-Z ]+ PRIVATE KEY-----[^-]+-----END [A-Z ]+ PRIVATE KEY-----/g },
   // Generic password assignments: matches only the value inside quotes using positive lookbehind and lookahead
-  { name: 'GENERIC_PASSWORD', regex: /(?<=\b(password|passwd|secret|api_key|apikey|private_key|token|auth)\s*[:=]\s*["'])(?!\[REDACTED_SECRET\])[^"']{4,}(?=["'])/gi }
+  { name: 'GENERIC_PASSWORD', regex: /(?<=\b\w*(password|passwd|secret|api_key|apikey|private_key|token|auth)\b\s*[:=]\s*["']|\b(?!monkey\b|donkey\b|turkey\b|whiskey\b|hockey\b|lackey\b)\w*key\b\s*[:=]\s*["'])(?!\[REDACTED_SECRET\])[^"']{4,}(?=["'])/gi }
 ];
 
 /**
