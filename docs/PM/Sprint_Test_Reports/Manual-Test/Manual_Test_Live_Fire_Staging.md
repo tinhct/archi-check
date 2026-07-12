@@ -149,9 +149,13 @@ Expected output (first few lines):
 ✓ Ready in ~230ms
 ```
 
+> [!NOTE]
+> Running **`npm run dev`** sets `NODE_ENV=development` automatically. This is necessary because the webhook API routes and testing triggers are blocked when `NODE_ENV=production` for safety.
+
 > [!TIP]
 > Keep this terminal window visible during all test cases — this is where you will read
 > shadow mode intercept logs in real time.
+
 
 ---
 

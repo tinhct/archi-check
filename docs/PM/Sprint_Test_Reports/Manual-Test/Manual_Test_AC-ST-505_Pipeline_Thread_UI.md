@@ -8,9 +8,12 @@
 ---
 
 > [!IMPORTANT]
-> Execute all steps below in a **local development** environment (`npm run dev`).
-> These features are intentionally blocked in production. Confirm `NODE_ENV=development`.
-> `.env.local` must contain `LLM_PROVIDER_TYPE=mock` for offline testing.
+> **Environment Context (`NODE_ENV`):**
+> These playground and local sandbox features are strictly blocked in production for security.
+> * Running **`npm run dev`** sets `NODE_ENV=development` automatically, allowing you to access and test the playground.
+> * Running **`npm run build && npm run start`** sets `NODE_ENV=production` automatically, blocking the playground and evaluate endpoints with an HTTP 404.
+> * **Verification:** Ensure you are running **`npm run dev`** and have set `LLM_PROVIDER_TYPE=mock` in `.env.local` for offline testing. You can verify the environment by visiting `/playground` (it should load with a yellow "Local development environment" warning badge). You can inspect the current shell environment with `echo $NODE_ENV`.
+
 
 ---
 

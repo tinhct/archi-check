@@ -94,3 +94,22 @@ The "Pipeline Thread" redesign (AC-ST-505) places a dedicated reply textarea dir
 
 **Fixture seeding for Phase 2:** Fixtures that include a `phase2` block (marked with a ⚡ prefix in the dropdown) will automatically pre-populate the quiz in `quiz_ready` state when selected — no API call is made. Reply boxes are always left empty, respecting the developer's intent to write their own answers.
 
+---
+
+### Q: How does ArchiCheck check or enforce the `NODE_ENV` environment variable, and how can I control it?
+
+**A:** `NODE_ENV` is a standard environment variable that controls whether the application runs in development or production. Next.js manages it automatically based on the command you run:
+* **`npm run dev`** (starts the local dev server) dynamically sets `process.env.NODE_ENV = 'development'`.
+* **`npm run build`** and **`npm run start`** (compiles and starts the production server) sets `process.env.NODE_ENV = 'production'`.
+
+ArchiCheck uses this variable to enforce environment boundaries:
+1. **Middleware Gate (`middleware.ts`):** If a request targets a playground route (e.g. `/playground` or `/api/playground`) and `NODE_ENV === 'production'`, the middleware intercepts it and returns an immediate 404.
+2. **API Gating:** The evaluate API route (`/api/playground/evaluate/route.ts`) checks `process.env.NODE_ENV === 'production'` and calls Next's `notFound()` helper as a second line of defense.
+3. **Zod Env Quarantine (`src/config/env.ts`):** Startup validation fails if mock LLM credentials or configuration elements (`LLM_PROVIDER_TYPE=mock`) are set in a production environment.
+
+**How to verify:**
+* To verify the development code path, run `npm run dev` and navigate to `/playground`.
+* To verify the production block, run `npm run build && npm run start` and confirm `/playground` returns a 404.
+* If you want to check the current value in your shell terminal, run `echo $NODE_ENV`. If empty, it means the variable is only set in-memory during script execution.
+
+
