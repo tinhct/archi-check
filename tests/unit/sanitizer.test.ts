@@ -67,4 +67,70 @@ describe('Secret Sanitizer Unit Tests', () => {
       'Sanitization timeout (possible ReDoS)'
     );
   }, 15000);
+
+  it('should successfully apply custom patterns and replace matches', async () => {
+    const input = 'const my_config = "CUSTOM_VAL_12345";';
+    const customPatterns = ['CUSTOM_VAL_[0-9]+'];
+    const sanitized = await scrubSecrets(input, customPatterns);
+    expect(sanitized).toBe('const my_config = "[REDACTED_SECRET]";');
+  });
+
+  it('should handle invalid custom regex patterns gracefully without throwing', async () => {
+    const input = 'const x = 5;';
+    const customPatterns = ['[invalid-regex'];
+    const sanitized = await scrubSecrets(input, customPatterns);
+    expect(sanitized).toBe(input);
+  });
+
+  it('should truncate and redact lines exceeding 500 characters to prevent ReDoS when custom patterns are set', async () => {
+    const longLine = 'x'.repeat(501);
+    const sanitized = await scrubSecrets(longLine, ['dummy_pattern']);
+    expect(sanitized).toBe('[REDACTED_SECRET]');
+  });
+
+  it('should trigger timeout in default patterns loop if CPU execution exceeds 500ms', async () => {
+    const originalNow = performance.now;
+    let callCount = 0;
+    performance.now = () => {
+      callCount++;
+      return callCount > 1 ? 501 : 0;
+    };
+    try {
+      await expect(scrubSecrets('some input')).rejects.toThrow(
+        'Sanitization timeout (possible ReDoS)'
+      );
+    } finally {
+      performance.now = originalNow;
+    }
+  });
+
+  it('should trigger timeout inside custom patterns loop if execution exceeds 500ms', async () => {
+    const originalNow = performance.now;
+    let callCount = 0;
+    performance.now = () => {
+      callCount++;
+      return callCount > 9 ? 501 : 0;
+    };
+    try {
+      await expect(scrubSecrets('some input', ['dummy_pattern'])).rejects.toThrow(
+        'Sanitization timeout (possible ReDoS)'
+      );
+    } finally {
+      performance.now = originalNow;
+    }
+  });
+
+  it('should re-throw custom pattern compilation timeouts to trigger fail-safe', async () => {
+    const originalRegExp = global.RegExp;
+    global.RegExp = function(pattern, flags) {
+      throw new Error('regex compile timeout');
+    } as any;
+    try {
+      await expect(scrubSecrets('input', ['dummy'])).rejects.toThrow(
+        'regex compile timeout'
+      );
+    } finally {
+      global.RegExp = originalRegExp;
+    }
+  });
 });
