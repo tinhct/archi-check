@@ -79,7 +79,7 @@
 |------|--------|-----------------|
 | 1 | Open browser DevTools → Network tab | Observe requests |
 | 2 | Note that the **⚖ Evaluate All Replies** button is DISABLED when any box has < 20 chars | UI-level gate enforced |
-| 3 | To test the API directly, run in browser console: `fetch('/api/playground/evaluate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ diff: 'some diff', quizJson: [], reply: 'short' }) }).then(r=>r.json()).then(console.log)` | Console prints: HTTP 400, `{ "error": "..." }` — Zod validation rejection |
+| 3 | To test the API directly, run in browser console: `fetch('/api/playground/evaluate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ diff: 'some diff', quizJson: [{ id: 'q1', question: 'Q', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }], reply: 'short' }) }).then(r=>r.json()).then(console.log)` | Console prints: HTTP 400, `{ "error": "reply is too short. Please provide a meaningful architectural justification (minimum 20 characters)." }` — Zod validation rejection |
 
 ### Test P2.4 — Production Block
 
