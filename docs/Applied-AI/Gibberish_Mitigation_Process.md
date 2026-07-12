@@ -1,21 +1,12 @@
 # Gibberish & Rubber-Stamp Bypass Prevention Process
 
-**Document Reference:** SEC-GP-001  
-**Last Updated:** 2026-07-12  
-**Status:** Approved / Implemented  
+**Context:** Bug BUG-505-3 highlighted that a developer could pass local playground validation checks by typing 20 random or repetitive characters (e.g. `gfgffffffdfdfdfdfdff` or `fdff3545656767876vfd`) which bypassed length constraints but contained zero semantic meaning.
+
+The following **multi-layered validation architecture** is established to ensure this bypass does not occur in Staging or Production environments.
 
 ---
 
-## 📌 Context & Problem Statement
-During Sprint 5 testing (specifically BUG-505-3), it was identified that the 20-character minimum length constraint on developer replies could be easily bypassed by typing repetitive or random character sequences (e.g., `'gfgffffffdfdfdfdfdff'` or `'fdff3545656767876vfd'`). 
-
-Since the local mock LLM provider only checked answer length, it immediately issued a `PASS (9/10)` verdict. In production, while a real LLM would typically reject this, transient outages triggering the **Fail-Open Default Policy** or lenient prompt scoring could allow these unsemantic bypasses to slip through, rubber-stamping code without cognitive review.
-
-To prevent this, ArchiCheck implements a **multi-layered validation architecture** that filters out non-semantic input before it can bypass the gates.
-
----
-
-## 🛡️ The 5-Layer Defense Architecture
+## 🛡️ The 5-Layer Defense Process
 
 ```mermaid
 graph TD
@@ -34,11 +25,11 @@ graph TD
 
 ### 1. Layer 1 — Pre-LLM API Validation Guardrails (Deterministic Gates)
 * **Goal:** Catch nonsense before calling the LLM. Non-spaced blocks or repetitive character mash-ups represent 95% of casual rubber-stamp bypasses.
-* **Process:** Implement lightweight, deterministic string analysis algorithms inside evaluation route handlers (`/api/playground/evaluate` and `/api/webhook` comment parsing):
-  * **Repetitive Letter Check:** Reject any reply containing more than 3 consecutive matching characters (e.g. `aaaa`, `ffff`).
+* **Process:** Implement lightweight, deterministic string analysis algorithms directly inside `POST /api/playground/evaluate` and `/api/webhook` handlers:
+  * **Repetitive Letter Check:** Reject any string containing more than 3 consecutive matching characters (e.g. `aaaa`, `ffff`).
   * **Word Spacing Check:** Enforce that a 20+ character answer must contain at least 3 space-separated words.
   * **Distinct Character Variety:** Require at least 6 unique letters (case-insensitive) for any answer ≥ 20 characters.
-  * **Suspicious Word Length:** Reject any individual word exceeding 15 characters, unless it contains path delimiters (`/`, `.`, `_`) or is a valid camelCase compound class name (matches `/[a-z][A-Z]/`).
+  * **Suspicious Word Length:** Reject any individual word exceeding 15 characters, unless it contains path delimiters (`/`, `.`, `_`) or is a valid camelCase compound class name.
 * **Benefit:** Saves API token budget and guarantees a deterministic block (LLMs are non-deterministic and can be tricked; RegExp is absolute).
 
 ---
@@ -79,7 +70,7 @@ graph TD
 
 ---
 
-### 5. Layer 5 — Input Sanitizer Gating
+### 5. Layer 5 — GitGuardian Secret / Input Gating
 * **Goal:** Prevent developers from bypassing sanitization by using prompt-injection strings inside raw files.
 * **Process:** Enforce that any reply submitted to issue comments goes through the same security quarantine as playgrounds (`scrubSecrets` and Danish DAN-style injection blocks).
 * **Benefit:** Protects the internal system prompts from leakage or parameter hijacking.
