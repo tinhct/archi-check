@@ -130,8 +130,8 @@ export class MockLLMProvider {
     const forceFail = scenario?.force_fail ?? false;
     
     const answer = answers[0] || '';
-    
     const normalizedAnswer = answer.toLowerCase();
+    
     const promptInjectionTriggers = [
       'ignore all previous instructions',
       'ignore previous instructions',
@@ -162,6 +162,55 @@ export class MockLLMProvider {
         passed: false,
         score: 4,
         reasoning: '❌ Mock evaluation failed: Scenario configured to force validation failure for testing.',
+        tokens: { input: 0, output: 0, total: 0 },
+      };
+    }
+
+    // Parse the concatenated Q/A blocks from the UI to check each reply box individually
+    const blocks = answer.split('\n\n');
+    const individualAnswers: string[] = [];
+    for (const block of blocks) {
+      const match = block.match(/\nA\d+:\s*([\s\S]*)$/);
+      if (match && match[1]) {
+        individualAnswers.push(match[1].trim());
+      }
+    }
+
+    // Fall back to validating the entire string if parse is not structured
+    const answersToVerify = individualAnswers.length > 0 ? individualAnswers : [answer.trim()];
+
+    const hasGibberish = answersToVerify.some((ans) => {
+      if (!ans) return false;
+
+      // 1. Repetitive characters: 4 or more consecutive identical characters (e.g., "ffffff", "aaaa")
+      if (/(.)\1{3,}/.test(ans)) return true;
+
+      // 2. Lack of space-separated words: a valid sentence must contain multiple words
+      const words = ans.split(/\s+/).filter(Boolean);
+      if (words.length < 3) return true;
+
+      // 3. Low distinct character variety: any 20+ character string must have at least 6 unique letters
+      const uniqueLetters = new Set(ans.replace(/[^a-zA-Z]/g, '').toLowerCase()).size;
+      if (ans.length >= 20 && uniqueLetters < 6) return true;
+
+      // 4. Suspect single word length: no single word should exceed 15 chars unless it has standard delimiters or is camelCase
+      const hasLongSuspiciousWord = words.some((word) => {
+        if (word.length > 15) {
+          // Exclude words containing standard delimiters (/ \ . _ -) or camelCase boundaries
+          return !(/[/\\._-]/.test(word) || /[a-z][A-Z]/.test(word));
+        }
+        return false;
+      });
+      if (hasLongSuspiciousWord) return true;
+
+      return false;
+    });
+
+    if (hasGibberish) {
+      return {
+        passed: false,
+        score: 2,
+        reasoning: '❌ Mock evaluation failed: Repetitive character patterns, lack of space-separated words, or invalid justifications detected. Please write a genuine, realistic architectural justification in each box.',
         tokens: { input: 0, output: 0, total: 0 },
       };
     }

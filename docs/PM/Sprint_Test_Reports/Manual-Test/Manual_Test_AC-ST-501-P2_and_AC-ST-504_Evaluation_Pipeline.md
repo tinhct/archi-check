@@ -114,6 +114,18 @@
 | 1 | Via browser console, POST to `/api/playground/evaluate` with missing `quizJson` field | Returns HTTP 400 |
 | 2 | Trigger this via the UI if possible (malformed state), or observe in UI that the error block shown for a 400 has | A **"Dismiss"** button only (no **Retry** button) — 400 errors are not retryable |
 
+### Test P2.8 — Gibberish & Repetitive Pattern Rejection (Mock LLM only)
+
+| Step | Action | Expected Result |
+|------|--------|-----------------|
+| 1 | Generate a quiz (any fixture) | Quiz renders with N questions |
+| 2 | In Q1 reply box, type: `'gfgffffffdfdfdfdfdff'` (20 characters, repeating `f` pattern) | Amber length hint disappears |
+| 3 | In remaining boxes, type: `'fdff3545656767876vfd'` (20 characters, no space-separated words) | Amber length hint disappears |
+| 4 | Click **⚖ Evaluate All Replies** | Evaluation fails with a score of `2 / 10` |
+| 5 | Verify the reasoning text | Shows: `"❌ Mock evaluation failed: Repetitive character patterns, lack of space-separated words, or invalid justifications detected. Please write a genuine, realistic architectural justification in each box."` |
+| 6 | Change the replies to valid sentences (e.g. `"We updated the class OrderRepositoryDecoratorImpl to resolve dependencies."` and `"The configuration was saved in src/lib/llm/provider.ts file."`) | Real text entered |
+| 7 | Click **⚖ Evaluate All Replies** | Evaluation succeeds with `PASS (9 / 10)` (note: camelCase names like `OrderRepositoryDecoratorImpl` and paths are correctly ignored by the long-word checking logic) |
+
 ---
 
 ## ✅ Done Criteria

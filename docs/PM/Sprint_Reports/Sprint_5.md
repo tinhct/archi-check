@@ -17,6 +17,7 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 | **AC-ST-505** | Playground UI — "Pipeline Thread" Layout Redesign | ✅ Done |
 | **BUG-505-1** | Reply textarea accepted trivially short inputs (`min(1)`) | ✅ Fixed |
 | **BUG-505-2** | Next.js 16 Turbopack warning for webpack config | ✅ Fixed |
+| **BUG-505-3** | Mock LLM allowed rubber-stamp bypass via gibberish replies | ✅ Fixed |
 
 *Note: AC-ST-501, AC-ST-502, AC-ST-503 were completed and validated in a prior session; this sprint report covers the Phase 2 extension work.*
 
@@ -31,7 +32,7 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 - Mock LLM (`mock_llm.ts`) updated to return token counts in its evaluation responses.
 - Zero Redis/Octokit side effects confirmed inside `validateAnswers` (pure function, all side effects remain in webhook route handler).
 - Shadow Mode compatibility confirmed — `auth.ts` Octokit interceptor unaffected by return type change.
-- Tests updated: 97/97 passing.
+- Tests updated: 101/101 passing.
 
 ### AC-ST-501-P2 — Two-Stage Evaluation Pipeline
 - **Shared schema:** `src/schema/quiz.ts` — `QuizSchema`, `DiffSchema`, `EvaluateResponseSchema` (Zod discriminated union).
@@ -39,7 +40,7 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 - **Evaluate route:** `POST /api/playground/evaluate` (Node.js runtime). Validates: diff (max 50,000 chars), quizJson (max 20 questions), reply (min 20, max 10,000 chars). Applies `scrubSecrets` to reply before LLM call. Returns discriminated union: `success | sanitizer_rejection | llm_format_error`. Blocked by `notFound()` in production.
 - **Fixture system:** `src/lib/mocks/fixtures/playground-fixtures.json` with 4 scenarios (clean, leaky, injection, ReDoS). webpack alias strips mocks from production client bundle.
 - **Two-stage React UI:** State machine `idle → quiz_ready → evaluated`. Strict downstream invalidation on diff change or Regenerate. Fixture seeding skips API call. Pipeline HUD with cumulative token total.
-- **Test coverage:** 11 unit tests for evaluate route; 97/97 total across 17 files.
+- **Test coverage:** 15 unit tests for evaluate route & mock LLM; 101/101 total across 17 files.
 
 ### AC-ST-505 — Pipeline Thread UI Redesign
 - **State:** `reply: string` → `perQuestionReplies: Record<string, string>` keyed on `question.id`.
@@ -82,6 +83,13 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 
   * **Actionable Improvement:** When modifying `next.config.ts`, always verify the Next.js major version in `package.json` and consult the migration notes for that version's bundler changes.
 
+* **What went wrong — Rubber-Stamp bypass on Mock LLM (BUG-505-3):**
+  While the frontend and API routes enforced a 20-character minimum length limit, developers could bypass this limit locally by typing 20 random characters (e.g., `gfgffffffdfdfdfdfdff` or `fdff3545656767876vfd`) and get an immediate `PASS (9/10)` score because the Mock LLM provider only checked length.
+
+  * **Root Cause:** The Mock LLM (`mock_llm.ts`) used a simplistic evaluation rubric: checking only whether the overall concatenated string exceeded the threshold length. It did not check for character entropy, word spacing, or repetitive patterns.
+
+  * **Actionable Improvement:** Expand local mock services to perform basic structure/syntax analysis on input parameters to prevent developers from learning bad habits during sandboxed trials. We implemented character repetition detectors (`/(.)\1{3,}/`), space/word counters (`words.length < 3`), unique letter variety tests, and suspicious long-word checkers in the Mock LLM. These checks correctly fail rubber-stamping attempts with a realistic error, while correctly ignoring valid camelCase class names (e.g. `OrderRepositoryDecoratorImpl`) and file path links.
+
 * **What went well:**
   - The discriminated union approach for the Phase 2 response schema (`success | sanitizer_rejection | llm_format_error`) was robust — no edge cases found during manual testing.
   - The `invalidateDownstream()` single-function invalidation pattern worked flawlessly across all three pipeline phases.
@@ -106,3 +114,4 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 * **Total Prompt Tokens:** N/A (mock provider used for all local testing)
 * **Total Completion Tokens:** N/A
 * **Estimated API Cost:** $0.00 (all tests run offline via `LLM_PROVIDER_TYPE=mock`)
+

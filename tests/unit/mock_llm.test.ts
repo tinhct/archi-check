@@ -104,6 +104,47 @@ describe('MockLLMProvider Unit Tests', () => {
     expect(result.reasoning).toContain('sufficiently detailed');
   });
 
+  describe('Gibberish and repetitive pattern detection', () => {
+    const mockQuiz = {
+      questions: [
+        { id: 'q1', question: 'Q1', targetFile: 'F', codeSnippet: 'C', rationale: 'R' },
+        { id: 'q2', question: 'Q2', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }
+      ]
+    };
+
+    it('should reject replies containing repetitive characters (e.g. gfgffffffdfdfdfdfdff)', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: gfgffffffdfdfdfdfdff\n\nQ2: Q2\nA2: This is a valid sentence that should normally pass.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(false);
+      expect(result.score).toBe(2);
+      expect(result.reasoning).toContain('Repetitive character patterns');
+    });
+
+    it('should reject replies lacking space-separated words (e.g. fdff3545656767876vfd)', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: fdff3545656767876vfd\n\nQ2: Q2\nA2: This is a valid sentence that should normally pass.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(false);
+      expect(result.score).toBe(2);
+      expect(result.reasoning).toContain('lack of space-separated words');
+    });
+
+    it('should reject replies containing excessively long suspicious words', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: fdff3545656767876vfd a b\n\nQ2: Q2\nA2: This is a valid sentence.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(false);
+      expect(result.score).toBe(2);
+      expect(result.reasoning).toContain('invalid justifications');
+    });
+
+    it('should allow valid sentences containing compound path strings or class names', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: We updated the class OrderRepositoryDecoratorImpl to resolve dependencies.\n\nQ2: Q2\nA2: The config was stored in src/lib/llm/provider.ts file.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(true);
+      expect(result.score).toBe(9);
+    });
+  });
+
+
   describe('Mock LLM Sandbox Configuration Routing', () => {
     it('should route to useState scenario when diff contains useState keyword', async () => {
       const mockDiff = 'diff --git a/file.tsx b/file.tsx\n+const [state, setState] = useState(0);';
