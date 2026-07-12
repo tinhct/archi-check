@@ -203,6 +203,27 @@ export class MockLLMProvider {
       });
       if (hasLongSuspiciousWord) return true;
 
+      // 5. Vowel-less words: any word of length >= 5 must contain at least one vowel (excluding paths, camelCase, and 'https')
+      const hasVowellessWord = words.some((word) => {
+        if (/[/\\._-]/.test(word) || /[a-z][A-Z]/.test(word)) return false;
+        if (word.length >= 5 && !/[aeiouy]/i.test(word)) {
+          return word.toLowerCase() !== 'https';
+        }
+        return false;
+      });
+      if (hasVowellessWord) return true;
+
+      // 6. Excessive consecutive consonants: any word of length >= 6 must not contain 5 or more consecutive alphabetical consonants
+      const hasConsonantMash = words.some((word) => {
+        if (/[/\\._-]/.test(word) || /[a-z][A-Z]/.test(word)) return false;
+        if (word.length >= 6 && /[bcdfghjklmnpqrstvwxz]{5,}/i.test(word)) {
+          // Whitelist common words like "strength", "phrase"
+          return !(/strength/i.test(word) || /phrase/i.test(word));
+        }
+        return false;
+      });
+      if (hasConsonantMash) return true;
+
       return false;
     });
 

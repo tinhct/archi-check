@@ -136,6 +136,27 @@ describe('MockLLMProvider Unit Tests', () => {
       expect(result.reasoning).toContain('invalid justifications');
     });
 
+    it('should reject replies containing vowel-less words of length >= 5', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: asfdg nhnhhjjj fdgfgfhghgh\n\nQ2: Q2\nA2: This is a valid sentence.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(false);
+      expect(result.score).toBe(2);
+    });
+
+    it('should reject replies containing excessive consecutive consonants of length >= 6', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: This has a consonant mash like asdfghj in the sentence.\n\nQ2: Q2\nA2: This is a valid sentence.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(false);
+      expect(result.score).toBe(2);
+    });
+
+    it('should allow valid sentences containing whitelisted words like strengths and catchphrase', async () => {
+      const concatenatedReply = 'Q1: Q1\nA1: This is a valid response with strengths and catchphrase in the description.\n\nQ2: Q2\nA2: The config was stored in src/lib/llm/provider.ts file.';
+      const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
+      expect(result.passed).toBe(true);
+      expect(result.score).toBe(9);
+    });
+
     it('should allow valid sentences containing compound path strings or class names', async () => {
       const concatenatedReply = 'Q1: Q1\nA1: We updated the class OrderRepositoryDecoratorImpl to resolve dependencies.\n\nQ2: Q2\nA2: The config was stored in src/lib/llm/provider.ts file.';
       const result = await provider.validateAnswers('some-diff', mockQuiz, [concatenatedReply]);
