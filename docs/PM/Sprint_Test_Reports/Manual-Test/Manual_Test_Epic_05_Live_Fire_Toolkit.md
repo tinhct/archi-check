@@ -109,33 +109,10 @@
 
 ---
 
-### 🌐 Case B: Live-Fire Staging (`MOCK_GITHUB=false`)
-
-#### Prerequisites (Case B)
-- Ensure `.env.local` contains **real credentials** of a configured GitHub App installation:
-  - `MOCK_GITHUB=false`
-  - `ARCHICHECK_MODE=shadow`
-  - `GITHUB_APP_ID=<your-app-id>`
-  - `GITHUB_PRIVATE_KEY="<your-private-pem-key>"`
-  - `GITHUB_WEBHOOK_SECRET=<your-webhook-secret>`
-- Restart dev server: `npm run dev`
-- Set up a webhook proxy forwarder (e.g. `ngrok http 3000` or `smee`) and map it in your GitHub App Webhook settings to forward live events to `http://localhost:3000/api/webhook`.
-
-#### Test B2.1 — Live API Read & Interception Verification
-
-| Step | Action Details | Expected Result |
-|------|----------------|-----------------|
-| 1 | Create a Pull Request or push changes to the repository where your test GitHub App is installed. | GitHub sends a live `pull_request` webhook payload to your localhost endpoint. |
-| 2 | Check the server terminal output. | Visual output logs show:<br/>1. Raw diff fetched successfully from GitHub REST API.<br/>2. Secrets sanitizer scans the live code changes.<br/>3. Gemini API pings for quiz questions.<br/>4. Outbound comments/status mutations are **intercepted** and print to stdout as `[SHADOW MODE] 🟡` logs. |
-| 3 | Open your repository on GitHub.com and view the PR page. | Confirm **no commit status check** is updated on your commit history, and **no comment** is posted to the PR thread. |
-
-#### Test B2.2 — Live Bypass Command Interception
-
-| Step | Action Details | Expected Result |
-|------|----------------|-----------------|
-| 1 | Post `/archicheck bypass` as a comment in the PR thread on GitHub. | GitHub fires a live `issue_comment` webhook payload to your local endpoint. |
-| 2 | Check the server terminal logs. | Visual output prints `[SHADOW MODE] 🟡 bypassCommand intercepted` along with the comment payload. |
-| 3 | Verify PR on GitHub.com | Confirm that the commit status gate remains unchanged (was not unblocked or updated). |
+> [!NOTE]
+> **Case B: Live-Fire Staging (`MOCK_GITHUB=false`) has been moved.**
+> Testing against real GitHub App credentials, a live webhook proxy (ngrok/smee), and a real repository requires a dedicated step-by-step guide to avoid accidental PR pollution.
+> See: `docs/PM/Sprint_Test_Reports/Manual-Test/Manual_Test_Live_Fire_Staging.md`
 
 ---
 

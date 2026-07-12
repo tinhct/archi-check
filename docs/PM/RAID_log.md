@@ -1,6 +1,6 @@
 # RAID Log
 
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-12
 
 ## ⚠️ Risks (Potential future problems)
 
@@ -21,6 +21,10 @@
 | R13 | 2026-07-10 | GitHub staging E2E tests blocked by 2FA login prompts or anti-bot captchas. | H | Use Playwright `storageState` session caching + programmatic TOTP fallback. | Closed |
 | R14 | 2026-07-10 | QA E2E test runs pollute staging branch refs and PR history. | M | Unconditional Octokit API teardown scripts deleting branches/PRs. | Closed |
 | R15 | 2026-07-10 | GitHub webhooks fail to route to dynamic Vercel preview environments. | H | Programmatically update QA GitHub App webhook URL to preview URL in CI. | Closed |
+| R16 | 2026-07-12 | Production regression if `validateAnswers` return type change (`EvaluationResult`) is not handled atomically with webhook route update. | H | Dual-approval PR gate required for AC-ST-504. CI must pass green before merge. | Open |
+| R17 | 2026-07-12 | `reasoning` vs `rationale` field name conflict between existing `evaluationResponseSchema` and Phase 2 API design. If misaligned, parity breaks silently. | M | Standardize on `reasoning` everywhere. Canonical Phase 2 schema updated to use `reasoning`. Verified in AC-ST-501-P2 AC-4. | Open |
+| R18 | 2026-07-12 | `playground-fixtures.json` containing adversarial prompt injection payloads may be included in production Next.js client bundle despite middleware 404 guard. | M | Configure `next.config.ts` webpack exclusion for `src/lib/mocks/` directory. Null-safety fallback `fixtures?.fixtures ?? []` required in UI component. | Open |
+| R19 | 2026-07-12 | LLM hallucinating scores outside 0-10 range causing Zod response parse failure, resulting in unhandled 500 on evaluate endpoint. | M | Route catches Zod parse failure and returns shaped `{ reason: "llm_format_error" }` 200 OK response instead of throwing. | Open |
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
@@ -57,6 +61,16 @@
 | D20 | 2026-07-10 | Use storageState + otplib for E2E authentication. | Session cookie caching handles 95% of runs, with a programmatic TOTP fallback. |
 | D21 | 2026-07-10 | API-driven global teardown branch cleanup. | Prevents repository branch bloat by closing PRs and deleting branches programmatically. |
 | D22 | 2026-07-10 | Dynamic webhook updates via App API. | Updates the QA GitHub App webhook endpoint to match Vercel Preview dynamically in CI. |
+| D23 | 2026-07-12 | Phase 2 evaluate response uses Zod discriminated union keyed on `reason` field with three variants: `success`, `sanitizer_rejection`, `llm_format_error`. | Flat schema permits logically impossible states (e.g., sanitizer_rejection with a score). Discriminated union enforces type-safe combinations at compile time. |
+| D24 | 2026-07-12 | Fixture file location: `src/lib/mocks/fixtures/playground-fixtures.json` (not `tests/` or `public/`). | `tests/` excluded from tsconfig. `public/` exposes security payloads. `src/lib/mocks/` resolves cleanly through TypeScript compiler while remaining logically quarantined. |
+| D25 | 2026-07-12 | `validateAnswers` confirmed pure (no Redis/Octokit side effects). Story 5.4 adds `tokens: { input, output, total }` to return type. | Side effects already correctly isolated in webhook route handler. Surfacing token counts enables playground evaluate route receipt display without duplicating LLM calls. |
+| D26 | 2026-07-12 | Zod structural validation runs BEFORE `parseDiff()` on the evaluate endpoint. | `parseDiff()` uses expensive regular expressions. Zod length boundaries (O(1) checks) immediately drop oversized payloads before diff parsing, preventing ReDoS on the Node event loop. |
+| D27 | 2026-07-12 | Sanitizer rejection of `reply` returns shaped HTTP 200 OK with `reason: "sanitizer_rejection"` and `passed: false`, NOT an HTTP 400. | HTTP 400 triggers generic error boundaries. A shaped 200 provides immediate, contextual feedback to developers testing prompt injection vectors locally, matching the pedagogical goal of the Playground. |
+| D28 | 2026-07-12 | Phase 2 diff and quizJson size limits: `diff` max 50,000 chars (shared with Phase 1 via `DiffSchema`), `quizJson` max 20 items (`z.array(QuizSchema).max(20)`), `reply` max 10,000 chars. | Protects evaluate endpoint from context window exhaustion and quota abuse via direct API calls bypassing the UI. |
+| D29 | 2026-07-12 | Playground evaluate route runs on Node.js runtime (not Edge). | Edge runtime dependency risk from transitive imports outweighs scalability benefit for a local-only developer tool. Middleware already blocks this route in production. |
+| D30 | 2026-07-12 | `passingThreshold: 7` is a fixed system constant returned in every Phase 2 API response. Configurable threshold via `.archicheck.yml` deferred to Future sprint (BLG-01). | Dynamically parsing synthetic repo configs in a stateless sandbox adds significant scope. Default of 7 is sufficient for Sprint 5. |
+| D31 | 2026-07-12 | Strict Invalidation rule: any diff `onChange` event or template load instantly nullifies `quizJson` and `evaluationResult` React state. Regenerate also clears Phase 2 state. CSS 0.2s opacity transition used for graceful visual fade. | Prevents contextual mismatch where quiz from Diff A is evaluated against Diff B reply. Debouncing creates a race condition window. |
+| D32 | 2026-07-12 | Token counter uses Replace (not Accumulate) semantics on Regenerate. Pipeline Total shows spinner during active LLM call. | Accumulation misrepresents single-transaction cost. Spinner prevents stale values from being read as current truth. |
 
 ## 🐛 Issues (Current problems occurring right now)
 

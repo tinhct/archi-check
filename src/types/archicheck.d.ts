@@ -31,9 +31,16 @@ export interface QuizState {
   bypassReason?: string;
 }
 
+export interface TokenCounts {
+  input: number;
+  output: number;
+  total: number;
+}
+
 export interface EvaluationResult {
   passed: boolean;
   score: number;
   reasoning: string;
+  tokens: TokenCounts;
 }
 

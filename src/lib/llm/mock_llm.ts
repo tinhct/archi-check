@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { QuizPayload, EvaluationResult } from '@/types/archicheck';
+import { QuizPayload, EvaluationResult, TokenCounts } from '@/types/archicheck';
 import { SandboxConfigSchema, SandboxScenario } from '@/types/sandbox';
 
 /**
@@ -113,12 +113,10 @@ export class MockLLMProvider {
     };
   }
 
-  async generateQuiz(diff: string): Promise<QuizPayload> {
+  async generateQuiz(diff: string): Promise<{ quiz: QuizPayload; tokens: TokenCounts }> {
     const scenario = this.matchScenario(diff);
-    if (scenario) {
-      return { questions: scenario.questions };
-    }
-    return this.getHardcodedDefaultQuestions();
+    const quiz = scenario ? { questions: scenario.questions } : this.getHardcodedDefaultQuestions();
+    return { quiz, tokens: { input: 0, output: 0, total: 0 } };
   }
 
   async validateAnswers(
@@ -154,7 +152,8 @@ export class MockLLMProvider {
       return {
         passed: false,
         score: 4,
-        reasoning: '❌ Security anomaly detected in response. Please provide a genuine architectural justification.'
+        reasoning: '❌ Security anomaly detected in response. Please provide a genuine architectural justification.',
+        tokens: { input: 0, output: 0, total: 0 },
       };
     }
     
@@ -162,7 +161,8 @@ export class MockLLMProvider {
       return {
         passed: false,
         score: 4,
-        reasoning: '❌ Mock evaluation failed: Scenario configured to force validation failure for testing.'
+        reasoning: '❌ Mock evaluation failed: Scenario configured to force validation failure for testing.',
+        tokens: { input: 0, output: 0, total: 0 },
       };
     }
     
@@ -170,14 +170,16 @@ export class MockLLMProvider {
       return {
         passed: true,
         score: 9,
-        reasoning: `✅ Mock evaluation passed: Your justification is sufficiently detailed (length > ${minLength} characters).`
+        reasoning: `✅ Mock evaluation passed: Your justification is sufficiently detailed (length > ${minLength} characters).`,
+        tokens: { input: 0, output: 0, total: 0 },
       };
     }
 
     return {
       passed: false,
       score: 4,
-      reasoning: `❌ Mock evaluation failed: Your explanation is too brief. Please elaborate with more detail (length must exceed ${minLength} characters).`
+      reasoning: `❌ Mock evaluation failed: Your explanation is too brief. Please elaborate with more detail (length must exceed ${minLength} characters).`,
+      tokens: { input: 0, output: 0, total: 0 },
     };
   }
 }

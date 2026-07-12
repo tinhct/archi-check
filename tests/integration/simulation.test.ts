@@ -96,15 +96,18 @@ vi.mock('@/lib/llm/provider', () => {
   return {
     llmProvider: {
       generateQuiz: vi.fn().mockResolvedValue({
-        questions: [
-          {
-            id: 'q1',
-            question: 'Why did you use an asynchronous task loop in the route handler?',
-            targetFile: 'src/app/api/webhook/route.ts',
-            codeSnippet: 'waitUntil(gatingTask)',
-            rationale: 'Checks if they understand Serverless background execution context limits.'
-          }
-        ]
+        quiz: {
+          questions: [
+            {
+              id: 'q1',
+              question: 'Why did you use an asynchronous task loop in the route handler?',
+              targetFile: 'src/app/api/webhook/route.ts',
+              codeSnippet: 'waitUntil(gatingTask)',
+              rationale: 'Checks if they understand Serverless background execution context limits.',
+            },
+          ],
+        },
+        tokens: { input: 0, output: 0, total: 0 },
       }),
       validateAnswers: vi.fn().mockImplementation((diff, quiz, answers) => {
         const answer = answers[0];
@@ -112,13 +115,15 @@ vi.mock('@/lib/llm/provider', () => {
           return Promise.resolve({
             passed: true,
             score: 9,
-            reasoning: 'The developer correctly explained that waitUntil prevents Vercel from freezing the context prematurely.'
+            reasoning: 'The developer correctly explained that waitUntil prevents Vercel from freezing the context prematurely.',
+            tokens: { input: 0, output: 0, total: 0 },
           });
         }
         return Promise.resolve({
           passed: false,
           score: 3,
-          reasoning: 'The developer failed to justify the concurrency and serverless execution bounds.'
+          reasoning: 'The developer failed to justify the concurrency and serverless execution bounds.',
+          tokens: { input: 0, output: 0, total: 0 },
         });
       })
     }

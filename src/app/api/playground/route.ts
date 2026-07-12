@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { scrubSecrets } from '@/lib/security/sanitizer';
 import { LLMProvider } from '@/lib/llm/provider';
 import { diffParserService } from '@/lib/analyzer/diff-parser';
+import { DiffSchema } from '@/schema/quiz';
 
 /**
  * POST /api/playground — AC-ST-501 / Epic-05
@@ -11,7 +12,7 @@ import { diffParserService } from '@/lib/analyzer/diff-parser';
  * ever bypassed (e.g., direct Vercel function invocation in production).
  *
  * Accepts: { diff: string, provider?: string }
- * Returns: { sanitizedDiff: string, quiz: object, tokenCost: string }
+ * Returns: { sanitizedDiff: string, quiz: object, tokens: { input: number, output: number, total: number } }
  */
 export async function POST(request: NextRequest) {
   // Secondary production gate (Defense in Depth — Layer 2)
@@ -30,6 +31,15 @@ export async function POST(request: NextRequest) {
 
   if (!diff || typeof diff !== 'string' || diff.trim().length === 0) {
     return NextResponse.json({ error: 'Request body must include a non-empty "diff" string.' }, { status: 400 });
+  }
+
+  // Validate diff size via shared DiffSchema (max 50,000 chars — matches evaluate endpoint)
+  const diffValidation = DiffSchema.safeParse(diff);
+  if (!diffValidation.success) {
+    return NextResponse.json(
+      { error: diffValidation.error.issues[0]?.message ?? 'Invalid diff input.' },
+      { status: 400 }
+    );
   }
 
   // Validate Git diff structure/modifications using the same parser as webhooks
@@ -52,19 +62,14 @@ export async function POST(request: NextRequest) {
     }
 
     const llm = new LLMProvider();
-    const quiz = await llm.generateQuiz(sanitizedDiff);
+    const { quiz, tokens } = await llm.generateQuiz(sanitizedDiff);
 
     // Restore original provider type env var
     if (providerOverride) {
       process.env.LLM_PROVIDER_TYPE = originalProviderType;
     }
 
-    // 3. Calculate a rough token cost estimate (characters / 4 ≈ tokens)
-    const estimatedInputTokens = Math.ceil(sanitizedDiff.length / 4);
-    const estimatedOutputTokens = Math.ceil(JSON.stringify(quiz).length / 4);
-    const tokenCost = `~${estimatedInputTokens + estimatedOutputTokens} tokens (estimate)`;
-
-    return NextResponse.json({ sanitizedDiff, quiz, tokenCost }, { status: 200 });
+    return NextResponse.json({ sanitizedDiff, quiz, tokens }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error.';
     console.error('[Playground API] Error:', message);

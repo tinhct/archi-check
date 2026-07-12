@@ -1,6 +1,6 @@
 # Product Backlog: ArchiCheck
 
-**Last Refined:** 2026-07-09
+**Last Refined:** 2026-07-12
 
 **Product Owner Persona:** Senior Agile Product Manager
 
@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
 |-------------|---------------|-------|-------------|------|--------------|----------------------|
-| 4           | 14            | 3     | 1           | 10   | 71.4%        | 2026-07-10           |
+| 5           | 17            | 0     | 0           | 17   | 100%         | 2026-07-12           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -200,56 +200,120 @@
 ---
 
 ### Epic-05: The "Live-Fire" Developer Toolkit
-* **Status:** To Do
-* **Description:** Empower developers to test real LLM generations locally using their own free-tier API keys, bypassing the need for live GitHub webhooks or staging infrastructure, while strictly protecting corporate token budgets.
-* **Progress:** `[░░░░░░░░░░] 0%`
+* **Status:** Done
+* **Description:** Empower developers to test real LLM generations locally using their own free-tier API keys, bypassing the need for live GitHub webhooks or staging infrastructure. Phase 2 extends the Local AI Playground into a stateful, two-stage interactive pipeline that mirrors the full GitHub PR comment/evaluation cycle. AC-ST-505 redesigned the UI into a Pipeline Thread layout with per-question inline reply boxes.
+* **Progress:** `[▓▓▓▓▓▓▓▓▓▓] 100%`
 
 #### 📋 User Stories
 
 ##### 🆔 AC-ST-501: The Local AI Playground (UI & API)
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 5
 * **Description:** As a Developer or OSS Contributor, I want a local web interface (localhost:3000/playground) to paste PR diffs and test them against live LLMs, so that I can rapidly iterate on AI prompt engineering without triggering GitHub webhooks or polluting remote repositories.
 * **Acceptance Criteria:**
-  1. [ ] Implement Next.js Middleware (`middleware.ts`) to intercept `/playground` and `/api/playground`. If `process.env.NODE_ENV === 'production'`, return an immediate 404 at the Edge.
-  2. [ ] Implement a secondary `notFound()` fallback inside the page and route components.
-  3. [ ] Build the Next.js API route that accepts a raw string diff, runs it through `sanitizer.ts`, sends it to the configured LLM provider, and returns the generated quiz JSON.
-  4. [ ] Build the React UI with a dark-mode developer aesthetic, utilizing a split-pane layout (Input Diff vs. Output JSON / Token Cost Estimate).
-  5. [ ] Implement a "Load Template" dropdown in the UI. Selecting a template must instantly auto-populate the input textarea with the 4 core mock scenarios from Sprint 4 (Clean, Leaky Diff, Prompt Injection, ReDoS).
+  1. [x] Implement Next.js Middleware (`middleware.ts`) to intercept `/playground` and `/api/playground`. If `process.env.NODE_ENV === 'production'`, return an immediate 404 at the Edge.
+  2. [x] Implement a secondary `notFound()` fallback inside the page and route components.
+  3. [x] Build the Next.js API route that accepts a raw string diff, runs it through `sanitizer.ts`, sends it to the configured LLM provider, and returns the generated quiz JSON.
+  4. [x] Build the React UI with a dark-mode developer aesthetic, utilizing a split-pane layout (Input Diff vs. Output JSON / Token Cost Estimate).
+  5. [x] Implement a "Load Fixture" dropdown in the UI. Selecting a fixture instantly auto-populates the diff and optionally seeds Phase 2 quiz state.
 * **Dependencies / Blockers:** Relies on Core Parser and Sanitizer configurations
 
 ##### 🆔 AC-ST-502: "Shadow Mode" (Read-Only Webhooks)
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 5
 * **Description:** As a System Administrator, I want a mode that processes real GitHub webhooks but intercepts all outbound write actions, so that I can safely test ArchiCheck against live historical PRs in my repository without posting ghost comments to my team.
 * **Acceptance Criteria:**
-  1. [ ] Update the GitHub App wrapper. If `process.env.ARCHICHECK_MODE === 'shadow'`, intercept and block `octokit.issues.createComment` and `octokit.repos.createCommitStatus`.
-  2. [ ] Intercept the caching utility: instantiate an `InMemoryCache` (using a JS Map) instead of the `UpstashRedisCache` so developers do not need live Redis credentials to run tests.
-  3. [ ] Route intercepted payloads to the local terminal. By default, output a colorized, human-readable trace log.
-  4. [ ] If `ARCHICHECK_SHADOW_FORMAT=json` is present in the environment, suppress all text logs and emit a single, strict, minified JSON object to stdout.
-  5. [ ] Strictly disable the parsing and execution of the `/archicheck bypass` slash command if Shadow Mode is active.
+  1. [x] Update the GitHub App wrapper. If `process.env.ARCHICHECK_MODE === 'shadow'`, intercept and block `octokit.issues.createComment` and `octokit.repos.createCommitStatus`.
+  2. [x] Intercept the caching utility: instantiate an `InMemoryCache` (using a JS Map) instead of the `UpstashRedisCache` so developers do not need live Redis credentials to run tests.
+  3. [x] Route intercepted payloads to the local terminal. By default, output a colorized, human-readable trace log.
+  4. [x] If `ARCHICHECK_SHADOW_FORMAT=json` is present in the environment, suppress all text logs and emit a single, strict, minified JSON object to stdout.
+  5. [x] Strictly disable the parsing and execution of the `/archicheck bypass` slash command if Shadow Mode is active.
 * **Dependencies / Blockers:** Relies on Webhook Handler
 
 ##### 🆔 AC-ST-503: The "BYOK" Free-Tier Setup Wizard
 * **Priority:** High
-* **Status:** To Do
+* **Status:** Done
 * **Assigned Sprint:** Sprint 5
 * **Description:** As a New Contributor, I want a CLI script to securely configure my own free-tier API key, so that I can test live-fire scenarios without needing access to the project's guarded Vertex AI staging budget.
 * **Acceptance Criteria:**
-  1. [ ] Write a Node CLI script (`npm run setup:keys`) using inquirer or prompts to guide the user through setup.
-  2. [ ] Prompt the user for their Gemini Developer key, and attempt a real, lightweight API call (e.g. countTokens) to validate the key online.
-  3. [ ] If the user passes the `--offline` flag, skip the ping, display a yellow warning (`⚠️ Offline mode enabled. Skipping Gemini API validation.`), and proceed.
-  4. [ ] If validation fails online, prompt the user: *"Validation failed. Do you want to save this key anyway? (y/N)"*.
-  5. [ ] Upon success (or explicit override), automatically inject `LLM_API_KEY=[key]` and `LLM_PROVIDER_TYPE=gemini-developer` into `.env.local` without corrupting other variables.
+  1. [x] Write a Node CLI script (`npm run setup:keys`) using inquirer or prompts to guide the user through setup.
+  2. [x] Prompt the user for their Gemini Developer key, and attempt a real, lightweight API call (e.g. countTokens) to validate the key online.
+  3. [x] If the user passes the `--offline` flag, skip the ping, display a yellow warning (`⚠️ Offline mode enabled. Skipping Gemini API validation.`), and proceed.
+  4. [x] If validation fails online, prompt the user: *"Validation failed. Do you want to save this key anyway? (y/N)"*.
+  5. [x] Upon success (or explicit override), automatically inject `LLM_API_KEY=[key]` and `LLM_PROVIDER_TYPE=gemini-developer` into `.env.local` without corrupting other variables.
 * **Dependencies / Blockers:** None
+
+##### 🆔 AC-ST-501-P2: Local AI Playground — Phase 2 (Two-Stage Evaluation Pipeline)
+* **Priority:** High
+* **Status:** Done
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a Developer tuning the AI system, I want a stateful two-stage interactive pipeline inside the Playground (Generate Quiz → Submit Reply → Grade) that mirrors the GitHub PR comment thread, so that I can test both generation and evaluation phases locally without triggering real webhooks.
+* **Acceptance Criteria:**
+  1. [x] **Schema Extraction (Task 5.1.1a):** `src/schema/quiz.ts` created with shared `QuizSchema` and `DiffSchema`. Both API routes import from it.
+  2. [x] **Phase 1 Breaking Schema Change (Task 5.1.1b):** `POST /api/playground` now returns `{ quiz, tokens: { input, output, total } }`. All 9 Phase 1 unit tests updated.
+  3. [x] **Evaluate API Route (Task 5.1.2):** `POST /api/playground/evaluate` implemented on Node.js runtime with Zod validation (reply min 20, max 10,000; quizJson max 20; diff max 50,000), sanitizer gate, LLM call, score integrity check. Production blocked via `notFound()`.
+  4. [x] **Canonical Phase 2 Response Schema:** Discriminated union (`success | sanitizer_rejection | llm_format_error`) implemented in `src/schema/quiz.ts` and enforced in the route.
+  5. [x] **Fixture File:** `src/lib/mocks/fixtures/playground-fixtures.json` created with 4 scenarios. webpack alias strips mocks from production client bundle.
+  6. [x] **Two-Stage React UI:** State machine `idle → quiz_ready → evaluated` with strict downstream invalidation, fixture seeding, Pipeline HUD, per-question inline reply boxes (AC-ST-505), compact token badges, sanitized diff tab.
+  7. [x] **Test Coverage:** 11 unit tests for evaluate route (97 total across 17 files). All green.
+* **Dependencies / Blockers:** Blocked by AC-ST-504 (resolved). Requires `src/schema/quiz.ts` (created).
+
+##### 🆔 AC-ST-504: Isolate & Surface LLM Evaluation Telemetry
+* **Priority:** Highest (Hard blocker for AC-ST-501-P2 evaluate endpoint)
+* **Status:** Done
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a Tech Lead, I want `validateAnswers` in `provider.ts` to surface separate `input`/`output` token counts in its return value so that the Playground evaluate route and the webhook route can display accurate per-phase token costs, while formally verifying the function contains zero Redis/Octokit side effects.
+* **Acceptance Criteria:**
+  1. [x] **Verify Purity:** `validateAnswers` confirmed pure — all Octokit and Redis side effects confirmed in webhook route handler only.
+  2. [x] **Update Return Type:** `EvaluationResult` type updated with `tokens: { input, output, total }`. `validateAnswers` threads token counts from `usageMetadata`.
+  3. [x] **Update Fail-Open:** Fail-open return includes `tokens: { input: 0, output: 0, total: 0 }`.
+  4. [x] **Update Webhook Route:** Webhook call-site updated. TypeScript compiles cleanly.
+  5. [x] **Verify Shadow Mode Compatibility:** `auth.ts` Octokit interceptor verified compatible after return type change.
+  6. [x] **Update Tests:** `provider.test.ts` and `simulation.test.ts` updated. 97/97 green.
+  7. [x] **Dual Approval Gate:** Approved by Tech Lead and System Architect.
+* **Dependencies / Blockers:** None.
+
+##### 🆔 AC-ST-505: Playground UI — "Pipeline Thread" Layout Redesign
+* **Priority:** High
+* **Status:** Done
+* **Assigned Sprint:** Sprint 5
+* **Description:** As a Developer using the Playground, I want a Pipeline Thread layout with per-question inline reply boxes, compact token badges, and a Sanitized Diff tab, so that the interaction flow mirrors the GitHub PR comment thread and eliminates the reply megabox / token receipt sprawl.
+* **Acceptance Criteria:**
+  1. [x] Right pane renders one `question-thread-block` per question with inline `<textarea>` reply box (`reply-input-{question.id}`).
+  2. [x] React state: `reply: string` replaced by `perQuestionReplies: Record<string, string>`. `invalidateDownstream()`, `handleReset()` clear the map. `handleRetryEval()` preserves it.
+  3. [x] Concatenation: structured `Q{n}: {question}\nA{n}: {answer}` format joined by `\n\n` before POST to evaluate endpoint.
+  4. [x] Evaluate button enabled only when ALL per-question boxes meet `MIN_REPLY_LENGTH` (20 chars). Per-box amber hint shown below threshold.
+  5. [x] Token receipt table replaced with compact inline badges: `In: X | Out: Y | Total: Z` in Phase 1 card header.
+  6. [x] Left pane tab bar: `[Raw PR Diff]` `[Sanitized View]`. Sanitized tab disabled until after Generate. Resets to Raw on `invalidateDownstream()`.
+  7. [x] Phase 2 megabox removed from left pane.
+  8. [x] Pipeline HUD (header bar) unchanged.
+  9. [x] Fixture `phase2.reply` ignored — reply boxes left empty on fixture load.
+  10. [x] Element IDs: `tab-raw`, `tab-sanitized`, `reply-input-{question.id}` added.
+  11. [x] `npx tsc --noEmit` clean. 97/97 tests green (no regressions).
+* **Dependencies / Blockers:** None — UI-only change, no API modifications.
+
+---
+
+## 📌 Non-Critical Backlog Items (Future Sprints)
+
+The following items were identified during the Phase 2 design session and are deferred:
+
+| ID | Description | Rationale for Deferral |
+|----|-------------|------------------------|
+| BLG-01 | Configurable `passingThreshold` via `.archicheck.yml` | Adds significant scope; default of 7 is sufficient for Sprint 5 sandbox |
+| BLG-02 | `z.literal(0)` enforcement on `sanitizer_rejection` token fields | Over-engineering for current sprint |
+| BLG-03 | Shared `DiffSchema` constant in `src/schema/quiz.ts` (already covered in AC-ST-501-P2 AC-1) | Covered |
+| BLG-04 | Fixture schema `version` field migration tooling (v1.0 → v2.0 migration helper) | Future when fixtures evolve |
 
 ---
 
 ## 🎯 Next Sprint Priorities (Refinement Queue)
-1. **AC-ST-501: Local AI Playground (UI & API)** (High - Critical developer feedback loop DX).
-2. **AC-ST-502: "Shadow Mode" (Read-Only Webhooks)** (High - Real repository safe integration testing).
-3. **AC-ST-503: The "BYOK" Free-Tier Setup Wizard** (High - Frictionless onboarding for external contributors).
-4. **AC-ST-302: Token Burn Telemetry Alerting** (High - Critical budget control for staging/prod).
-5. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium - Required for Alpha pilots).
+
+**Sprint 5 — COMPLETE ✅**
+All Sprint 5 stories (AC-ST-501, AC-ST-502, AC-ST-503, AC-ST-504, AC-ST-501-P2, AC-ST-505) are Done.
+
+**Sprint 6 — Candidate Stories (Future Sprints):**
+1. **AC-ST-302: Token Burn Telemetry Alerting** (High — Critical budget control before staging/prod launch.)
+2. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium — Required for Alpha pilots in Vietnam and EU.)

@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
             }
 
             // F. Generate Quiz (LLM Provider call)
-            const quizPayload = await llmProvider.generateQuiz(sanitizedDiff);
+            const { quiz: quizPayload } = await llmProvider.generateQuiz(sanitizedDiff);
 
             // F. Cache Quiz State in Upstash Redis (Cache-First)
             // If this throws (timeout/error), it falls to catch block (Fail-Open)

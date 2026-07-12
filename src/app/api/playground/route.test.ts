@@ -3,6 +3,10 @@
  *
  * Historical Mitigation (Sprint 4): All fs calls and external modules
  * are mocked to prevent reading real disk files and polluting the environment.
+ *
+ * Breaking change (AC-ST-501-P2 Task A3): response now returns real
+ * `tokens: { input, output, total }` from LLM provider instead of the
+ * estimated `tokenCost` string.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
@@ -69,21 +73,24 @@ describe('POST /api/playground', () => {
       content.replace(/AKIAIOSFODNN7EXAMPLE/g, '[REDACTED_SECRET]')
     );
 
-    // Default happy-path mock for generateQuiz
+    // Default happy-path mock for generateQuiz — returns new { quiz, tokens } shape
     mockGenerateQuiz.mockResolvedValue({
-      questions: [
-        {
-          id: 'q1',
-          question: 'Why is this change necessary?',
-          targetFile: 'src/index.ts',
-          codeSnippet: 'const added = "new";',
-          rationale: 'To understand the architecture decision.',
-        },
-      ],
+      quiz: {
+        questions: [
+          {
+            id: 'q1',
+            question: 'Why is this change necessary?',
+            targetFile: 'src/index.ts',
+            codeSnippet: 'const added = "new";',
+            rationale: 'To understand the architecture decision.',
+          },
+        ],
+      },
+      tokens: { input: 120, output: 80, total: 200 },
     });
   });
 
-  it('returns sanitizedDiff, quiz, and tokenCost for a valid diff', async () => {
+  it('returns sanitizedDiff, quiz, and real token counts for a valid diff', async () => {
     const req = makeRequest({ diff: 'const x = "AKIAIOSFODNN7EXAMPLE";', provider: 'mock' });
     const res = await POST(req);
 
@@ -93,8 +100,10 @@ describe('POST /api/playground', () => {
     expect(body.sanitizedDiff).toContain('[REDACTED_SECRET]');
     expect(body).toHaveProperty('quiz');
     expect(body.quiz.questions).toHaveLength(1);
-    expect(body).toHaveProperty('tokenCost');
-    expect(typeof body.tokenCost).toBe('string');
+    // Verify new tokens shape (replaces deprecated tokenCost string)
+    expect(body).toHaveProperty('tokens');
+    expect(body.tokens).toEqual({ input: 120, output: 80, total: 200 });
+    expect(body).not.toHaveProperty('tokenCost');
   });
 
   it('calls scrubSecrets before calling the LLM', async () => {
@@ -115,6 +124,14 @@ describe('POST /api/playground', () => {
     const req = makeRequest({ diff: '   ', provider: 'mock' });
     const res = await POST(req);
     expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when diff exceeds 50,000 characters', async () => {
+    const req = makeRequest({ diff: 'x'.repeat(50001), provider: 'mock' });
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toContain('50,000');
   });
 
   it('returns 400 when body is invalid JSON', async () => {

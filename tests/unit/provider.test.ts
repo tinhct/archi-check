@@ -27,9 +27,9 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
 
     const result = await llmProvider.generateQuiz('some-diff-content');
 
-    expect(result.questions).toHaveLength(1);
-    expect(result.questions[0].targetFile).toBe('unknown');
-    expect(result.questions[0].question).toContain('Bypassed due to LLM circuit breaker');
+    expect(result.quiz.questions).toHaveLength(1);
+    expect(result.quiz.questions[0].targetFile).toBe('unknown');
+    expect(result.quiz.questions[0].question).toContain('Bypassed due to LLM circuit breaker');
     expect(spy).toHaveBeenCalled();
   });
 
@@ -47,6 +47,7 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
     expect(result.passed).toBe(true);
     expect(result.score).toBe(10);
     expect(result.reasoning).toContain('Evaluation bypassed due to LLM timeout');
+    expect(result.tokens).toEqual({ input: 0, output: 0, total: 0 });
     expect(spy).toHaveBeenCalled();
   });
 

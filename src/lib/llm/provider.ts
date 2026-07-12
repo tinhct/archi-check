@@ -1,5 +1,5 @@
 import { env } from '@/config/env';
-import { QuizPayload, EvaluationResult } from '@/types/archicheck';
+import { QuizPayload, EvaluationResult, TokenCounts } from '@/types/archicheck';
 import { PROMPTS } from './prompts';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VertexAI } from '@google-cloud/vertexai';
@@ -71,7 +71,7 @@ export class LLMProvider {
   /**
    * Generates a quiz from a git diff payload.
    */
-  async generateQuiz(diff: string): Promise<QuizPayload> {
+  async generateQuiz(diff: string): Promise<{ quiz: QuizPayload; tokens: TokenCounts }> {
     if (this.providerType === 'mock' && this.mockProvider) {
       return this.mockProvider.generateQuiz(diff);
     }
@@ -79,23 +79,26 @@ export class LLMProvider {
     const prompt = PROMPTS.QUIZ_GENERATION_V1.replace('{{diff}}', this.sanitizePromptInput(diff));
 
     try {
-      const jsonResponse = await this.executeWithRetry((signal) =>
+      const response = await this.executeWithRetry((signal) =>
         this.callLLM(prompt, QUIZ_SCHEMA, signal)
       );
-      return JSON.parse(jsonResponse) as QuizPayload;
+      return { quiz: JSON.parse(response.text) as QuizPayload, tokens: response.tokens };
     } catch (error) {
       console.error('[ArchiCheck] LLM generateQuiz circuit breaker triggered (failing open):', error);
       // Return a safe fail-open fallback so the PR status check passes and doesn't block CI/CD
       return {
-        questions: [
-          {
-            id: 'q1',
-            question: 'What is the architectural role of this component? (Bypassed due to LLM circuit breaker)',
-            targetFile: 'unknown',
-            codeSnippet: 'unknown',
-            rationale: 'Circuit breaker fail-open default.'
-          }
-        ]
+        quiz: {
+          questions: [
+            {
+              id: 'q1',
+              question: 'Bypassed due to LLM circuit breaker — what is the architectural intent of your changes?',
+              targetFile: 'unknown',
+              codeSnippet: '',
+              rationale: 'LLM unavailable — fallback question to unblock CI/CD pipeline.',
+            },
+          ],
+        },
+        tokens: { input: 0, output: 0, total: 0 },
       };
     }
   }
@@ -118,16 +121,23 @@ export class LLMProvider {
       .replace('{{answers}}', this.sanitizePromptInput(JSON.stringify(answers)));
 
     try {
-      const jsonResponse = await this.executeWithRetry((signal) =>
+      const response = await this.executeWithRetry((signal) =>
         this.callLLM(prompt, EVAL_SCHEMA, signal)
       );
-      return JSON.parse(jsonResponse) as EvaluationResult;
+      const parsed = JSON.parse(response.text) as { passed: boolean; score: number; reasoning: string };
+      return {
+        passed: parsed.passed,
+        score: parsed.score,
+        reasoning: parsed.reasoning,
+        tokens: response.tokens,
+      };
     } catch (error) {
       console.error('[ArchiCheck] LLM validateAnswers circuit breaker triggered (failing open):', error);
       return {
         passed: true,
         score: 10,
-        reasoning: 'Evaluation bypassed due to LLM timeout or service error. Auto-approved.'
+        reasoning: 'Evaluation bypassed due to LLM timeout or service error. Auto-approved.',
+        tokens: { input: 0, output: 0, total: 0 },
       };
     }
   }
@@ -135,7 +145,7 @@ export class LLMProvider {
   /**
    * Routes the LLM execution based on configured provider and model type.
    */
-  private async callLLM(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
+  private async callLLM(prompt: string, schema: object, signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
     if (this.provider === 'claude') {
       return this.callClaude(prompt, schema, signal);
     }
@@ -150,7 +160,7 @@ export class LLMProvider {
   /**
    * Calls the developer-tier Gemini API using the official SDK.
    */
-  private async callGeminiDeveloper(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
+  private async callGeminiDeveloper(prompt: string, schema: object, signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
     const genAI = new GoogleGenerativeAI(this.apiKey);
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
@@ -173,23 +183,29 @@ export class LLMProvider {
 
     // Telemetry log for token consumption
     const tokenUsage = result.response.usageMetadata;
+    const tokens: TokenCounts = {
+      input: tokenUsage?.promptTokenCount ?? 0,
+      output: tokenUsage?.candidatesTokenCount ?? 0,
+      total: tokenUsage?.totalTokenCount ?? 0,
+    };
+
     if (tokenUsage) {
       console.log(JSON.stringify({
         event: 'llm_tokens_consumed',
-        prompt_tokens: tokenUsage.promptTokenCount,
-        completion_tokens: tokenUsage.candidatesTokenCount,
-        total_tokens: tokenUsage.totalTokenCount
+        prompt_tokens: tokens.input,
+        completion_tokens: tokens.output,
+        total_tokens: tokens.total,
       }));
     }
 
-    return text;
+    return { text, tokens };
   }
 
   /**
    * Calls the enterprise-tier Vertex AI endpoint using the official Google Cloud SDK.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async callVertexAI(prompt: string, schema: object, _signal: AbortSignal): Promise<string> {
+  private async callVertexAI(prompt: string, schema: object, _signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
     if (!this.googleCredsJson) {
       throw new Error('GOOGLE_CREDS_JSON is required for Vertex AI configuration');
     }
@@ -223,22 +239,28 @@ export class LLMProvider {
     }
 
     const tokenUsage = result.response.usageMetadata;
+    const tokens: TokenCounts = {
+      input: tokenUsage?.promptTokenCount ?? 0,
+      output: tokenUsage?.candidatesTokenCount ?? 0,
+      total: tokenUsage?.totalTokenCount ?? 0,
+    };
+
     if (tokenUsage) {
       console.log(JSON.stringify({
         event: 'llm_tokens_consumed',
-        prompt_tokens: tokenUsage.promptTokenCount,
-        completion_tokens: tokenUsage.candidatesTokenCount,
-        total_tokens: tokenUsage.totalTokenCount
+        prompt_tokens: tokens.input,
+        completion_tokens: tokens.output,
+        total_tokens: tokens.total,
       }));
     }
 
-    return text;
+    return { text, tokens };
   }
 
   /**
    * Calls Claude API via HTTP REST as configured (with zero data retention headers).
    */
-  private async callClaude(prompt: string, schema: object, signal: AbortSignal): Promise<string> {
+  private async callClaude(prompt: string, schema: object, signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
     const url = 'https://api.anthropic.com/v1/messages';
     
     const response = await fetch(url, {
@@ -271,16 +293,22 @@ export class LLMProvider {
     }
 
     const tokenUsage = result?.usage;
+    const tokens: TokenCounts = {
+      input: tokenUsage?.input_tokens ?? 0,
+      output: tokenUsage?.output_tokens ?? 0,
+      total: (tokenUsage?.input_tokens ?? 0) + (tokenUsage?.output_tokens ?? 0),
+    };
+
     if (tokenUsage) {
       console.log(JSON.stringify({
         event: 'llm_tokens_consumed',
-        prompt_tokens: tokenUsage.input_tokens,
-        completion_tokens: tokenUsage.output_tokens,
-        total_tokens: tokenUsage.input_tokens + tokenUsage.output_tokens
+        prompt_tokens: tokens.input,
+        completion_tokens: tokens.output,
+        total_tokens: tokens.total,
       }));
     }
 
-    return text;
+    return { text, tokens };
   }
 
   /**
