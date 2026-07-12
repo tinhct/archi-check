@@ -23,7 +23,6 @@ import './playground.css';
 
 // Static JSON import — webpack alias resolves to {} in production builds
 // (see next.config.ts), so FIXTURES gracefully degrades to an empty array.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import fixturesData from '@/lib/mocks/fixtures/playground-fixtures.json';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────

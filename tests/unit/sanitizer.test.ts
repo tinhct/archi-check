@@ -122,9 +122,9 @@ describe('Secret Sanitizer Unit Tests', () => {
 
   it('should re-throw custom pattern compilation timeouts to trigger fail-safe', async () => {
     const originalRegExp = global.RegExp;
-    global.RegExp = function(pattern, flags) {
+    global.RegExp = (() => {
       throw new Error('regex compile timeout');
-    } as any;
+    }) as unknown as typeof RegExp;
     try {
       await expect(scrubSecrets('input', ['dummy'])).rejects.toThrow(
         'regex compile timeout'

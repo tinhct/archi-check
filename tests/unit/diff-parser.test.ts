@@ -97,7 +97,9 @@ diff --git a/src/include-me/file.ts b/src/include-me/file.ts
   });
 
   it('should handle exclusion pattern parsing errors gracefully by writing a warning and skipping the pattern', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const originalGlobToRegex = (diffParserService as any).globToRegex;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (diffParserService as any).globToRegex = () => {
       throw new Error('mock glob regex build error');
     };
@@ -105,6 +107,7 @@ diff --git a/src/include-me/file.ts b/src/include-me/file.ts
       const isExcluded = diffParserService.isExcluded('src/file.ts', ['invalid-glob-pattern']);
       expect(isExcluded).toBe(false);
     } finally {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (diffParserService as any).globToRegex = originalGlobToRegex;
     }
   });
