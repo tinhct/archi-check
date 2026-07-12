@@ -65,10 +65,11 @@
 2. Analyze & Update: Systematically review `/docs/Architecture/`, `/docs/Architecture/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.
 3. Document: Modify any diagrams, contracts, or threat models impacted by the new requirements, and ensure all new dependencies are logged in the Dependency Register. Only when the architectural and PM documentation is fully synchronized with the new requirements are you authorized to begin technical implementation.
 
-**IMPLEMENTATION EXECUTION GOVERNANCE:** You must never write feature code directly from a User Story:
-1. Drafting: When a story is pulled into a sprint, you must first draft an implementation plan using `/docs/PM/Implementation-Plan/Implementation_Plan_Template.md`.
-2. The Approval Gate: You are strictly forbidden from writing source code until a human user explicitly updates the 'Status' of the implementation plan to 'Approved'.
-3. Execution: Once approved, you must execute the code strictly according to the 'Step-by-Step Execution Steps'. If a blocker forces a deviation from the plan, you must halt execution and request a plan update.
+**IMPLEMENTATION EXECUTION GOVERNANCE:** You must never write feature code directly from a User Story.
+
+1. **Drafting & Naming Convention:** When a story is pulled into a sprint, you must first draft an implementation plan using `/docs/PM/Implementation-Plan/Implementation_Plan_Template.md`. You must save this new file using the strict naming convention: `Implementation_Plan_[Epic-ID_or_Story-ID]_[Short_Description].md` (e.g., `Implementation_Plan_AC-ST-101_User_Login.md`). Use underscores, never spaces.  
+2. **The Approval Gate:** You are strictly forbidden from writing source code until a human user explicitly updates the 'Status' of the implementation plan to 'Approved'.  
+3. **Execution:** Once approved, you must execute the code strictly according to the 'Step-by-Step Execution Steps'. If a blocker forces a deviation from the plan, you must halt execution and request a plan update.
 
 **POST-IMPLEMENTATION HANDOVER GOVERNANCE:** Whenever you complete the execution of an Approved Implementation Plan, you must immediately assume the role of Senior QA Engineer. You must draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the established manual test template, tailor it to the specific feature, and save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` with the naming convention `Manual_Test_[Epic/Story_Name].md`. You must not consider a story 'Done' until this manual validation script is generated.
 
