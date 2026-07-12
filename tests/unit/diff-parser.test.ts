@@ -95,4 +95,34 @@ diff --git a/src/include-me/file.ts b/src/include-me/file.ts
     // Only src/include-me/file.ts (1 line added) should count. src/exclude-me/file.ts should be ignored.
     expect(analysis.linesAdded).toBe(1);
   });
+
+  it('should handle exclusion pattern parsing errors gracefully by writing a warning and skipping the pattern', () => {
+    const originalGlobToRegex = (diffParserService as any).globToRegex;
+    (diffParserService as any).globToRegex = () => {
+      throw new Error('mock glob regex build error');
+    };
+    try {
+      const isExcluded = diffParserService.isExcluded('src/file.ts', ['invalid-glob-pattern']);
+      expect(isExcluded).toBe(false);
+    } finally {
+      (diffParserService as any).globToRegex = originalGlobToRegex;
+    }
+  });
+
+  it('should skip blocklisted files in extractAddedCode', () => {
+    const mockDiff = `
+diff --git a/package-lock.json b/package-lock.json
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1,1 +1,2 @@
++{ "new_dependency": "1.0.0" }
+diff --git a/src/index.ts b/src/index.ts
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -1,1 +1,2 @@
++const active = true;
+    `.trim();
+    const cleanCode = diffParserService.extractAddedCode(mockDiff);
+    expect(cleanCode).toBe('const active = true;');
+  });
 });

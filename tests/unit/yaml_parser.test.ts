@@ -62,4 +62,10 @@ lines_added_threshold: [invalid
     
     warnSpy.mockRestore();
   });
+
+  it('should fallback to defaults when YAML contains only comments and parses as null', () => {
+    const yaml = '# This is just a comment';
+    const config = parseAndValidateConfig(yaml);
+    expect(config.lines_added_threshold).toBe(300);
+  });
 });
