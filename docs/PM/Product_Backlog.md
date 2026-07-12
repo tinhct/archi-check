@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
 |-------------|---------------|-------|-------------|------|--------------|----------------------|
-| 5           | 17            | 0     | 0           | 17   | 100%         | 2026-07-12           |
+| 5           | 23            | 5     | 0           | 18   | 78.3%        | 2026-07-12           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -59,6 +59,27 @@
 *   2. [x] Validates that invalid JSON or altered response schemas throw parsing exceptions and redirect flow to fallback states timing-safely.
 * **Dependencies / Blockers:** None
 
+##### 🆔 AC-ST-601: Enforce Strict Environment Variable Boot Validation
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 6
+* **Description:** As a Developer or Administrator, I want the environment configuration system to parse GITHUB_PRIVATE_KEY for standard RSA delimiters and multi-line formats on boot, so that key format errors are caught at startup rather than throwing cryptic JWT signing errors at runtime.
+* **Acceptance Criteria:**
+*   1. [ ] Zod env validation schema (`src/config/env.ts`) parses GITHUB_PRIVATE_KEY checking that it starts with `-----BEGIN RSA PRIVATE KEY-----` and contains newline formatting.
+*   2. [ ] Startup fails immediately with a fatal error if key validation fails, stopping misconfigured Docker or staging/production server containers from booting.
+* **Dependencies / Blockers:** None
+
+##### 🆔 AC-ST-603: Standardize Pre-LLM API Validation Guardrails (Deterministic Filtering)
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 6
+* **Description:** As a Product Owner, I want the production webhook pipeline (/api/webhook) and evaluate API route to use the same deterministic gibberish verification rules implemented in the local sandbox, so that nonsense answers are blocked at the API layer without burning LLM token budgets.
+* **Acceptance Criteria:**
+*   1. [ ] Webhook route processes reply comments through deterministic gibberish checks: character repetition checks, spacing/word count density, distinct letter counts, and suspicious single-word limits.
+*   2. [ ] Obvious gibberish comments are rejected at the API layer (returning a status nudge / comment), avoiding expensive non-deterministic LLM evaluation calls.
+*   3. [ ] Playground evaluate route (`/api/playground/evaluate`) uses the same deterministic checker.
+* **Dependencies / Blockers:** Relies on Epic-05 (ac-st-501-p2, mock semantic validator logic)
+
 ---
 
 ### Epic-02: Interactive Interrogation Gate & Bypass
@@ -92,11 +113,21 @@
 * **Priority:** Highest
 * **Status:** Done
 * **Assigned Sprint:** Sprint 3
-* **Description:** As an administrator, I want to bypass status gates using a simple comment command so that critical production hotfixes are never delayed during outages.
+* **Description:** As an administrator, I want to bypass status gates using a simple comment comment so that critical production hotfixes are never delayed during outages.
 * **Acceptance Criteria:**
-  1. [x] Intercepts `/archicheck bypass` commands ignoring trailing whitespace.
+  1. [x] Intercepts `/archicheck bypass` comments ignoring trailing whitespace.
   2. [x] Queries repository permission levels to allow bypasses strictly for Admins/Maintainers.
 * **Dependencies / Blockers:** Relies on AC-ST-201
+
+##### 🆔 AC-ST-602: Implement Edge Runtime waitUntil Async Queue Fallback
+* **Priority:** Medium
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 6
+* **Description:** As a System Architect, I want the webhook pipeline background execution task to support non-Edge platforms gracefully, so that the background LLM calls are not prematurely terminated when deploying to Node.js environments.
+* **Acceptance Criteria:**
+*   1. [ ] Implement a request context task queue helper to track background promises.
+*   2. [ ] Helper executes `waitUntil` if available (Next.js/Vercel Edge default), or holds the request connection open / tracks promises via local lifecycle queues if running on standard Node.js containers.
+* **Dependencies / Blockers:** None
 
 ---
 
@@ -314,6 +345,9 @@ The following items were identified during the Phase 2 design session and are de
 **Sprint 5 — COMPLETE ✅**
 All Sprint 5 stories (AC-ST-501, AC-ST-502, AC-ST-503, AC-ST-504, AC-ST-501-P2, AC-ST-505) are Done.
 
-**Sprint 6 — Candidate Stories (Future Sprints):**
-1. **AC-ST-302: Token Burn Telemetry Alerting** (High — Critical budget control before staging/prod launch.)
-2. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium — Required for Alpha pilots in Vietnam and EU.)
+**Sprint 6 — Sprint Backlog (Active Planning):**
+1. **AC-ST-603: Standardize Pre-LLM API Validation Guardrails (Deterministic Filtering)** (High — Prevents production budget burn from spam replies)
+2. **AC-ST-601: Enforce Strict Environment Variable Boot Validation** (High — Prevents runtime JWT key failures)
+3. **AC-ST-302: Token Burn Telemetry Alerting** (High — Critical budget control before staging/prod launch)
+4. **AC-ST-602: Implement Edge Runtime waitUntil Async Queue Fallback** (Medium — Ensures environment hosting flexibility)
+5. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium — Required for Alpha pilots in Vietnam and EU)
