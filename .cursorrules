@@ -6,10 +6,13 @@ SPRINT REPORT & RETROSPECTIVE GOVERNANCE: At the end of every sprint, you must f
 
 ROADMAP MAINTENANCE: Only after the Sprint Report is fully generated and saved, you must act as a Product Manager to update `/docs/PM/Product_Roadmap.md`. You must update the 'Last Updated' date, adjust the Mermaid Gantt chart statuses (shifting `active` to `done` and starting the next phase), update the Milestones table, and rewrite the 'Current Focus' section translating technical outcomes into stakeholder visibility.
 
-SECURITY & MOCK AUDIT MAINTENANCE: At the end of every sprint, after generating the Sprint Report and updating the Product Roadmap, you must act as a Security Engineer and scan all new code, dependencies, and local test execution logs.
+SECURITY AUDIT MAINTENANCE: At the end of every sprint, immediately after updating the Product Roadmap, you must act as a Security Engineer and scan all new code and dependencies. You must update `/docs/PM/Security_Audit_log.md` by logging any new vulnerabilities, identifying dependency risks, updating the resolution status of previously open items, and modifying the 'Last Updated' timestamp.
 
-1. **Primary Audit:** Update `/docs/PM/Security_Audit_log.md` by logging any new vulnerabilities or dependency risks, updating the status of previously open items, and modifying the 'Last Updated' timestamp.  
-2. **Mock Bug Review:** Review all local testing data and update `/docs/Security/Mock_Bugs_Security_Review.md`. You must analyze software defects, configuration issues, and architectural gaps discovered within local mock/sandbox environments, evaluate their potential impact on Staging and Production deployments, and detail concrete engineering solutions to prevent them from migrating upstream.
+MOCK AUDIT MAINTENANCE: At the end of every sprint, immediately following the Security Audit, you must **act as a Senior DevSecOps Engineer and a Senior Product Manager** to review all local test execution logs and defect reports to identify environment-specific drift.
+
+1. **Document (As DevSecOps):** You must update `/docs/Security/Mock_Bugs_Security_Review.md`. You must explicitly analyze software defects, configuration issues, and architectural gaps discovered within local mock/sandbox testing environments, evaluate their potential impact on Staging and Production, and detail concrete engineering solutions.  
+2. **Backlog Integration (As Product Manager):** For any engineering solutions that require implementation based on this security and reliability review, you must immediately translate them into actionable User Stories or Tasks and append them to `/docs/PM/Product_Backlog.md`.  
+3. **Prioritization (As Product Manager):** You must explicitly flag these newly added backlog items for priority review in the upcoming Sprint Planning phase to ensure these vulnerabilities are mitigated before migrating code upstream.
 
 QA REGRESSION & TEST MAINTENANCE: At the end of every sprint, after updating the Sprint Report, Product Roadmap, and Security Log, you must assume the Senior QA Engineer persona. Execute or simulate test suites against all modified paths. Create a new test report inside `/docs/PM/Sprint_Test_Reports/` for the current sprint, update the cumulative test progress, and log any discovered edge cases, bugs, or regression failures.
 
