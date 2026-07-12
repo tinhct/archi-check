@@ -170,3 +170,45 @@ Adopt a strict fail-open policy. If Redis timeouts (1,000ms limit), LLM timeouts
 ### Consequences
 * **Positive:** Guarantees that ArchiCheck outages never halt development operations.
 * **Negative:** A minor decrease in security enforcement during system outages.
+
+---
+
+## ADR-011 — Discriminated Union Response Schema for Playground Phase 2 Evaluate Endpoint
+
+**Status:** Accepted
+**Date:** 2026-07-12
+**Story:** AC-ST-501-P2
+
+### Context
+The `POST /api/playground/evaluate` endpoint can produce three semantically distinct outcomes: a successful LLM evaluation, a sanitizer-blocked reply, or an LLM format error. A flat response schema (e.g., `passed: boolean | null, score: number | null, reason: string`) would permit logically impossible combinations (`passed: true, score: null`) that TypeScript cannot prevent at compile time, creating a maintenance burden and potential for silent data corruption in the UI.
+
+### Decision
+Adopt a Zod discriminated union keyed on `reason` with three variants: `success`, `sanitizer_rejection`, `llm_format_error`. TypeScript infers the correct type in each branch. All three variants always return HTTP 200 OK. HTTP 400 is reserved strictly for structural validation failures (`{ error: string }`). This ensures the UI can safely switch on `reason` without null-guards on every field.
+
+### Consequences
+* **Positive:** Impossible states are unrepresentable at compile time. UI `switch (reason)` is exhaustive and type-safe. HTTP 400 semantics are clean (client error, not application result).
+* **Negative:** Three schema definitions to maintain. Zod discriminated unions have slightly more boilerplate than flat schemas.
+
+---
+
+## ADR-012 — Pipeline Thread UI State Machine for Playground Phase 2
+
+**Status:** Accepted
+**Date:** 2026-07-12
+**Story:** AC-ST-505
+
+### Context
+The original Playground UI used a single reply textarea in the left pane while questions were displayed in the right pane. This created cross-pane eye travel and format ambiguity. A redesign was needed that (a) mirrors the GitHub PR comment thread UX, (b) prevents contextual mismatch (quiz from Diff A evaluated against answer to Diff B), and (c) does not require API contract changes.
+
+### Decision
+Implement a three-phase React state machine (`idle → quiz_ready → evaluated`) with the following invariants:
+1. **Strict Downstream Invalidation:** Any change to the diff textarea or fixture load instantly resets all Phase 1 and Phase 2 state with a 0.2s CSS opacity fade. There is no debounce window — the reset is synchronous.
+2. **Per-Question Inline Reply Boxes:** Replace `reply: string` state with `perQuestionReplies: Record<question.id, string>`. Each question block renders its own `<textarea>` directly below the question text.
+3. **All-or-Nothing Submission:** The Evaluate button is only enabled when every per-question box contains ≥ 20 characters. Partial submissions are blocked at the UI level before any API call.
+4. **Structured Concatenation:** Answers are assembled as `Q{n}: {question}\nA{n}: {answer}` joined by `\n\n` before POST to the evaluate endpoint. The API contract (a single `reply: string`) is unchanged.
+5. **Retry Preserves Drafts:** `handleRetryEval()` clears the error and reverts to `quiz_ready` without clearing `perQuestionReplies`.
+
+### Consequences
+* **Positive:** No cross-pane eye travel. Format ambiguity eliminated. API contract unchanged (zero backend impact). State invalidation prevents evaluation of stale quiz/diff combinations.
+* **Negative:** `perQuestionReplies` is a `Record<string, string>` instead of a plain string — slightly more complex state shape. Fixture `phase2.reply` string cannot be split across N question boxes without a parse utility (deferred to future sprint).
+

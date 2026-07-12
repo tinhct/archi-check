@@ -1,6 +1,6 @@
 # ArchiCheck: Frequently Asked Questions (FAQ)
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-12
 
 **Target Audience:** End-Users, Stakeholders, and Onboarding Developers
 
@@ -58,3 +58,39 @@ This baseline score is then fed into the **Heuristics Gating Engine** which deci
 ### Q: Can anyone answer the architectural quiz to unblock a PR, or can it be bypassed during an outage?
 
 **A:** Quiz answer validation is restricted strictly to the pull request author (`pull_request.user.login`) to ensure that co-authors or reviewers do not absorb their cognitive debt. Submissions from other logins are rejected with a warning comment. However, if a production outage occurs, repository administrators or maintainers can issue the `/archicheck bypass` slash command inside the thread. This queries collaborator permissions and immediately sets the status check to `Success` with an emergency bypass audit trail.
+
+---
+
+## 🧪 Local AI Playground
+
+### Q: What is the "Two-Stage Evaluation Pipeline" in the Local AI Playground?
+
+**A:** The Playground now supports a complete two-stage flow that mirrors the full GitHub PR comment/evaluation cycle locally:
+
+1. **Phase 1 — Quiz Generation:** Paste a raw git diff into the left pane and click **Generate Quiz**. The system runs the diff through the sanitizer and sends it to the configured LLM provider (mock or real Gemini), which returns a set of architectural comprehension questions. Token counts (`input / output / total`) are displayed in a compact badge next to each phase.
+
+2. **Phase 2 — Evaluation:** Each question has its own dedicated reply textarea directly below it (the "Pipeline Thread" layout). Type your architectural justification in each box. Once all boxes contain at least 20 characters, click **Evaluate All Replies**. The system concatenates your answers into a structured `Q1: ... A1: ...` format and passes them to the same `validateAnswers` function used in production. The result — a PASS/FAIL verdict, score out of 10, and reasoning — is displayed immediately.
+
+This enables prompt engineers and developers to iterate on both AI pipeline phases locally without any GitHub webhooks, live PRs, or API budget exposure.
+
+---
+
+### Q: Why does the Playground use per-question reply boxes instead of a single text area?
+
+**A:** The original design had a single large textarea on the left side of the screen while questions were listed on the right. This created two friction points:
+
+1. **Cross-screen eye travel:** On a wide monitor, developers had to visually ping-pong between the question list (right) and their answer area (left), which was mentally exhausting.
+2. **Format ambiguity:** When the AI generates 3 distinct questions, it was unclear whether to write a single essay or number the answers `1... 2... 3...`.
+
+The "Pipeline Thread" redesign (AC-ST-505) places a dedicated reply textarea directly below each question, following the same visual pattern as GitHub PR review comments. Answers are automatically structured and concatenated before evaluation, so the API contract is preserved without any developer effort.
+
+---
+
+### Q: What are the Playground fixtures, and are they included in the production app?
+
+**A:** Fixtures are pre-built test scenarios stored in `src/lib/mocks/fixtures/playground-fixtures.json`. They allow developers to instantly load well-known diff scenarios (clean code, code containing AWS keys, prompt injection attempts, ReDoS bombs) without having to construct test diffs from scratch.
+
+**Production safety:** The fixture file is completely excluded from the production Next.js client bundle via a webpack NullLoader alias in `next.config.ts`. Additionally, the playground page and API routes are already blocked by middleware (HTTP 404) in production environments. The fixture file therefore never ships to end users.
+
+**Fixture seeding for Phase 2:** Fixtures that include a `phase2` block (marked with a ⚡ prefix in the dropdown) will automatically pre-populate the quiz in `quiz_ready` state when selected — no API call is made. Reply boxes are always left empty, respecting the developer's intent to write their own answers.
+
