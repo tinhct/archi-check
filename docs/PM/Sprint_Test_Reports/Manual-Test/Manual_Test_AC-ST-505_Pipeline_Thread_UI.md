@@ -65,11 +65,12 @@
 | Step | Action | Expected Result |
 |------|--------|-----------------|
 | 1 | Generate a quiz (any fixture) | Phase 1 completes |
-| 2 | Inspect the Phase 1 card header (top of the right pane card) | A single-line badge row appears: `In: X \| Out: Y \| Total: Z` in monospace font |
+| 2 | Inspect the Phase 1 card header (top of the right pane card) | A single-line badge row appears: `In: X \| Out: Y \| Total: Z` in monospace font (**Note:** values will be `0` for Mock LLM, or `> 0` for live providers) |
 | 3 | Verify NO large token table is rendered | Confirm there is no multi-row HTML `<table>` with token data in the UI |
 | 4 | Evaluate all replies with ≥ 20 chars each | Phase 2 completes |
-| 5 | Inspect the eval result card | A Phase 2 token badge row appears below the reasoning text: `In: X \| Out: Y \| Total: Z` |
-| 6 | Inspect the Pipeline Total HUD in the header bar | Shows the sum of Phase 1 + Phase 2 tokens as a single number |
+| 5 | Inspect the eval result card | A Phase 2 token badge row appears below the reasoning text: `In: X \| Out: Y \| Total: Z` (values will be `0` for Mock LLM) |
+| 6 | Inspect the Pipeline Total HUD in the header bar | Shows the sum of Phase 1 + Phase 2 tokens as a single number (`0` for Mock LLM) |
+
 
 ## 🧪 Test 505.6 — State Invalidation on Diff Change
 

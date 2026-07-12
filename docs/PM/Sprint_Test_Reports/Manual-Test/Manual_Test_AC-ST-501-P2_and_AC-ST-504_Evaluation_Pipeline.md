@@ -26,8 +26,9 @@
 | 1 | Navigate to `http://localhost:3000/playground` | Playground UI loads |
 | 2 | Load any fixture from the dropdown | Diff textarea populates |
 | 3 | Click **▶ Generate Quiz** | Spinner; quiz loads |
-| 4 | Inspect the Phase 1 card header in the right pane | Token badge row visible: `In: X \| Out: Y \| Total: Z` where X, Y, Z are integers > 0 |
-| 5 | Verify `Total = Input + Output` | `Z = X + Y` (can verify by mental arithmetic on the values shown) |
+| 4 | Inspect the Phase 1 card header in the right pane | Token badge row visible: `In: X \| Out: Y \| Total: Z`. **Note:** These will be `0` when using the offline Mock LLM, or integers `> 0` when using a live LLM provider. |
+| 5 | Verify `Total = Input + Output` | `Z = X + Y` (verify by addition on the values shown: e.g. `0 = 0 + 0` or real values) |
+
 
 ### Test 504.2 — Phase 2 Token Counts Rendered
 
