@@ -709,8 +709,9 @@ export default function PlaygroundPage() {
                     </button>
                   </div>
                 </div>
-              </>
-            )}
+              </div>
+            </>
+          )}
 
             {/* ════════════════════════════════════════
                 PHASE 2 OUTPUT
