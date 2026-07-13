@@ -11,6 +11,13 @@ const nextConfig = (phase: string): NextConfig => {
     // The webpack config below is only exercised during production builds,
     // where Turbopack is not used. Fixtures are intentionally available in dev.
     turbopack: {},
+    allowedDevOrigins: [
+      "vocalist-fence-outpost.ngrok-free.dev",
+      "*.ngrok-free.dev",
+      "*.ngrok-free.app",
+      "*.ngrok.io",
+      "*.smee.io"
+    ],
     webpack: (config) => {
       // In production client builds, resolve the mocks directory to false (empty module).
       // This ensures adversarial fixture payloads (prompt injection samples, ReDoS triggers)
