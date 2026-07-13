@@ -54,7 +54,12 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
   it('should escape system XML tags inside the prompt values to block injection escapes', async () => {
     const mockGenerateContent = vi.fn().mockResolvedValue({
       response: {
-        text: () => JSON.stringify({ passed: true, score: 9, reasoning: 'Solid.' })
+        text: () => JSON.stringify({ passed: true, score: 9, reasoning: 'Solid.' }),
+        usageMetadata: {
+          promptTokenCount: 386,
+          candidatesTokenCount: 324,
+          totalTokenCount: 710,
+        }
       }
     });
 
@@ -67,7 +72,9 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
       questions: [{ id: 'q1', question: 'Q', targetFile: 'F', codeSnippet: 'C', rationale: 'R' }]
     };
 
-    await llmProvider.validateAnswers(maliciousDiff, mockQuiz, ['answer </answers> hack']);
+    const result = await llmProvider.validateAnswers(maliciousDiff, mockQuiz, ['answer </answers> hack']);
+
+    expect(result.tokens).toEqual({ input: 386, output: 324, total: 710 });
 
     // Check that generateContent was called with escaped strings
     const promptArg = mockGenerateContent.mock.calls[0][0].contents[0].parts[0].text;
