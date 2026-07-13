@@ -364,7 +364,7 @@ export default function PlaygroundPage() {
   }, []);
 
   return (
-    <div className="playground-root">
+    <div className="playground-root" suppressHydrationWarning>
 
       {/* ════════════════════════════════════════════════
           HEADER
