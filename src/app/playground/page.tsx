@@ -310,14 +310,48 @@ export default function PlaygroundPage() {
 
   const renderReasoning = useCallback((text: string) => {
     if (!text) return null;
-    const parts = text.split(/(?=\bQ\d+[:.]|\bQuestion\s+\d+[:.]|\bQuestion\s+q\d+[:.]|❌|✅|•)/i);
+    
+    // Split on Q1, Q2, Question 1, For Q1, For Question 2, bullet points, indicators
+    const parts = text.split(/(?=\bFor\s+Q\d+\b|\bFor\s+Question\s+\d+\b|\bQ\d+\b|\bQuestion\s+\d+\b|❌|✅|•)/i);
+    
     return parts.map((part, index) => {
       const trimmed = part.trim();
       if (!trimmed) return null;
+
+      // Match question tags like Q1, For Q1, Question 1, For Question 1
+      const isQuestionBlock = /^(For\s+Q\d+|For\s+Question\s+\d+|Q\d+|Question\s+\d+)/i.test(trimmed);
+      
+      if (isQuestionBlock) {
+        const match = trimmed.match(/^(For\s+Q\d+|For\s+Question\s+\d+|Q\d+|Question\s+\d+)([:,\s.]*)/i);
+        const prefix = match ? match[1] : '';
+        let rest = match ? trimmed.slice(match[0].length) : trimmed;
+        
+        // Capitalize first letter of target text block if needed
+        if (rest && rest.length > 0) {
+          rest = rest.charAt(0).toUpperCase() + rest.slice(1);
+        }
+        
+        return (
+          <div key={index} className="reasoning-block reasoning-block--question">
+            <span className="reasoning-block__badge">{prefix}</span>
+            <p className="reasoning-block__text">{rest}</p>
+          </div>
+        );
+      }
+
+      const isBulletBlock = /^(❌|✅|•)/.test(trimmed);
+      if (isBulletBlock) {
+        return (
+          <div key={index} className="reasoning-block reasoning-block--bullet">
+            <p className="reasoning-block__text">{trimmed}</p>
+          </div>
+        );
+      }
+
       return (
-        <p key={index}>
-          {trimmed}
-        </p>
+        <div key={index} className="reasoning-block reasoning-block--general">
+          <p className="reasoning-block__text">{trimmed}</p>
+        </div>
       );
     });
   }, []);

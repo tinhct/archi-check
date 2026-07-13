@@ -843,6 +843,55 @@
   margin-bottom: 0;
 }
 
+/* Premium Reasoning Block Styling */
+.reasoning-block {
+  margin-bottom: 0.75rem;
+}
+
+.reasoning-block:last-child {
+  margin-bottom: 0;
+}
+
+.reasoning-block--question {
+  border-left: 2px solid #58a6ff;
+  padding-left: 0.75rem;
+  margin-top: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.reasoning-block__badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #58a6ff;
+  background-color: rgba(56, 139, 253, 0.15);
+  border: 1px solid rgba(56, 139, 253, 0.25);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reasoning-block__text {
+  font-size: 0.85rem;
+  color: #c9d1d9;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.reasoning-block--bullet {
+  padding-left: 0.25rem;
+}
+
+.reasoning-block--general .reasoning-block__text {
+  font-size: 0.88rem;
+  color: #e6edf3;
+  line-height: 1.62;
+  font-weight: 400;
+}
+
 /* ── Evaluation Empty State ───────────────────────────────────── */
 .eval-empty {
   display: flex;
