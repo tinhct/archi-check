@@ -19,6 +19,7 @@ export class GitHubAuthService {
       webhooks: {
         secret: env.GITHUB_WEBHOOK_SECRET,
       },
+      Octokit: Octokit,
     });
   }
 
