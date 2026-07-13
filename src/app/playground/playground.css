@@ -650,24 +650,27 @@
 }
 
 /* ── Phase 2 Output Divider (right pane) ─────────────────────── */
+.phase1-output-divider,
 .phase2-output-divider {
-  margin: 1.25rem 0 0.75rem;
+  margin: 1.5rem 0 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #58a6ff;
+  letter-spacing: 0.08em;
+  color: #8b949e;
 }
 
+.phase1-output-divider::before,
+.phase1-output-divider::after,
 .phase2-output-divider::before,
 .phase2-output-divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: #21262d;
+  background: #30363d;
 }
 
 /* ── Compact Spinner (Phase 2 loading) ────────────────────────── */
@@ -735,10 +738,22 @@
 /* ── Evaluation Result Card ───────────────────────────────────── */
 .eval-card {
   background: #161b22;
-  border: 1px solid #21262d;
+  border: 1px solid #30363d;
   border-radius: 10px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.eval-card__body {
   padding: 1.25rem;
-  margin-bottom: 1rem;
+}
+
+.eval-card__footer {
+  border-top: 1px dashed #30363d;
+  padding: 0.75rem 1.25rem;
+  background: #0d1117;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .eval-verdict {

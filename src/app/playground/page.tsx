@@ -602,14 +602,18 @@ export default function PlaygroundPage() {
                 Questions + inline reply boxes
             ════════════════════════════════════════ */}
             {quizJson && quizJson.length > 0 && !isGenerating && (
-              <div className="thread-card">
+              <>
+                <div className="phase1-output-divider">
+                  <span>Phase 1 — Generated Questions</span>
+                </div>
+                <div className="thread-card">
 
-                {/* Card header: title + compact token badges */}
-                <div className="thread-card__header">
-                  <div className="thread-card__title">
-                    <span>🤖 Phase 1 — Generated Questions ({quizJson.length})</span>
-                    {isFixtureSeeded && <span className="fixture-seeded-tag">fixture</span>}
-                  </div>
+                  {/* Card header: title + compact token badges */}
+                  <div className="thread-card__header">
+                    <div className="thread-card__title">
+                      <span>🤖 Questions Generated ({quizJson.length})</span>
+                      {isFixtureSeeded && <span className="fixture-seeded-tag">fixture</span>}
+                    </div>
                   {phase1Result && (
                     <div className="token-badges">
                       <span className="token-badge-item">
@@ -704,9 +708,9 @@ export default function PlaygroundPage() {
                       {isEvaluating ? '⏳ Evaluating…' : '⚖ Evaluate All Replies'}
                     </button>
                   </div>
-                </div>
               </div>
-            )}
+            </>
+          )}
 
             {/* ════════════════════════════════════════
                 PHASE 2 OUTPUT
@@ -765,39 +769,6 @@ export default function PlaygroundPage() {
                         ? 'blocked'
                         : 'system-error'
                     }`}>
-                      {/* Unified Header Metadata */}
-                      <div className="eval-card__header">
-                        <div className="eval-card__header-title">
-                          <span className="eval-card__header-icon">
-                            {evaluationResult.reason === 'success'
-                              ? '📋'
-                              : evaluationResult.reason === 'sanitizer_rejection'
-                              ? '🛡️'
-                              : '⚠️'}
-                          </span>
-                          <span>
-                            {evaluationResult.reason === 'success'
-                              ? 'Phase 2 — Evaluation Result'
-                              : evaluationResult.reason === 'sanitizer_rejection'
-                              ? 'Phase 2 — Sanitizer Blocked'
-                              : 'Phase 2 — System Error'}
-                          </span>
-                        </div>
-                        <div className="token-badges text-xs font-mono">
-                          <span className="token-badge-item">
-                            In: <strong>{evaluationResult.tokens.input.toLocaleString()}</strong>
-                          </span>
-                          <span className="token-badge-sep">|</span>
-                          <span className="token-badge-item">
-                            Out: <strong>{evaluationResult.tokens.output.toLocaleString()}</strong>
-                          </span>
-                          <span className="token-badge-sep">|</span>
-                          <span className="token-badge-item token-badge-item--total">
-                            Total: <strong>{evaluationResult.tokens.total.toLocaleString()}</strong>
-                          </span>
-                        </div>
-                      </div>
-
                       {/* Card Body */}
                       <div className="eval-card__body">
                         {evaluationResult.reason === 'success' ? (
@@ -818,7 +789,7 @@ export default function PlaygroundPage() {
                               </div>
                               <div className="eval-summary-box">
                                 <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-file-lines mr-1.5" /> Executive Summary
+                                  <i className="fa-solid fa-file-lines mr-1.5" /> EXECUTIVE SUMMARY:
                                 </h4>
                                 <p className="eval-summary-text">{summary}</p>
                               </div>
@@ -828,17 +799,20 @@ export default function PlaygroundPage() {
                             {breakdown.length > 0 && (
                               <div className="eval-breakdown">
                                 <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-list-check mr-1.5" /> Per-Question Breakdown
+                                  <i className="fa-solid fa-list-check mr-1.5" /> PER-QUESTION BREAKDOWN:
                                 </h4>
                                 <ul className="eval-breakdown-list">
-                                  {breakdown.map((item, idx) => (
-                                    <li key={idx} className="eval-breakdown-item">
-                                      <span className="eval-breakdown-badge">{item.prefix}</span>
-                                      <div className="eval-breakdown-content">
-                                        <p className="eval-breakdown-text">{item.text}</p>
-                                      </div>
-                                    </li>
-                                  ))}
+                                  {breakdown.map((item, idx) => {
+                                    const prefixText = item.prefix.endsWith(':') ? item.prefix : `${item.prefix}:`;
+                                    return (
+                                      <li key={idx} className="eval-breakdown-item">
+                                        <span className="eval-breakdown-badge">{prefixText}</span>
+                                        <div className="eval-breakdown-content">
+                                          <p className="eval-breakdown-text">{item.text}</p>
+                                        </div>
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                               </div>
                             )}
@@ -857,7 +831,7 @@ export default function PlaygroundPage() {
                               </div>
                               <div className="eval-summary-box">
                                 <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> Security Blocked
+                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SECURITY BLOCKED:
                                 </h4>
                                 <p className="eval-summary-text">{evaluationResult.reasoning}</p>
                               </div>
@@ -885,7 +859,7 @@ export default function PlaygroundPage() {
                               </div>
                               <div className="eval-summary-box">
                                 <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> System Error
+                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SYSTEM ERROR:
                                 </h4>
                                 <p className="eval-summary-text">{evaluationResult.reasoning}</p>
                               </div>
@@ -899,6 +873,23 @@ export default function PlaygroundPage() {
                             </button>
                           </>
                         )}
+                      </div>
+
+                      {/* Card Footer: unified token receipt at the bottom */}
+                      <div className="eval-card__footer">
+                        <div className="token-badges text-xs font-mono">
+                          <span className="token-badge-item">
+                            In: <strong>{evaluationResult.tokens.input.toLocaleString()}</strong>
+                          </span>
+                          <span className="token-badge-sep">|</span>
+                          <span className="token-badge-item">
+                            Out: <strong>{evaluationResult.tokens.output.toLocaleString()}</strong>
+                          </span>
+                          <span className="token-badge-sep">|</span>
+                          <span className="token-badge-item token-badge-item--total">
+                            Total: <strong>{evaluationResult.tokens.total.toLocaleString()}</strong>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
