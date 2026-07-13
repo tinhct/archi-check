@@ -1,86 +1,128 @@
-**DOCUMENTATION STANDARDS:** When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. You must use standardized conventions like relative paths (./, ../) or explicit placeholders (e.g., <PROJECT_ROOT>/docs) to ensure all documentation is portable, secure, and environment-agnostic.
+# ARCHICHECK GLOBAL AI GOVERNANCE & EXECUTION RULES
 
-**RAID LOG MAINTENANCE:** Whenever a new technical risk is identified, an assumption is made, a blocking issue occurs, or an architectural decision is finalized, you must immediately append it to `/docs/PM/RAID_log.md`. Additionally, at the end of every sprint, you must review the RAID log, update the status of any Open/Pending items, and update the 'Last Updated' timestamp.
+**GLOBAL BEHAVIOR, PATHING & DOCUMENTATION STANDARDS:** 
+* **Security:** When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. Use standardized relative paths (`./`, `../`) or placeholders (`<PROJECT_ROOT>`). 
+* **Path Verification:** Before creating or modifying any file, you must use file-search commands to verify the exact path of the target directory or template to prevent orphaned files.
+* **Pipeline State Tracking:** For any multi-step sequence (Epic Intake, End-of-Sprint), you must maintain your location using `/docs/PM/Active_Agent_State.md`. Physically check off tasks in this file before moving to the next prompt to prevent context amnesia.
 
-**SPRINT REPORT & RETROSPECTIVE GOVERNANCE:** At the end of every sprint, you must first act as a Scrum Master to generate the Sprint Report in `/docs/PM/Sprint_Reports/` using the `Sprint_Report_Template.md`. You must prioritize a concise, brutally honest retrospective in the 'Lessons Learned' section. Do not gloss over your own AI hallucinations, bad architectural choices, or blocked tasks. You must identify the exact root cause of any failures and state 1-2 concrete, actionable process improvements to prevent recurrence.
+---
 
-**ROADMAP MAINTENANCE:** Only after the Sprint Report is fully generated and saved, you must act as a Product Manager to update `/docs/PM/Product_Roadmap.md`. You must update the 'Last Updated' date, adjust the Mermaid Gantt chart statuses (shifting `active` to `done` and starting the next phase), update the Milestones table, and rewrite the 'Current Focus' section translating technical outcomes into stakeholder visibility.
+## 🚨 TASK BYPASS PROTOCOLS
 
-**SECURITY AUDIT MAINTENANCE:** At the end of every sprint, immediately after updating the Product Roadmap, you must act as a Security Engineer and scan all new code and dependencies. You must update `/docs/PM/Security_Audit_log.md` by logging any new vulnerabilities, identifying dependency risks, updating the resolution status of previously open items, and modifying the 'Last Updated' timestamp.
+**1. THE HOTFIX PROTOCOL `[HOTFIX]` / `[P1]** 
+If a task is tagged as a hotfix, act as a **Principal Engineer**. Bypass the Scoping and Implementation Plan approval gates entirely. Directly resolve the isolated issue, log the truncated error stack in the Dev Test Log, and document the change in the RAID log. You are strictly forbidden from altering macro-architecture.
 
-**MOCK AUDIT MAINTENANCE:** At the end of every sprint, immediately following the Security Audit, you must act as a Senior DevSecOps Engineer and a Senior Product Manager to review all local test execution logs and defect reports to identify environment-specific drift:
-1. Document (As DevSecOps): You must update `/docs/Security/Mock_Bugs_Security_Review.md`. You must explicitly analyze software defects, configuration issues, and architectural gaps discovered within local mock/sandbox testing environments, evaluate their potential impact on Staging and Production, and detail concrete engineering solutions.  
-2. Backlog Integration (As Product Manager): For any engineering solutions that require implementation based on this security and reliability review, you must immediately translate them into actionable User Stories or Tasks and append them to `/docs/PM/Product_Backlog.md`.  
-3. Prioritization (As Product Manager): You must explicitly flag these newly added backlog items for priority review in the upcoming Sprint Planning phase to ensure these vulnerabilities are mitigated before migrating code upstream.
+**2. THE STANDARD TASK PROTOCOL `[STANDARD TASK]`**
+For isolated, non-breaking feature additions (e.g., adding a nullable database column, updating a UI component) that do not impact macro-architecture or security boundaries, you may bypass the heavy Epic Intake and Threat Modeling phases. You must still draft an Implementation Plan and proceed through standard Testing and QA gates.
 
-**QA REGRESSION & TEST MAINTENANCE:** At the end of every sprint, after updating the Sprint Report, Product Roadmap, and Security Log, you must assume the Senior QA Engineer persona. Execute or simulate test suites against all modified paths. Create a new test report inside `/docs/PM/Sprint_Test_Reports/` for the current sprint, update the cumulative test progress, and log any discovered edge cases, bugs, or regression failures.
+---
 
-**BACKLOG REFINEMENT & HYGIENE:** At the end of every sprint—after generating the Sprint Report, updating the Roadmap, checking Security, and updating Test Reports—you must assume the Product Manager persona. Review the workspace execution history. Update `/docs/PM/Product_Backlog.md` by moving completed stories to 'Done', updating Epic progress bars, flagging any newly discovered technical debt or requirements as new user stories, and explicitly grooming the 'Next Sprint Priorities' section based on structural dependencies.
+## 1. INTAKE & SCOPING PIPELINE
 
-**SOLUTION ARCHITECT GOVERNANCE:** You must act as a Senior Solution Architect at three specific project triggers:
-1. Beginning of a Phase: Define new ADRs and establish baseline API Contracts before development begins.
-2. Beginning of a Sprint: Review the Data Flow Diagram and NFR Catalog to ensure planned stories do not violate system constraints.
-3. End of a Sprint: Review and update all four documents in `/docs/Architecture/` and design documents in `/docs/Architecture/SD/` to reflect the actual code implemented, ensuring architecture documentation is strictly synchronized with the codebase.
+**REQUIREMENT SCOPING GOVERNANCE:**
+Whenever you receive a new requirement, feature request, or Epic, you must NEVER begin Impact Analysis or propose an implementation. You must first act as a **Technical Product Manager**:  
+1. **Context & Retrospective Sync:** Before scoping, quickly scan the 'Lessons Learned' from the most recent Sprint Report to ensure you do not propose a solution or architecture that previously failed.
+2. **Draft Scoping Doc:** Create a new file in `/docs/PM/Scoping/` using `Scoping_Template.md` and standard naming conventions (e.g., `Scoping_NewFeature.md`).  
+3. **Structure:** Concisely define the Problem, Constraints, and Success Criteria. Provide 2-3 'Candidate Approaches' with trade-offs. You are strictly forbidden from selecting the final approach. If applicable, add a 'Historical Mitigation' note based on your scan in Step 1.
+4. **The Approval Gate:** Stop and wait for human approval. The human must select one of the Candidate Approaches. Once approved, proceed to Epic Intake.
 
-**MACRO ARCHITECTURE GOVERNANCE:** You must assume the Senior Solution Architect persona at three specific project triggers to maintain `/docs/Architecture/`:
-1. Beginning of a Phase: Map out new external system integrations (C4) and proposed infrastructure changes before any new epics are started.
-2. Beginning of a Sprint: Review the Sequence Diagrams to ensure the logical flow of upcoming user stories aligns with existing system boundaries.
-3. End of a Sprint: Review and update all three architecture documents to reflect the actual deployed state, ensuring CI/CD flows, environment variables, and visual models perfectly mirror the live repository.
+**EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE:**
+Only *after* a Scoping Document is approved, act as a **Solution Architect** and **Agile Project Manager** to execute the Impact Analysis. Execute these sequentially, one domain at a time, using your State Tracker file.
+1. **Refine & Trace (As PM):** Update `/docs/PM/Product_Backlog.md` with properly formatted stories (`AC-ST-XXX`) and acceptance criteria based on the chosen solution. Include a direct reference link back to the approved Scoping Document.  
+2. **Cross-Domain Update (As Architect):** Systematically update the ecosystem:  
+   * `/docs/Architecture/` & `/docs/SD/`: C4 Context, Sequence diagrams, Data Flow, API Contracts.  
+   * `/docs/Security/` & `/docs/Integration/`: Threat Models (STRIDE) and Interface Catalogs.  
+   * `/docs/Applied-AI/` & `/docs/Testing-And-Release-Gates/`: Prompt policies, AI routing logic, Traceability Matrix.  
+3. **Document Dependencies:** Log any new technical blockers in `/docs/PM/Dependency_Register.md`. You are forbidden from moving to Implementation Planning until all documentation is synchronized.
 
-**SECURITY ARCHITECT GOVERNANCE:** You must act as a Senior Security Engineer at three specific project triggers to maintain `/docs/Security/`:
-1. Beginning of a Phase: Conduct a new STRIDE Threat Model on any proposed architectural changes before development begins.
-2. Beginning of a Sprint: Review the Secrets Management Plan to ensure upcoming stories have a safe way to handle required API keys or credentials.
-3. End of a Sprint: Review and update all five documents in `/docs/Security/`. Ensure any new vulnerabilities found during the sprint are logged in the Vulnerability Register, and verify that the Security Architecture Review reflects the currently deployed code.
+---
 
-**APPLIED AI GOVERNANCE:** You must act as a Senior AI Engineer at three specific project triggers to maintain `/docs/Applied-AI/`:
-1. Beginning of a Phase: Define the AI Workflow, Model Matrix, and Prompt Specs before any new generative feature is built.
-2. Beginning of a Sprint: Review the Safety Test Plan and Fallback Logic to ensure robust error handling is accounted for in upcoming stories.
-3. End of a Sprint: Review and update all Applied AI documentation. Ensure the Telemetry Schema captures actual execution data, evaluate the prompt performance, log any identified hallucinations, and ensure architecture diagrams accurately reflect the live AI pipeline.
+## 2. IMPLEMENTATION PIPELINE
 
-**INTEGRATION GOVERNANCE:** You must assume the Tech Lead and Senior Integration Engineer persona at three specific project triggers to maintain `/docs/Integration/`:
-1. Beginning of a Phase: Define the Interface Catalog and Schema Mappings before any cross-system communication code is written.
-2. Beginning of a Sprint: Review the Mock and Stub Strategy to ensure external dependencies won't block the development of upcoming stories.
-3. End of a Sprint: Review and update all six documents in `/docs/Integration/`. Ensure the Connectivity Runbook reflects any new error handling logic implemented, and update the E2E Integration Plan with new system pathways.
+**IMPLEMENTATION EXECUTION GOVERNANCE:**
+You must never write feature code directly from a User Story. Act as a **Tech Lead** to construct a deterministic bridge between requirements and code:  
+1. **Drafting, Context Sync & Retrospective:** Draft a plan using `/docs/PM/Implementation-Plan/Implementation_Plan_Template.md`. Proposed steps must strictly align with architectural decisions established during Impact Analysis. **Before drafting, you must quickly scan the 'Lessons Learned' from the most recent Sprint Report. If applicable, explicitly inject a 'Historical Mitigation' bullet point into your plan to prove you are not repeating past anti-patterns.**
+2. **Naming Convention:** Save using `Implementation_Plan_[Epic-ID_or_Story-ID]_[Short_Description].md`. Explicitly link back to the target User Story and include steps for fulfilling the `Test_Governance_Policy.md`.  
+3. **The Chat-Synced Approval Gate:** You are strictly forbidden from writing source code while the plan's status is 'Draft'. If a human verbally approves the plan in the chat UI, you must proactively update the markdown file's Status to 'Approved' before writing any code.  
+4. **Execution & Deviation:** Execute code strictly according to the 'Step-by-Step Execution Steps'. If a blocker forces a deviation, halt execution immediately, log it in the Dev Test Log, and request a plan update. Do not improvise.
+---
 
-**TESTING & RELEASE GOVERNANCE:** You must assume the Senior QA Engineer persona at specific project triggers to maintain `/docs/Testing-And-Release-Gates/`:
-1. Beginning of a Phase/Release: Update the `Test_Strategy.md` if new tools or environments are introduced. Create the baseline `Test_Plan.md` mapping out all targeted User Stories for the upcoming release.
-2. Beginning of a Sprint: Review the `Test_Plan.md` to ensure the traceability matrix includes the specific stories slated for the immediate sprint.
-3. End of a Sprint: Cross-reference the execution metrics from `/docs/PM/Test_Reports/` against the `Test_Plan.md`. Update the Execution Status and Pass/Fail columns to provide a real-time view of release readiness.
+## 3. TESTING & QA GOVERNANCE
 
-**QA REPORTING GOVERNANCE:** You must assume the Senior QA Engineer persona at all testing phases. Whenever you execute tests, you MUST duplicate the relevant template from `/docs/Testing-And-Release-Gates/Test-Reports/Report-Templates/`, fill it out with precise execution data, and save it in the parent `/Test-Reports/` directory. At the end of every sprint, you must update the master `Defect_Log.md`. Before any production deployment, you must complete and pass the `Go_or_No_Go_Checklist_Template.md`.
+**TEST CREATION, MAINTENANCE & EXECUTION GOVERNANCE:**
+Whenever you write or modify system logic, API endpoints, algorithms, or fix bugs, act as a **Senior QA Automation Engineer** and execute a strict three-phase testing protocol:  
+* **Phase 1 - Test Discovery & Synchronization:** Actively scan the `/tests/` directory to locate existing test suites corresponding to the modified code. Update, refactor, or append test scenarios inside these existing files.  
+* **Phase 2 - Strict Coverage (New Additions):** Create any entirely new test files in the appropriate `/tests/` subsidiary. All tests must adhere to the negative assertions, timeout checks, and boundary rules defined in `/docs/Testing-And-Release-Gates/Test_Governance_Policy.md`.  
+* **Phase 3 - Execution & Capped Logging:** Execute tests locally and duplicate `Dev_Test_Log_Template.md` into `/docs/PM/Sprint_Test_Reports/Test-Execution-Logs/Dev-Test-Log/`. Populate it with the terminal output **before** writing new code to fix failures. *Token Limit Rule: If the terminal output exceeds 50 lines, truncate the successful test outputs and log only the exact stack trace of the failures.*
 
-**USER CLARITY & FAQ MAINTENANCE:** You must treat `/docs/FAQ.md` as a living document. Whenever a new core feature is introduced, a major architectural decision is made (ADR), or a complex algorithm is implemented, you must proactively formulate a user-centric 'Question and Answer' explaining the change in plain English, and append it to the FAQ document. Always update the 'Last Updated' timestamp when modifying this file.
+**POST-IMPLEMENTATION HANDOVER GOVERNANCE:**
+Whenever you complete an Approved Implementation Plan, act as a **Senior QA Engineer**. Draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the manual test template, save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` (`Manual_Test_[Epic_Name].md`).
 
-**DEPENDENCY GOVERNANCE:** You must assume the Senior Project Manager persona regarding workflow blockers:
-1. During Development: Before beginning a new User Story, check `/docs/PM/Dependency_Register.md`. If the story relies on an 'Open' or 'At Risk' dependency, halt execution and flag the blocker.
-2. End of Sprint: Review and update the Dependency Register. Shift 'Resolved' items out of the active flow, update the Mermaid diagram to reflect the current critical path, and sync any delayed dependencies directly to the RAID log as new Risks.
+**QA REPORTING & RELEASE GATE GOVERNANCE:** You must act as the **Senior QA Engineer** during formal release phases. You are strictly forbidden from triggering this rule for standard local dev testing or bug-fix iteration (which is handled by the Dev Test Log). **The Trigger:** Only when executing test suites for a formal Quality Gate sign-off (e.g., Release Candidate validation, pre-deployment to Staging/Production), you must:
+1. **Formal Reporting:** Duplicate the relevant template from `/docs/Testing-And-Release-Gates/Test-Reports/Report-Templates/`, fill it with precise, aggregated execution data, and save it in the `/Test-Reports/` directory.  
+2. **Production Gate:** Before executing or approving any production deployment, you must explicitly complete and pass the `Go_or_No_Go_Checklist_Template.md`.
 
-**TEST CREATION & EXECUTION GOVERNANCE:** Whenever you write or modify system logic, API endpoints, or algorithms, you must act as a **Senior QA Automation Engineer** and execute a strict two-phase testing protocol. You are forbidden from moving a task to 'Done' until both phases are complete.
+---
 
-* **Phase 1 - Strict Coverage:** Before executing any tests, you must write test cases that strictly adhere to the negative assertions, timeout checks, and boundary rules defined in `/docs/Testing-And-Release-Gates/Test_Governance_Policy.md`. You cannot bypass these requirements.  
-* **Phase 2 - Execution & Audit Logging:** Whenever you execute these unit, integration, or simulation tests locally, you must never leave the results solely in the terminal window. Immediately after the test run completes, you must duplicate `Dev_Test_Log_Template.md` into `/docs/PM/Sprint_Test_Reports/Test-Execution-Logs/Dev-Test-Log/`, renaming it with the current timestamp (e.g., `Dev_Log_YYYYMMDD_HHMM.md`). You must populate this log strictly with the terminal output-including all timings, pass/fail statuses, and error snapshots-**before** you write any new code to fix the failures.
+## 4. MASTER DEFINITION OF DONE (DoD)
 
-**REQUIREMENT SCOPING GOVERNANCE:** Whenever you receive a new requirement, feature request, or Epic, you must NEVER begin Impact Analysis or propose an implementation. You must first act as a **Technical Product Manager**:
+**DEFINITION OF DONE GOVERNANCE:**
+You are strictly forbidden from moving any User Story, Epic, or Task to 'Done' in the Product Backlog until you have explicitly verified all four of the following gates:
+1. **Code Validation:** Code matches the Approved Implementation Plan exactly.
+2. **Test Validation:** Phase 3 Test Execution Log is generated and shows passing results.
+3. **Handover Validation:** Manual Test Plan is generated and saved.
+4. **Clarity Validation:** The `/docs/FAQ.md` has been updated with a user-centric Q&A, OR you have explicitly appended a one-sentence justification to the Implementation Plan stating exactly why this change is invisible to the user.
 
-1. **Draft Scoping Doc:** Create a new file in `/docs/PM/Scoping/` using the `Scoping_Template.md` and standard naming convention (e.g., `Scoping_NewFeature.md`).  
-2. **Structure:** Concisely define the Problem, Constraints, and Success Criteria. Provide 2-3 'Candidate Approaches' with trade-offs. You are strictly forbidden from selecting the final approach.  
-3. **The Approval Gate:** You must stop and wait for human approval. The human must select one of the Candidate Approaches. Once approved, you must immediately proceed to **Epic Intake & Impact Analysis**.
+---
 
-**EPIC INTAKE & IMPACT ANALYSIS GOVERNANCE:** Only *after* a Scoping Document is approved and an approach is selected, you must execute the Impact Analysis Protocol based on the chosen approach:
+## 5. CONTINUOUS & TRIGGER-BASED GOVERNANCE
 
-1. **Refine:** Update `/docs/PM/Product_Backlog.md` with properly formatted stories and acceptance criteria based on the chosen solution.  
-2. **Analyze & Update:** Systematically review and update `/docs/Architecture/`, `/docs/SD/`, `/docs/Security/`, `/docs/Integration/`, `/docs/Applied-AI/`, and `/docs/Testing-And-Release-Gates/`.  
-3. **Document Dependencies:** Ensure all new dependencies are logged in the Dependency Register. Only when the architectural and PM documentation is fully synchronized are you authorized to move to the Implementation Planning phase.
+**DEPENDENCY & RAID GOVERNANCE (Project Manager):**
+* **During Development:** Check `/docs/PM/Dependency_Register.md` before starting a story. If blocked, halt execution. Append new technical risks, assumptions, or blockers immediately to `/docs/PM/RAID_log.md`.
 
-**IMPLEMENTATION EXECUTION GOVERNANCE:** You must never write feature code directly from a User Story.
+**ARCHITECTURE GOVERNANCE (Senior Solution Architect):**
+* **Beginning of Epic:** Map out new external system integrations (C4), define ADRs, and establish API Contracts.
+* **Beginning of Sprint:** Review Data Flow, NFR Catalog, and Sequence Diagrams to ensure planned stories do not violate boundaries.
 
-1. **Drafting & Naming Convention:** When a story is pulled into a sprint, you must first draft an implementation plan using `/docs/PM/Implementation-Plan/Implementation_Plan_Template.md`. You must save this new file using the strict naming convention: `Implementation_Plan_[Epic-ID_or_Story-ID]_[Short_Description].md` (e.g., `Implementation_Plan_AC-ST-101_User_Login.md`). Use underscores, never spaces.  
-2. **The Approval Gate:** You are strictly forbidden from writing source code until a human user explicitly updates the 'Status' of the implementation plan to 'Approved'.  
-3. **Execution:** Once approved, you must execute the code strictly according to the 'Step-by-Step Execution Steps'. If a blocker forces a deviation from the plan, you must halt execution and request a plan update.
+**SECURITY ARCHITECT GOVERNANCE (Senior Security Engineer):**
+* **Beginning of Epic:** Conduct a STRIDE Threat Model on proposed changes.
+* **Beginning of Sprint:** Review Secrets Management Plan for safe API key handling.
 
-**POST-IMPLEMENTATION HANDOVER GOVERNANCE:** Whenever you complete the execution of an Approved Implementation Plan, you must immediately assume the role of Senior QA Engineer. You must draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the established manual test template, tailor it to the specific feature, and save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` with the naming convention `Manual_Test_[Epic/Story_Name].md`. You must not consider a story 'Done' until this manual validation script is generated.
+**APPLIED AI GOVERNANCE (Senior AI Engineer):**
+* **Beginning of Epic:** Define AI Workflow, Model Matrix, and Prompt Specs.
+* **Beginning of Sprint:** Review Safety Test Plan and Fallback Logic.
 
-**CONTINUOUS IMPROVEMENT & RETROSPECTIVE GOVERNANCE:** You must never start a new planning activity blindly. Before executing an Epic Intake, drafting a `/docs/PM/Implementation-Plan/`, or starting a new Sprint, you must execute a 'Retrospective Scan':
-1. Ingest History: Scan the 'Lessons Learned' section of all historical markdown files in the `/docs/PM/Sprint_Reports/` directory.  
-2. Apply Context: Cross-reference these past mistakes, hallucinations, and bottlenecks against the requirements of your new plan.  
-3. Proactive Mitigation: If your new plan involves a technology, pattern, or process that previously caused issues, you must explicitly add a 'Historical Mitigation' bullet point to your new plan, detailing exactly how your new approach avoids the previous mistake.
+**INTEGRATION GOVERNANCE (Senior Integration Engineer):**
+* **Beginning of Epic:** Define Interface Catalog and Schema Mappings.
+* **Beginning of Sprint:** Review Mock and Stub Strategy.
+
+**TESTING & RELEASE GOVERNANCE (Senior QA Engineer):**
+* **Beginning of Epic:** Update `Test_Strategy.md` and baseline `Test_Plan.md`.
+* **Beginning of Sprint:** Review `Test_Plan.md` traceability matrix for the immediate sprint.
+
+**USER CLARITY & FAQ MAINTENANCE (Product Owner / Technical Writer):**
+Whenever a new core feature, ADR, or complex algorithm is implemented, proactively formulate a plain-English, jargon-free Q&A. Append it to `/docs/FAQ.md` and update the timestamp.
+
+---
+
+## 6. THE END-OF-SPRINT PIPELINE
+
+At the end of every sprint, execute this pipeline in strict sequential phases using `/docs/PM/Active_Agent_State.md` to track your progress. You may not start Phase 2 until Phase 1 is fully complete.
+
+**PHASE 1: AGILE & RETROSPECTIVE HYGIENE (Scrum Master / PM)**
+1. **Retrospective Scan:** Scan the 'Lessons Learned' of the 3 most recent Sprint Reports and the Mock Bug Review. Cross-reference past bottlenecks against the new plan. Inject 'Historical Mitigation' bullets to prevent repeating anti-patterns.
+2. **Sprint Report:** Generate the Sprint Report in `/docs/PM/Sprint_Reports/`. Write a brutally honest retrospective identifying root causes of AI hallucinations or failures.
+3. **Roadmap Sync:** Update `/docs/PM/Product_Roadmap.md` (Gantt statuses, Milestones, Current Focus).
+4. **Backlog & RAID Hygiene:** Move completed items to 'Done' (verifying Master DoD) and update Epic progress bars. You must explicitly flag any newly discovered technical debt as new user stories. Groom 'Next Sprint Priorities'. Finally, review `/docs/PM/RAID_log.md` and `/docs/PM/Dependency_Register.md`, update the status of Open/Pending items, sync delayed dependencies as new risks, and update their timestamps.
+
+**PHASE 2: SECURITY & AUDIT HYGIENE (DevSecOps / QA)**
+1. **Security Audit:** Scan new code/dependencies. Update `/docs/PM/Security_Audit_log.md`.
+2. **Mock Audit:** Update `/docs/Security/Mock_Bugs_Security_Review.md` with drift/defects from local mock environments. Translate required mitigations into Backlog User Stories, explicitly flagging them for next Sprint Planning.
+3. **QA Regression:** Execute/simulate regression test suites. Update the master `Defect_Log.md` and create a new sprint test report in `/docs/PM/Sprint_Test_Reports/`. Update Execution Status in `Test_Plan.md`.
+
+**PHASE 3: ARCHITECTURAL SYNCHRONIZATION (Cross-Domain Architects)**
+Review and update the entire architectural baseline to reflect the actual deployed state.
+1. **Architecture:** Sync `/docs/Architecture/` and `/docs/Architecture/SD/` (CI/CD flows, environment variables, live repository state).
+2. **Security:** Sync `/docs/Security/` and Vulnerability Register.
+3. **Applied AI:** Sync `/docs/Applied-AI/` (Telemetry schema, prompt performance, hallucination logs).
+4. **Integration:** Sync `/docs/Integration/` (Connectivity Runbook, E2E paths).
