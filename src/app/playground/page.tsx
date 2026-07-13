@@ -308,6 +308,20 @@ export default function PlaygroundPage() {
     quizJson.length > 0 &&
     quizJson.every((q) => (perQuestionReplies[q.id]?.trim().length ?? 0) >= MIN_REPLY_LENGTH);
 
+  const renderReasoning = useCallback((text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(?=\bQ\d+[:.]|\bQuestion\s+\d+[:.]|\bQuestion\s+q\d+[:.]|❌|✅|•)/i);
+    return parts.map((part, index) => {
+      const trimmed = part.trim();
+      if (!trimmed) return null;
+      return (
+        <p key={index}>
+          {trimmed}
+        </p>
+      );
+    });
+  }, []);
+
   return (
     <div className="playground-root">
 
@@ -692,7 +706,7 @@ export default function PlaygroundPage() {
 
                         <div className="eval-reasoning">
                           <div className="eval-reasoning__label">Reasoning</div>
-                          <p>{evaluationResult.reasoning}</p>
+                          {renderReasoning(evaluationResult.reasoning)}
                         </div>
 
                         {/* Compact Phase 2 token badges (matches Phase 1 style) */}
@@ -722,7 +736,7 @@ export default function PlaygroundPage() {
                         </div>
                         <div className="eval-reasoning">
                           <div className="eval-reasoning__label">Details</div>
-                          <p>{evaluationResult.reasoning}</p>
+                          {renderReasoning(evaluationResult.reasoning)}
                         </div>
                         <button
                           className="btn-clear"
@@ -745,7 +759,7 @@ export default function PlaygroundPage() {
                         </div>
                         <div className="eval-reasoning">
                           <div className="eval-reasoning__label">Details</div>
-                          <p>{evaluationResult.reasoning}</p>
+                          {renderReasoning(evaluationResult.reasoning)}
                         </div>
                         <div className="token-badges token-badges--p2">
                           <span className="token-badge-item">
