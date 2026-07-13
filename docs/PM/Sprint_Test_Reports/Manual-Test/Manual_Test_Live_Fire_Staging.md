@@ -251,6 +251,40 @@ Expected output (first few lines):
 | 5 | Confirm write interception | Check for `[SHADOW MODE] 🟡` lines | Both `createComment` (quiz posting) and `createCommitStatus` (gate lock) are intercepted — NOT sent to GitHub |
 | 6 | Verify PR is clean | Open the PR on GitHub.com | Zero comments, zero commit status checks — the PR looks untouched |
 
+
+---
+
+## 🔍 How to Verify Webhook Delivery
+
+If you need to verify that a live webhook was successfully dispatched by GitHub and correctly received by your local server, you can check the results in three different places:
+
+### 1. ngrok Web Inspection Interface (Highly Recommended)
+When ngrok is running, it hosts a local web dashboard that captures and displays every single HTTP request passing through your tunnel.
+* **Access URL:** Open `http://127.0.0.1:4040` in your browser.
+* **What to look for:** 
+  * You should see a `POST /api/webhook` entry in the left-hand sidebar history.
+  * Clicking on it lets you inspect the **Headers** and **JSON Payload** sent by GitHub.
+  * In the **Response** tab, you should see the HTTP status code (typically `202 Accepted` or `200 OK`) and the JSON body returned by your local server.
+
+### 2. GitHub App "Recent Deliveries" Page (Source of Truth)
+GitHub tracks every single webhook execution, including historical logs and manual redelivery triggers.
+* **Access URL:** Navigate to your **GitHub Settings** $\rightarrow$ **Developer Settings** $\rightarrow$ **GitHub Apps** $\rightarrow$ Click **Edit** on your App $\rightarrow$ Click **Advanced** in the left menu.
+* **What to look for:**
+  * Under the **Recent Deliveries** section, you will see a list of webhook events.
+  * A green checkmark ($\checkmark$) with a `202` or `200` response status confirms it was delivered and acknowledged by your local proxy.
+  * Click on any delivery ID to expand the full Request/Response payload, headers, and metadata. You can also click the **Redeliver** button to replay the event without having to recreate/modify the PR.
+
+### 3. Dev Server Terminal Logs
+Your server outputs console logs when the webhook route executes.
+* **What to look for:**
+  * Look at the terminal running `npm run dev`. You should see output matching the webhook handler:
+    ```text
+    [ArchiCheck] Webhook received for event: pull_request.opened
+    [ArchiCheck] Heuristics scored: Gated.
+    [SHADOW MODE] 🟡 createCommitStatus intercepted
+    [SHADOW MODE] 🟡 createComment intercepted
+    ```
+
 ---
 
 ## ✅ Done Criteria
