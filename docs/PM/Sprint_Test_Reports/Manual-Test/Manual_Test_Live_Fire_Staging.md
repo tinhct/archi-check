@@ -156,6 +156,13 @@ Expected output (first few lines):
 > Keep this terminal window visible during all test cases — this is where you will read
 > shadow mode intercept logs in real time.
 
+> [!IMPORTANT]
+> **Avoid Hydration Mismatch Errors in Browser:**
+> When opening the application or testing UI components via your local server or the ngrok tunnel, always use an **Incognito/Private window** with all browser extensions disabled.
+> 
+> Browser extensions (such as Scite, password managers, or translation tools) can inject script tags or style elements into the page before React loads. Because next.js development overlays display hydration mismatches as prominent red error panels, testing in an extension-free environment is critical to verify clean rendering.
+
+
 
 ---
 
