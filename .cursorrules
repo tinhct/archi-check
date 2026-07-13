@@ -58,20 +58,6 @@ Whenever you write or modify system logic, API endpoints, algorithms, or fix bug
 **POST-IMPLEMENTATION HANDOVER GOVERNANCE:**
 Whenever you complete an Approved Implementation Plan, act as a **Senior QA Engineer**. Draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the manual test template, save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` (`Manual_Test_[Epic_Name].md`).
 
-**HYDRATION MISMATCH DIAGNOSTIC & RESOLUTION RULES:**
-When diagnosing Next.js / React 19 hydration mismatches, follow this strict root-cause analysis checklist before proposing any code changes:
-1. **Analyze the Visual Diff:**
-   - Identify elements marked with `-` (Server DOM at boot time) and `+` (Client Virtual DOM).
-   - If the mismatch contains browser-extension files or tags (e.g. `chrome-extension://`, `sciteFont.css`, `id="shadowLL"`), it is an **External Browser Injection**.
-   - If the mismatch contains dynamic tokens or values (e.g. timestamps, random keys), it is a **Dynamic State Leak**.
-   - If the mismatch contains nesting structure discrepancies (e.g. `p` inside `div`), it is an **Invalid HTML Nesting**.
-2. **Resolution Protocols:**
-   - **Protocol A (Injected Head/Metadata styles/scripts):** For pages/components experiencing third-party extension head injections, wrap the page/component in `next/dynamic` with `{ ssr: false }`. This disables pre-rendering for that tree and bypasses the hydration engine entirely.
-   - **Protocol B (Body/Attribute translations & themes):** Add `suppressHydrationWarning` to both `<html>` and `<body>` tags in `layout.tsx`.
-   - **Protocol C (Dynamic client values):** Do not call browser APIs or dynamic getters directly in the initial render. Initialize state to empty/null and update inside `useEffect`.
-   - **Protocol D (Invalid nesting):** Validate code structures against strict semantic nesting rules (no `div`/`p` inside `<p>`, table rows must reside in a `tbody`, etc.).
-
-
 **QA REPORTING & RELEASE GATE GOVERNANCE:** You must act as the **Senior QA Engineer** during formal release phases. You are strictly forbidden from triggering this rule for standard local dev testing or bug-fix iteration (which is handled by the Dev Test Log). **The Trigger:** Only when executing test suites for a formal Quality Gate sign-off (e.g., Release Candidate validation, pre-deployment to Staging/Production), you must:
 1. **Formal Reporting:** Duplicate the relevant template from `/docs/Testing-And-Release-Gates/Test-Reports/Report-Templates/`, fill it with precise, aggregated execution data, and save it in the `/Test-Reports/` directory.  
 2. **Production Gate:** Before executing or approving any production deployment, you must explicitly complete and pass the `Go_or_No_Go_Checklist_Template.md`.
