@@ -198,10 +198,12 @@ export class LLMProvider {
 
     // Telemetry log for token consumption
     const tokenUsage = result.response.usageMetadata;
+    const inputTokens = tokenUsage?.promptTokenCount ?? 0;
+    const outputTokens = tokenUsage?.candidatesTokenCount ?? 0;
     const tokens: TokenCounts = {
-      input: tokenUsage?.promptTokenCount ?? 0,
-      output: tokenUsage?.candidatesTokenCount ?? 0,
-      total: tokenUsage?.totalTokenCount ?? 0,
+      input: inputTokens,
+      output: outputTokens,
+      total: inputTokens + outputTokens,
     };
 
     if (tokenUsage) {
@@ -255,10 +257,12 @@ export class LLMProvider {
     }
 
     const tokenUsage = result.response.usageMetadata;
+    const inputTokens = tokenUsage?.promptTokenCount ?? 0;
+    const outputTokens = tokenUsage?.candidatesTokenCount ?? 0;
     const tokens: TokenCounts = {
-      input: tokenUsage?.promptTokenCount ?? 0,
-      output: tokenUsage?.candidatesTokenCount ?? 0,
-      total: tokenUsage?.totalTokenCount ?? 0,
+      input: inputTokens,
+      output: outputTokens,
+      total: inputTokens + outputTokens,
     };
 
     if (tokenUsage) {
