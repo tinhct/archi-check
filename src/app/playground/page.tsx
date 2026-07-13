@@ -283,6 +283,44 @@ export default function PlaygroundPage() {
     setPhase('quiz_ready');
   }, []);
 
+  const parseReasoning = useCallback((text: string) => {
+    if (!text) return { summary: '', breakdown: [] };
+    
+    // Split on Q1, Q2, Question 1, For Q1, For Question 2, bullet points, indicators
+    const parts = text.split(/(?=\bFor\s+Q\d+\b|\bFor\s+Question\s+\d+\b|\bQ\d+\b|\bQuestion\s+\d+\b|❌|✅|•)/i);
+    
+    const summaryParts: string[] = [];
+    const breakdown: Array<{ prefix: string; text: string }> = [];
+    
+    parts.forEach((part) => {
+      const trimmed = part.trim();
+      if (!trimmed) return;
+      
+      const isQuestionBlock = /^(For\s+Q\d+|For\s+Question\s+\d+|Q\d+|Question\s+\d+)/i.test(trimmed);
+      if (isQuestionBlock) {
+        const match = trimmed.match(/^(For\s+Q\d+|For\s+Question\s+\d+|Q\d+|Question\s+\d+)([:,\s.]*)/i);
+        const prefix = match ? match[1] : '';
+        let rest = match ? trimmed.slice(match[0].length) : trimmed;
+        if (rest && rest.length > 0) {
+          rest = rest.charAt(0).toUpperCase() + rest.slice(1);
+        }
+        breakdown.push({ prefix, text: rest });
+      } else {
+        const isBulletBlock = /^(❌|✅|•)/.test(trimmed);
+        if (isBulletBlock && breakdown.length > 0) {
+          breakdown[breakdown.length - 1].text += '\n\n' + trimmed;
+        } else {
+          summaryParts.push(trimmed);
+        }
+      }
+    });
+    
+    return {
+      summary: summaryParts.join('\n\n') || 'No summary provided.',
+      breakdown
+    };
+  }, []);
+
   // ── Derived Values ───────────────────────────────────────────────────────────
   const showPipelineSpinner = isGenerating || isEvaluating;
   const p1Total = phase1Result?.tokens?.total ?? null;
@@ -717,34 +755,35 @@ export default function PlaygroundPage() {
                 )}
 
                 {/* Phase 2: Evaluation Result Card */}
-                {evaluationResult && !isEvaluating && (
-                  <div className="eval-card">
-                    {evaluationResult.reason === 'success' ? (
-                      <>
-                        <div className={`eval-verdict eval-verdict--${evaluationResult.passed ? 'pass' : 'fail'}`}>
-                          <span className="eval-verdict__icon">
-                            {evaluationResult.passed ? '✅' : '❌'}
+                {evaluationResult && !isEvaluating && (() => {
+                  const { summary, breakdown } = parseReasoning(evaluationResult.reasoning);
+                  return (
+                    <div className={`eval-card eval-card--${
+                      evaluationResult.reason === 'success'
+                        ? (evaluationResult.passed ? 'pass' : 'fail')
+                        : evaluationResult.reason === 'sanitizer_rejection'
+                        ? 'blocked'
+                        : 'system-error'
+                    }`}>
+                      {/* Unified Header Metadata */}
+                      <div className="eval-card__header">
+                        <div className="eval-card__header-title">
+                          <span className="eval-card__header-icon">
+                            {evaluationResult.reason === 'success'
+                              ? '📋'
+                              : evaluationResult.reason === 'sanitizer_rejection'
+                              ? '🛡️'
+                              : '⚠️'}
                           </span>
-                          <span className="eval-verdict__label">
-                            {evaluationResult.passed ? 'PASS' : 'FAIL'}
+                          <span>
+                            {evaluationResult.reason === 'success'
+                              ? 'Phase 2 — Evaluation Result'
+                              : evaluationResult.reason === 'sanitizer_rejection'
+                              ? 'Phase 2 — Sanitizer Blocked'
+                              : 'Phase 2 — System Error'}
                           </span>
                         </div>
-
-                        <div className="eval-score">
-                          <span className="eval-score__number">{evaluationResult.score}</span>
-                          <span className="eval-score__denom">/ 10</span>
-                          <span className="eval-score__threshold">
-                            Passing: ≥ {evaluationResult.passingThreshold}
-                          </span>
-                        </div>
-
-                        <div className="eval-reasoning">
-                          <div className="eval-reasoning__label">Reasoning</div>
-                          {renderReasoning(evaluationResult.reasoning)}
-                        </div>
-
-                        {/* Compact Phase 2 token badges (matches Phase 1 style) */}
-                        <div className="token-badges token-badges--p2">
+                        <div className="token-badges text-xs font-mono">
                           <span className="token-badge-item">
                             In: <strong>{evaluationResult.tokens.input.toLocaleString()}</strong>
                           </span>
@@ -757,63 +796,113 @@ export default function PlaygroundPage() {
                             Total: <strong>{evaluationResult.tokens.total.toLocaleString()}</strong>
                           </span>
                         </div>
-                      </>
-                    ) : evaluationResult.reason === 'sanitizer_rejection' ? (
-                      <>
-                        <div className="eval-verdict eval-verdict--blocked">
-                          <span className="eval-verdict__icon">🛡️</span>
-                          <span className="eval-verdict__label">Sanitizer Blocked</span>
-                        </div>
-                        <div className="eval-score">
-                          <span className="eval-score__number eval-score__number--null">—</span>
-                          <span className="eval-score__denom">/ 10</span>
-                        </div>
-                        <div className="eval-reasoning">
-                          <div className="eval-reasoning__label">Details</div>
-                          {renderReasoning(evaluationResult.reasoning)}
-                        </div>
-                        <button
-                          className="btn-clear"
-                          style={{ marginTop: '0.75rem' }}
-                          onClick={handleRetryEval}
-                        >
-                          ↺ Retry with clean reply
-                        </button>
-                      </>
-                    ) : (
-                      /* llm_format_error */
-                      <>
-                        <div className="eval-verdict eval-verdict--system-error">
-                          <span className="eval-verdict__icon">⚠️</span>
-                          <span className="eval-verdict__label">System Error</span>
-                        </div>
-                        <div className="eval-score">
-                          <span className="eval-score__number eval-score__number--null">—</span>
-                          <span className="eval-score__denom">/ 10</span>
-                        </div>
-                        <div className="eval-reasoning">
-                          <div className="eval-reasoning__label">Details</div>
-                          {renderReasoning(evaluationResult.reasoning)}
-                        </div>
-                        <div className="token-badges token-badges--p2">
-                          <span className="token-badge-item">
-                            Tokens consumed (failed call):
-                          </span>
-                          <span className="token-badge-item token-badge-item--total">
-                            <strong>{evaluationResult.tokens.total.toLocaleString()}</strong>
-                          </span>
-                        </div>
-                        <button
-                          className="btn-clear"
-                          style={{ marginTop: '0.75rem' }}
-                          onClick={handleRetryEval}
-                        >
-                          ↺ Retry
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
+                      </div>
+
+                      {/* Card Body */}
+                      <div className="eval-card__body">
+                        {evaluationResult.reason === 'success' ? (
+                          <>
+                            {/* Score & Executive Summary */}
+                            <div className="eval-main-row">
+                              <div className="eval-score-box">
+                                <span className={`eval-verdict-tag eval-verdict-tag--${evaluationResult.passed ? 'pass' : 'fail'}`}>
+                                  {evaluationResult.passed ? '✅ PASS' : '❌ FAIL'}
+                                </span>
+                                <div className="eval-score-num">
+                                  {evaluationResult.score}
+                                  <span className="eval-score-denom">/10</span>
+                                </div>
+                                <span className="eval-score-threshold">
+                                  Threshold: ≥ {evaluationResult.passingThreshold}
+                                </span>
+                              </div>
+                              <div className="eval-summary-box">
+                                <h4 className="eval-section-title">
+                                  <i className="fa-solid fa-file-lines mr-1.5" /> Executive Summary
+                                </h4>
+                                <p className="eval-summary-text">{summary}</p>
+                              </div>
+                            </div>
+
+                            {/* Detailed Breakdown */}
+                            {breakdown.length > 0 && (
+                              <div className="eval-breakdown">
+                                <h4 className="eval-section-title">
+                                  <i className="fa-solid fa-list-check mr-1.5" /> Per-Question Breakdown
+                                </h4>
+                                <ul className="eval-breakdown-list">
+                                  {breakdown.map((item, idx) => (
+                                    <li key={idx} className="eval-breakdown-item">
+                                      <span className="eval-breakdown-badge">{item.prefix}</span>
+                                      <div className="eval-breakdown-content">
+                                        <p className="eval-breakdown-text">{item.text}</p>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </>
+                        ) : evaluationResult.reason === 'sanitizer_rejection' ? (
+                          <>
+                            <div className="eval-main-row">
+                              <div className="eval-score-box">
+                                <span className="eval-verdict-tag eval-verdict-tag--fail">
+                                  Blocked
+                                </span>
+                                <div className="eval-score-num">
+                                  —
+                                  <span className="eval-score-denom">/10</span>
+                                </div>
+                              </div>
+                              <div className="eval-summary-box">
+                                <h4 className="eval-section-title">
+                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> Security Blocked
+                                </h4>
+                                <p className="eval-summary-text">{evaluationResult.reasoning}</p>
+                              </div>
+                            </div>
+                            <button
+                              className="btn-clear"
+                              style={{ marginTop: '0.75rem' }}
+                              onClick={handleRetryEval}
+                            >
+                              ↺ Retry with clean reply
+                            </button>
+                          </>
+                        ) : (
+                          /* llm_format_error */
+                          <>
+                            <div className="eval-main-row">
+                              <div className="eval-score-box">
+                                <span className="eval-verdict-tag eval-verdict-tag--fail">
+                                  Error
+                                </span>
+                                <div className="eval-score-num">
+                                  —
+                                  <span className="eval-score-denom">/10</span>
+                                </div>
+                              </div>
+                              <div className="eval-summary-box">
+                                <h4 className="eval-section-title">
+                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> System Error
+                                </h4>
+                                <p className="eval-summary-text">{evaluationResult.reasoning}</p>
+                              </div>
+                            </div>
+                            <button
+                              className="btn-clear"
+                              style={{ marginTop: '0.75rem' }}
+                              onClick={handleRetryEval}
+                            >
+                              ↺ Retry
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Phase 2: Awaiting submission */}
                 {!evaluationResult && !evalError && !isEvaluating && phase === 'quiz_ready' && (
