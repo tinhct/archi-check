@@ -45,14 +45,29 @@ export class LLMProvider {
   private googleCredsJson?: string;
   private mockProvider?: MockLLMProvider;
 
+  private getProviderType(): 'gemini-developer' | 'vertex' | 'mock' {
+    return (process.env.LLM_PROVIDER_TYPE || this.providerType) as 'gemini-developer' | 'vertex' | 'mock';
+  }
+
+  private getProvider(): 'gemini' | 'claude' {
+    return (process.env.LLM_PROVIDER || this.provider) as 'gemini' | 'claude';
+  }
+
+  private getApiKey(): string {
+    return process.env.LLM_API_KEY || this.apiKey;
+  }
+
+  private getGoogleCredsJson(): string | undefined {
+    return process.env.GOOGLE_CREDS_JSON || this.googleCredsJson;
+  }
+
   constructor() {
     this.provider = env.LLM_PROVIDER as 'gemini' | 'claude';
     this.providerType = env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex' | 'mock';
     this.apiKey = env.LLM_API_KEY;
     this.googleCredsJson = env.GOOGLE_CREDS_JSON;
-    if (this.providerType === 'mock') {
-      this.mockProvider = new MockLLMProvider();
-    }
+    // Pre-initialize mock provider just in case
+    this.mockProvider = new MockLLMProvider();
   }
 
   /**
@@ -72,7 +87,7 @@ export class LLMProvider {
    * Generates a quiz from a git diff payload.
    */
   async generateQuiz(diff: string): Promise<{ quiz: QuizPayload; tokens: TokenCounts }> {
-    if (this.providerType === 'mock' && this.mockProvider) {
+    if (this.getProviderType() === 'mock' && this.mockProvider) {
       return this.mockProvider.generateQuiz(diff);
     }
 
@@ -111,7 +126,7 @@ export class LLMProvider {
     questions: QuizPayload,
     answers: string[]
   ): Promise<EvaluationResult> {
-    if (this.providerType === 'mock' && this.mockProvider) {
+    if (this.getProviderType() === 'mock' && this.mockProvider) {
       return this.mockProvider.validateAnswers(diff, questions, answers);
     }
 
@@ -146,11 +161,11 @@ export class LLMProvider {
    * Routes the LLM execution based on configured provider and model type.
    */
   private async callLLM(prompt: string, schema: object, signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
-    if (this.provider === 'claude') {
+    if (this.getProvider() === 'claude') {
       return this.callClaude(prompt, schema, signal);
     }
 
-    if (this.providerType === 'vertex') {
+    if (this.getProviderType() === 'vertex') {
       return this.callVertexAI(prompt, schema, signal);
     }
 
@@ -161,7 +176,7 @@ export class LLMProvider {
    * Calls the developer-tier Gemini API using the official SDK.
    */
   private async callGeminiDeveloper(prompt: string, schema: object, signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
-    const genAI = new GoogleGenerativeAI(this.apiKey);
+    const genAI = new GoogleGenerativeAI(this.getApiKey());
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
       generationConfig: {
@@ -206,11 +221,12 @@ export class LLMProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async callVertexAI(prompt: string, schema: object, _signal: AbortSignal): Promise<{ text: string; tokens: TokenCounts }> {
-    if (!this.googleCredsJson) {
+    const credsJson = this.getGoogleCredsJson();
+    if (!credsJson) {
       throw new Error('GOOGLE_CREDS_JSON is required for Vertex AI configuration');
     }
 
-    const creds = JSON.parse(this.googleCredsJson);
+    const creds = JSON.parse(credsJson);
     const vertexAI = new VertexAI({
       project: creds.project_id,
       location: 'us-central1', // Standard default region, can be overridden if needed
@@ -267,7 +283,7 @@ export class LLMProvider {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-api-key': this.apiKey,
+        'x-api-key': this.getApiKey(),
         'anthropic-version': '2023-06-01',
         // Enable prompt caching and enforce zero data training/retention
         'anthropic-beta': 'prompt-caching-2024-07-31'
