@@ -141,7 +141,7 @@ export class LLMProvider {
       );
       const parsed = JSON.parse(response.text) as { passed: boolean; score: number; reasoning: string };
       return {
-        passed: parsed.passed,
+        passed: parsed.score >= 7,
         score: parsed.score,
         reasoning: parsed.reasoning,
         tokens: response.tokens,
