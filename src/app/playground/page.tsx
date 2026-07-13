@@ -774,26 +774,28 @@ export default function PlaygroundPage() {
                       <div className="eval-card__body">
                         {evaluationResult.reason === 'success' ? (
                           <>
-                            {/* Score & Executive Summary */}
-                            <div className="eval-main-row">
-                              <div className="eval-score-box">
-                                <span className={`eval-verdict-tag eval-verdict-tag--${evaluationResult.passed ? 'pass' : 'fail'}`}>
-                                  {evaluationResult.passed ? '✅ PASS' : '❌ FAIL'}
-                                </span>
-                                <div className="eval-score-num">
-                                  {evaluationResult.score}
-                                  <span className="eval-score-denom">/10</span>
-                                </div>
-                                <span className="eval-score-threshold">
-                                  Threshold: ≥ {evaluationResult.passingThreshold}
-                                </span>
+                            {/* Score, Result, and Threshold Inline Bar */}
+                            <div className="eval-status-bar">
+                              <span className={`eval-verdict-tag eval-verdict-tag--${evaluationResult.passed ? 'pass' : 'fail'}`}>
+                                {evaluationResult.passed ? '✅ PASS' : '❌ FAIL'}
+                              </span>
+                              <span className="eval-status-divider">·</span>
+                              <div className="eval-score-inline">
+                                <span className="eval-score-num-inline">{evaluationResult.score}</span>
+                                <span className="eval-score-denom">/10</span>
                               </div>
-                              <div className="eval-summary-box">
-                                <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-file-lines mr-1.5" /> EXECUTIVE SUMMARY:
-                                </h4>
-                                <p className="eval-summary-text">{summary}</p>
-                              </div>
+                              <span className="eval-status-divider">·</span>
+                              <span className="eval-score-threshold">
+                                Threshold: ≥ {evaluationResult.passingThreshold}
+                              </span>
+                            </div>
+
+                            {/* Executive Summary */}
+                            <div className="eval-summary-box" style={{ marginTop: '0.85rem', marginBottom: '1.25rem' }}>
+                              <h4 className="eval-section-title">
+                                <i className="fa-solid fa-file-lines mr-1.5" /> EXECUTIVE SUMMARY:
+                              </h4>
+                              <p className="eval-summary-text">{summary}</p>
                             </div>
 
                             {/* Detailed Breakdown */}
@@ -820,26 +822,24 @@ export default function PlaygroundPage() {
                           </>
                         ) : evaluationResult.reason === 'sanitizer_rejection' ? (
                           <>
-                            <div className="eval-main-row">
-                              <div className="eval-score-box">
-                                <span className="eval-verdict-tag eval-verdict-tag--fail">
-                                  Blocked
-                                </span>
-                                <div className="eval-score-num">
-                                  —
-                                  <span className="eval-score-denom">/10</span>
-                                </div>
+                            <div className="eval-status-bar">
+                              <span className="eval-verdict-tag eval-verdict-tag--fail">
+                                Blocked
+                              </span>
+                              <span className="eval-status-divider">·</span>
+                              <div className="eval-score-inline">
+                                <span className="eval-score-num-inline">—</span>
+                                <span className="eval-score-denom">/10</span>
                               </div>
-                              <div className="eval-summary-box">
-                                <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SECURITY BLOCKED:
-                                </h4>
-                                <p className="eval-summary-text">{evaluationResult.reasoning}</p>
-                              </div>
+                            </div>
+                            <div className="eval-summary-box" style={{ marginTop: '0.85rem', marginBottom: '1.25rem' }}>
+                              <h4 className="eval-section-title">
+                                <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SECURITY BLOCKED:
+                              </h4>
+                              <p className="eval-summary-text">{evaluationResult.reasoning}</p>
                             </div>
                             <button
                               className="btn-clear"
-                              style={{ marginTop: '0.75rem' }}
                               onClick={handleRetryEval}
                             >
                               ↺ Retry with clean reply
@@ -848,26 +848,24 @@ export default function PlaygroundPage() {
                         ) : (
                           /* llm_format_error */
                           <>
-                            <div className="eval-main-row">
-                              <div className="eval-score-box">
-                                <span className="eval-verdict-tag eval-verdict-tag--fail">
-                                  Error
-                                </span>
-                                <div className="eval-score-num">
-                                  —
-                                  <span className="eval-score-denom">/10</span>
-                                </div>
+                            <div className="eval-status-bar">
+                              <span className="eval-verdict-tag eval-verdict-tag--fail">
+                                Error
+                              </span>
+                              <span className="eval-status-divider">·</span>
+                              <div className="eval-score-inline">
+                                <span className="eval-score-num-inline">—</span>
+                                <span className="eval-score-denom">/10</span>
                               </div>
-                              <div className="eval-summary-box">
-                                <h4 className="eval-section-title">
-                                  <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SYSTEM ERROR:
-                                </h4>
-                                <p className="eval-summary-text">{evaluationResult.reasoning}</p>
-                              </div>
+                            </div>
+                            <div className="eval-summary-box" style={{ marginTop: '0.85rem', marginBottom: '1.25rem' }}>
+                              <h4 className="eval-section-title">
+                                <i className="fa-solid fa-triangle-exclamation mr-1.5" /> SYSTEM ERROR:
+                              </h4>
+                              <p className="eval-summary-text">{evaluationResult.reasoning}</p>
                             </div>
                             <button
                               className="btn-clear"
-                              style={{ marginTop: '0.75rem' }}
                               onClick={handleRetryEval}
                             >
                               ↺ Retry
