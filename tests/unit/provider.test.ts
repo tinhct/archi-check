@@ -88,4 +88,26 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
     expect(promptArg).toContain('[/diff]');
     expect(promptArg).toContain('[/answers]');
   });
+
+  it('should override passed: false from LLM to true if score is greater than or equal to 7', async () => {
+    const mockGenerateContent = vi.fn().mockResolvedValue({
+      response: {
+        text: () => JSON.stringify({ passed: false, score: 7, reasoning: 'Decent effort.' }),
+        usageMetadata: {
+          promptTokenCount: 100,
+          candidatesTokenCount: 50,
+          totalTokenCount: 150,
+        }
+      }
+    });
+
+    vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue({
+      generateContent: mockGenerateContent
+    } as never);
+
+    const result = await llmProvider.validateAnswers('diff', { questions: [] }, ['answer']);
+
+    expect(result.score).toBe(7);
+    expect(result.passed).toBe(true); // Overridden to true because score >= 7
+  });
 });
