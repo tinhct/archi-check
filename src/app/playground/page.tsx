@@ -708,9 +708,9 @@ export default function PlaygroundPage() {
                       {isEvaluating ? '⏳ Evaluating…' : '⚖ Evaluate All Replies'}
                     </button>
                   </div>
-              </div>
-            </>
-          )}
+                </div>
+              </>
+            )}
 
             {/* ════════════════════════════════════════
                 PHASE 2 OUTPUT
