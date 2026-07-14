@@ -175,6 +175,34 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.message).toBe('Warning comment posted to non-author commenter');
   });
 
+  it('should ignore comment events created by bot users to prevent infinite loops', async () => {
+    const payload = {
+      action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {}
+      },
+      comment: {
+        body: 'I am ArchiCheck Bot replying to my own comment',
+        user: { login: 'archicheck-local-dev-tinhct[bot]', type: 'Bot' },
+      },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
+    };
+
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.message).toBe('Comment from bot user ignored');
+  });
+
   it('should accept PR author comments, clean replies, and return 202', async () => {
     const payload = {
       action: 'created',

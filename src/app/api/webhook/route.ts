@@ -216,6 +216,11 @@ export async function POST(req: NextRequest) {
     
     // We only process created comments on active pull requests
     if (action === 'created' && issue.pull_request && installation?.id) {
+      // Prevent infinite comment feedback loops by ignoring bot-created comments
+      if (comment.user.type === 'Bot' || comment.user.login.endsWith('[bot]')) {
+        return NextResponse.json({ message: 'Comment from bot user ignored' }, { status: 200 });
+      }
+
       const prNumber = issue.number;
       const commentAuthor = comment.user.login;
       const repoName = repository.name;
