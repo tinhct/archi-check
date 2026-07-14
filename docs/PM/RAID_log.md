@@ -28,6 +28,10 @@
 | R20 | 2026-07-14 | Next.js dev server showing client-side hydration warning overlays due to browser extensions injecting elements into MetadataWrapper. | M | Created `src/instrumentation-client.ts` to patch window.reportError before hydration runs, suppressing extension hydration errors in development. | Closed |
 | R21 | 2026-07-14 | Infinite comment loop triggered when bot accounts reply to comment webhooks, causing recursive webhook triggering. | M | Filter out webhook events where comment author type is 'Bot' or username ends in '[bot]'. | Closed |
 | R22 | 2026-07-14 | TypeError on live environments due to unconfigured Octokit in App constructor, leaving .rest undefined. | H | Pass custom REST-enabled Octokit class to App constructor options. | Closed |
+| R23 | 2026-07-14 | Background task execution using in-memory fallback queues risks promise loss during container restarts/crashes in standalone Node runtimes. | M | Implement standard Node event drainage process checks before termination. | Open |
+| R24 | 2026-07-14 | Real-time telemetry token aggregation on Redis adds response latency overhead to API endpoints. | M | Run telemetry checking asynchronously in background contexts, keeping webhook response times under 200ms. | Open |
+| R25 | 2026-07-14 | Pre-LLM deterministic validation algorithms trigger false-positives on highly technical but legitimate developer answers. | H | Implement distinct token/space limits and delimiters parsing rules supporting camelCase/Vietnamese/German tech words. | Open |
+
 
 
 ## 🧠 Assumptions (Things accepted as true without proof)
