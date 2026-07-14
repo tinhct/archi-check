@@ -251,6 +251,38 @@ Expected output (first few lines):
 | 5 | Confirm write interception | Check for `[SHADOW MODE] 🟡` lines | Both `createComment` (quiz posting) and `createCommitStatus` (gate lock) are intercepted — NOT sent to GitHub |
 | 6 | Verify PR is clean | Open the PR on GitHub.com | Zero comments, zero commit status checks — the PR looks untouched |
 
+---
+
+### Test B2.6 — Authorized Emergency Slash Command Bypass (Live Mode)
+
+**Goal:** Verify that a repository Admin/Maintainer can execute the `/archicheck bypass` slash command to emergency-unlock a gated PR when the system is in normal (non-shadow) mode.
+
+| Step | Action | What to Do (Detailed) | Expected Result |
+|------|--------|-----------------------|-----------------|
+| 1 | Disable Shadow Mode | Open `.env.local` and comment out or remove `ARCHICHECK_MODE=shadow`. Confirm `MOCK_GITHUB=false`. | Configuration updated |
+| 2 | Restart dev server | Stop the dev server (`Ctrl+C`) and start it again (`npm run dev`) to apply the mode change | Server starts in normal mode |
+| 3 | Create a gated test PR | Lower your thresholds in `.archicheck.yml` to trigger a gate lock. Push a commit and open a PR. | PR is created, status check is set to `pending` (yellow indicator), and the quiz comment is successfully posted on GitHub.com |
+| 4 | Post bypass comment as Admin | Log in with the GitHub account of the **repository owner, an Admin, or a Maintainer** and post a PR comment: `/archicheck bypass` | Comment is posted to the PR thread |
+| 5 | Watch terminal logs | Watch the dev server terminal output | The terminal logs a structured JSON audit log event: `{"event":"bypass_executed","pr_id":"...","user":"...","role":"admin"}` |
+| 6 | Verify PR status check unlocked | Look at the commit status checks block on the PR page | The `archicheck/verification` status check turns **green (Success)** with description: `"⚠️ Emergency bypass executed by Tech Lead."` |
+| 7 | Verify audit comment posted | Review the PR comment thread on GitHub.com | A new comment is posted by the bot: `"⚠️ Emergency bypass executed by @<user>. Automated architectural verification check has been bypassed. PR is unblocked for merge."` |
+
+---
+
+### Test B2.7 — Unauthorized Bypass Request Rejection (Live Mode)
+
+**Goal:** Verify that if a non-admin/non-maintainer user attempts to post `/archicheck bypass`, the request is rejected, the commit status remains pending (locked), and a rejection comment is posted.
+
+| Step | Action | What to Do (Detailed) | Expected Result |
+|------|--------|-----------------------|-----------------|
+| 1 | Ensure normal mode active | Confirm `.env.local` does not have `ARCHICHECK_MODE=shadow` and `MOCK_GITHUB=false`. Dev server running. | Configuration confirmed |
+| 2 | Have a non-admin post bypass | Log in with a different GitHub account that has **write or read access but is NOT an Admin or Maintainer** on the repo. Post comment: `/archicheck bypass` | Comment is posted to the PR thread |
+| 3 | Watch terminal logs | Watch the dev server terminal output | The webhook handler returns successfully, logging the rejection action |
+| 4 | Verify rejection comment | Check the PR comment thread | A new comment is posted by the bot: `"❌ Unauthorized. Only Maintainers or Admins can execute an emergency bypass. (Current role: 'write')"` |
+| 5 | Verify status remains locked | Inspect the PR status check indicator | The status check remains **yellow (Pending)** and description continues to show: `"Verification quiz pending. Click 'Details' to review the questions."` |
+
+---
+
 
 ---
 
