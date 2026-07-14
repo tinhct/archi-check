@@ -73,6 +73,12 @@
 | **AC-ST-501-P2** | Local AI Playground — Phase 2 | Unit / Integration | Run | Pass | BUG-505-1, BUG-505-3 | 2026-07-14 |
 | **AC-ST-504** | Isolate & Surface LLM Telemetry | Unit / Integration | Run | Pass | None | 2026-07-14 |
 | **AC-ST-505** | Playground UI Thread Layout | UI / Unit | Run | Pass | BUG-505-1 | 2026-07-14 |
+| **AC-ST-601** | Enforce Strict Env Boot Validation | Unit | To Do | N/A | None | 2026-07-14 |
+| **AC-ST-602** | Edge Runtime waitUntil Queue Fallback | Integration / Unit | To Do | N/A | None | 2026-07-14 |
+| **AC-ST-603** | Pre-LLM API Validation Guardrails | Integration / Unit | To Do | N/A | None | 2026-07-14 |
+| **AC-ST-302** | Token Burn Telemetry Alerting | Integration / Unit | To Do | N/A | None | 2026-07-14 |
+| **AC-ST-301** | Pilot Onboarding & Cohort Config | Integration / Unit | To Do | N/A | None | 2026-07-14 |
+
 
 
 ## 🚨 Risk-Based Testing Priorities

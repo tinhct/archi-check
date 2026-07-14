@@ -1,6 +1,6 @@
 # Core Sequence Diagrams
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-14
 
 ## 🔄 Sequence 1: Core Developer Gating & Interrogation Loop
 
@@ -20,7 +20,7 @@ sequenceDiagram
     GH-->>Edge: Status Check locked
     Edge->>GH: 202 Accepted response (Acknowledge)
     
-    Note over Edge: Kicks off async task (waitUntil)
+    Note over Edge: Kicks off async task (waitUntil on Edge, or in-memory asyncTracker queue on Node)
     Edge->>GH: Fetch PR Diff (GET pulls/101)
     GH-->>Edge: Raw Git Diff content
     Note over Edge: Extract Complexity Scorer & Heuristics
@@ -46,14 +46,20 @@ sequenceDiagram
         Edge->>GH: Post Warning comment (Reject answer)
     else Commenter IS PR Author
         Note over Edge: Strip blockquotes from comment body
-        Note over Edge: Sanitize XML tag boundaries (diff/answers)
-        Edge->>GH: Fetch original PR Diff (resilient re-fetch)
-        GH-->>Edge: Raw Diff
-        Edge->>LLM: validateAnswers(diff, quiz, justification)
-        LLM-->>Edge: EvaluationResult (passed: true, reasoning)
-        Edge->>GH: Update Commit Status to SUCCESS (Unblocks PR)
-        Edge->>Redis: setPRState(prId, status: 'success')
-        Edge->>GH: Post verification complete success comment
+        Note over Edge: Run deterministic filtering (AC-ST-603)
+        alt Reply fails deterministic check (gibberish/repetition/short)
+            Edge->>GH: Post warning/nudge comment, keep gate LOCKED
+        else Reply passes checks
+            Note over Edge: Sanitize XML tag boundaries (diff/answers)
+            Edge->>GH: Fetch original PR Diff (resilient re-fetch)
+            GH-->>Edge: Raw Diff
+            Edge->>LLM: validateAnswers(diff, quiz, justification)
+            LLM-->>Edge: EvaluationResult (passed: true, reasoning, tokens)
+            Note over Edge: Aggregate tokens & check budget alerts in Redis (AC-ST-302)
+            Edge->>GH: Update Commit Status to SUCCESS (Unblocks PR)
+            Edge->>Redis: setPRState(prId, status: 'success')
+            Edge->>GH: Post verification complete success comment
+        end
     end
 ```
 

@@ -1,6 +1,6 @@
 # System Data Flow
 
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-07-14
 
 ## 🗺️ Data Flow Visualization
 
@@ -22,12 +22,14 @@ graph TD
     L -->|Comment is /archicheck bypass| M{Check Commenter Repo Permissions}
     M -->|Admin or Maintainer| N[Overwrite Status to Success, Set Redis to Bypassed, Post Confirm Comment]
     M -->|Write or Read| O[Post Unauthorized Warning Comment, Keep Gate Locked]
-    
     L -->|Comment is Quiz Answer| P{Commenter is PR Author?}
     P -->|No| Q[Post Non-Author Warning Comment, Reject Answer]
-    P -->|Yes| R[Strip Blockquotes, Sanitize Inputs & Call LLM Validator]
-    R -->|passed: true| S[Update Status to Success, Set Redis to Success, Post Confirm Comment]
-    R -->|passed: false| T[Keep Status Pending, Post Nudge Comment]
+    P -->|Yes| R[Strip Blockquotes]
+    R -->|4. Run Deterministic Filter| U{Reply Valid?}
+    U -->|No| V[Post Warning Comment, Keep Gate Locked]
+    U -->|Yes| W[Sanitize Inputs & Call LLM Validator]
+    W -->|passed: true| S[Update Status to Success, Set Redis to Success, Post Confirm Comment, Log Telemetry Alert]
+    W -->|passed: false| T[Keep Status Pending, Post Nudge Comment]
 ```
 
 ## 🗄️ Data Entities & Storage

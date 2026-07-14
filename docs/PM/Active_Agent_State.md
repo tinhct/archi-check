@@ -7,12 +7,12 @@ This tracker maintains the sequential state of Sprint 6 tasks, planning approval
 ## 🏃 Active Phase Checklist
 
 ### 📋 Phase 1: Sprint Initiation & Governance Reviews
-- [ ] **Step 1.1: Dependency & RAID Verification** — Review `/docs/PM/Dependency_Register.md` for active blockers and `/docs/PM/RAID_log.md` for open risks.
-- [ ] **Step 1.2: Architecture & Sequence Alignment** — Review Data Flow, NFR Catalog, and Sequence Diagrams to ensure planned stories do not violate boundaries.
-- [ ] **Step 1.3: Security & Secrets Review** — Review Secrets Management Plan for safe API key handling on boot and validation.
-- [ ] **Step 1.4: Applied AI Prompt & Safety Review** — Review Safety Test Plan, prompt specifications, and fallback logic for gibberish filtering.
-- [ ] **Step 1.5: Integration & Stub Review** — Review Mock and Stub Strategy for telemetry and Edge queue checks.
-- [ ] **Step 1.6: QA & Test Plan Alignment** — Review `Test_Plan.md` traceability matrix for the Sprint 6 stories.
+- [x] **Step 1.1: Dependency & RAID Verification** — Review `/docs/PM/Dependency_Register.md` for active blockers and `/docs/PM/RAID_log.md` for open risks.
+- [x] **Step 1.2: Architecture & Sequence Alignment** — Review Data Flow, NFR Catalog, and Sequence Diagrams to ensure planned stories do not violate boundaries.
+- [x] **Step 1.3: Security & Secrets Review** — Review Secrets Management Plan for safe API key handling on boot and validation.
+- [x] **Step 1.4: Applied AI Prompt & Safety Review** — Review Safety Test Plan, prompt specifications, and fallback logic for gibberish filtering.
+- [x] **Step 1.5: Integration & Stub Review** — Review Mock and Stub Strategy for telemetry and Edge queue checks.
+- [x] **Step 1.6: QA & Test Plan Alignment** — Review `Test_Plan.md` traceability matrix for the Sprint 6 stories.
 
 ### 📝 Phase 2: Implementation Planning (Tech Lead)
 - [ ] **Step 2.1: Draft & Approve Plan for AC-ST-601** — Enforce Strict Environment Variable Boot Validation.
