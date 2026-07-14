@@ -21,8 +21,9 @@ export async function checkTokenBudget(tokens: TokenCounts): Promise<void> {
     const outputKey = 'archicheck:telemetry:output_tokens';
 
     // Increment input and output token totals in Redis
-    const inputTotal = await (redis as any).incrby(inputKey, tokens.input);
-    const outputTotal = await (redis as any).incrby(outputKey, tokens.output);
+    const client = redis as { incrby: (key: string, val: number) => Promise<number> };
+    const inputTotal = await client.incrby(inputKey, tokens.input);
+    const outputTotal = await client.incrby(outputKey, tokens.output);
 
     // Calculate cumulative cost in USD
     const inputCost = (inputTotal * GEMINI_INPUT_COST_PER_MILLION) / 1000000;

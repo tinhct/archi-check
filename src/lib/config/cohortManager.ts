@@ -54,7 +54,7 @@ export function getCohortOverrides(
 
     // Filter out undefined fields to avoid overwriting baseConfig fields with undefined
     const cleanOverrides = Object.fromEntries(
-      Object.entries(matchedCohort.overrides).filter(([_, value]) => value !== undefined)
+      Object.entries(matchedCohort.overrides).filter(([, value]) => value !== undefined)
     );
 
     return {

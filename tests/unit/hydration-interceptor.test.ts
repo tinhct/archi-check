@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // Unit tests for the instrumentation-client.ts hydration error filter.

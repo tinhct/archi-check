@@ -1,19 +1,26 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { checkTokenBudget } from '@/lib/telemetry/budgetAlert';
 import { redis } from '@/lib/redis/client';
 import { env } from '@/config/env';
 
+interface MockRedisClient {
+  get: Mock;
+  set: Mock;
+  incrby: Mock;
+  flushAll: () => void;
+}
+
 // Mock Redis client calls
 vi.mock('@/lib/redis/client', () => {
-  const store = new Map<string, any>();
+  const store = new Map<string, unknown>();
   const mockClient = {
     get: vi.fn(async (key: string) => store.get(key) || null),
-    set: vi.fn(async (key: string, value: any) => {
+    set: vi.fn(async (key: string, value: unknown) => {
       store.set(key, value);
       return 'OK';
     }),
     incrby: vi.fn(async (key: string, amount: number) => {
-      const current = store.get(key) || 0;
+      const current = (store.get(key) as number) || 0;
       const next = current + amount;
       store.set(key, next);
       return next;
@@ -28,11 +35,11 @@ vi.mock('@/lib/redis/client', () => {
 describe('Token Burn Telemetry Alerting Unit Tests', () => {
   const originalSlackUrl = env.SLACK_WEBHOOK_URL;
   const originalBudgetLimit = env.TELEMETRY_BUDGET_LIMIT;
-  let fetchSpy: any;
+  let fetchSpy: Mock;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (redis as any).flushAll();
+    (redis as unknown as MockRedisClient).flushAll();
     
     // Default mock environment variables
     env.SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/T123/B123/mock-key';
@@ -65,8 +72,8 @@ describe('Token Burn Telemetry Alerting Unit Tests', () => {
     // Total cost for { input: 1M, output: 1M } = $0.375, under $10 limit
     await checkTokenBudget({ input: 1000000, output: 1000000, total: 2000000 });
 
-    expect((redis as any).incrby).toHaveBeenCalledWith('archicheck:telemetry:input_tokens', 1000000);
-    expect((redis as any).incrby).toHaveBeenCalledWith('archicheck:telemetry:output_tokens', 1000000);
+    expect((redis as unknown as MockRedisClient).incrby).toHaveBeenCalledWith('archicheck:telemetry:input_tokens', 1000000);
+    expect((redis as unknown as MockRedisClient).incrby).toHaveBeenCalledWith('archicheck:telemetry:output_tokens', 1000000);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
@@ -92,7 +99,7 @@ describe('Token Burn Telemetry Alerting Unit Tests', () => {
     await checkTokenBudget({ input: 100000000, output: 10000000, total: 110000000 });
 
     // Confirm Redis gets updated, but fetch alert is bypassed
-    expect((redis as any).incrby).toHaveBeenCalled();
+    expect((redis as unknown as MockRedisClient).incrby).toHaveBeenCalled();
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
