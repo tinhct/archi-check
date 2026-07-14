@@ -1,0 +1,20 @@
+version: "1.0"
+cohorts:
+  - id: "frontend-team"
+    name: "Frontend UI Developers"
+    members:
+      - "frontend-dev-1"
+      - "frontend-dev-2"
+    overrides:
+      algorithmic_complexity_score: 3
+      excluded_paths:
+        - "**/tests/**"
+        - "**/docs/**"
+        - "**/*.md"
+  - id: "backend-team"
+    name: "Backend Core Developers"
+    members:
+      - "backend-dev-1"
+      - "pr-author-user"
+    overrides:
+      algorithmic_complexity_score: 7

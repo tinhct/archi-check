@@ -14,6 +14,7 @@ import { checkTokenBudget } from '@/lib/telemetry/budgetAlert';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 import { scrubSecrets } from '@/lib/security/sanitizer';
+import { getCohortOverrides } from '@/lib/config/cohortManager';
 import { trackTask } from '@/lib/utils/asyncTracker';
 
 /**
@@ -67,7 +68,9 @@ export async function POST(req: NextRequest) {
           try {
             // A. Fetch repository configuration (.archicheck.yml/yaml)
             const configString = await fetchRepositoryConfig(octokit, repoOwner, repoName, headSha);
-            const config = parseAndValidateConfig(configString);
+            const baseConfig = parseAndValidateConfig(configString);
+            const prAuthor = pull_request.user.login;
+            const config = getCohortOverrides(prAuthor, baseConfig);
 
             // B. Fetch Diff
             const rawDiff = await diffParserService.fetchPRDiff(octokit, repoOwner, repoName, prNumber);
