@@ -133,7 +133,7 @@
 
 ### Epic-03: Staging Polish & Telemetry
 * **Status:** To Do
-* **Description:** Integrate telemetry analysis tools and prepare initial cohorts onboarding for the Vietnamese and European Alpha pilots.
+* **Description:** Integrate telemetry analysis tools and prepare initial cohorts onboarding for early adopter developer teams and pilot cohorts.
 * **Progress:** `[░░░░░░░░░░] 0%`
 
 #### 📋 User Stories
@@ -142,7 +142,7 @@
 * **Priority:** Medium
 * **Status:** To Do
 * **Assigned Sprint:** Future
-* **Description:** As an onboarding manager, I want cohort mappings stored in configuration profiles so that Vietnam and EU pilots can use custom interrogation rules.
+* **Description:** As an onboarding manager, I want cohort mappings stored in configuration profiles so that pilot developer teams can use custom interrogation rules.
 * **Acceptance Criteria:**
   1. [ ] Parse country-specific threshold configs from local YAML files.
   2. [ ] Map custom prompt validation presets according to regional team roles.
@@ -350,4 +350,4 @@ All Sprint 5 stories (AC-ST-501, AC-ST-502, AC-ST-503, AC-ST-504, AC-ST-501-P2, 
 2. **AC-ST-601: Enforce Strict Environment Variable Boot Validation** (High — Prevents runtime JWT key failures)
 3. **AC-ST-302: Token Burn Telemetry Alerting** (High — Critical budget control before staging/prod launch)
 4. **AC-ST-602: Implement Edge Runtime waitUntil Async Queue Fallback** (Medium — Ensures environment hosting flexibility)
-5. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium — Required for Alpha pilots in Vietnam and EU)
+5. **AC-ST-301: Pilot Onboarding & Cohort Configuration** (Medium — Required for Alpha pilots across initial developer teams)
