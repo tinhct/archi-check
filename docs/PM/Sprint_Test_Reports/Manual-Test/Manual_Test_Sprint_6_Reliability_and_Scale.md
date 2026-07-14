@@ -18,9 +18,12 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 ## 🏗️ Test Environment Setup (Local/Dev)
 
 **Pre-requisites for Execution:**
-* Node.js v18+ is installed.
-* Local Upstash Redis instance or mock Redis adapter is configured.
-* Terminal is open at the project root.
+- [ ] Node.js v18+ is installed.
+- [ ] A local Upstash Redis instance is running, or the mock Redis adapter is active in `.env.local`.
+- [ ] Slack Webhook URL configured in `.env.local` to receive notifications.
+- [ ] A terminal window is open at the root of the `archi-check` directory.
+- [ ] Next.js development server is compiled or ready for dev execution:
+  - Run `npm run build` to verify production environment boundaries and build artifacts.
 
 ---
 
@@ -32,8 +35,8 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Set `process.env.NODE_ENV = 'production'`, set `GITHUB_PRIVATE_KEY` with single-line PEM format, and trigger imports | Application logs validation failure, prints specific key error, and halts process via `process.exit(1)`. | |
-| 2.   | Set `GITHUB_PRIVATE_KEY` with escaped `\n` characters (e.g. `-----BEGIN...\n...`) | Parser successfully normalizes escaped `\n` to real newlines, successfully passes boot validations, and imports cleanly. | |
+| 1.   | Run in terminal:<br>`NODE_ENV=production GITHUB_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----single-line-payload-----END PRIVATE KEY-----" npm run start` | Application boot halts immediately with message:<br>`❌ [ArchiCheck] Environment validation failed during boot:`<br>`  - GITHUB_PRIVATE_KEY: Invalid RSA private key structure: Must contain multiple lines` | |
+| 2.   | Run in terminal:<br>`NODE_ENV=production GITHUB_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQ...\n-----END RSA PRIVATE KEY-----" npm run start` | Parser transforms `\n` to real newlines, environment variables compile, and the production server boots successfully. | |
 
 ### Test Flow 2: Pre-LLM Deterministic Validation (AC-ST-603)
 
@@ -41,8 +44,8 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Post a comment reply consisting of keyboard mashing (e.g., `aaaaabbbbbcccccddddd`) on the webhook route | Webhook route short-circuits, posts a PR comment explaining the rejection, and returns status 200 without LLM calling. | |
-| 2.   | Submit similar mashing text (`aaaaabbbbbcccccddddd`) to playground evaluate API endpoint | Playground endpoint returns status 200 with payload `{ reason: 'sanitizer_rejection', passed: false, ... }` containing the details. | |
+| 1.   | Send a POST request to `/api/webhook` with headers:<br>`x-github-event: issue_comment`<br>Body containing a comment with keyboard mashing:<br>`"body": "aaaaabbbbbcccccdddddeeeee"` | Returns `200 OK` with JSON:<br>`{ "message": "Reply rejected by deterministic validation guardrails" }`<br>No background LLM validation is scheduled. | |
+| 2.   | Send a POST request to `/api/playground/evaluate` with body:<br>`{ "diff": "+const x = 1;", "quizJson": [...], "reply": "aaaaabbbbbcccccdddddeeeee" }` | Returns `200 OK` with status payload:<br>`{ "reason": "sanitizer_rejection", "passed": false, "score": null, "reasoning": "Reply rejected by validation guardrails: Repetitive character pattern detected.", "tokens": { "input": 0, "output": 0, "total": 0 } }` | |
 
 ### Test Flow 3: Token Burn Telemetry & Budgeting (AC-ST-302)
 
@@ -50,8 +53,8 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Configure `SLACK_WEBHOOK_URL` and set `TELEMETRY_BUDGET_LIMIT` to `$0.01` (very low) | First LLM validation call aggregates token costs in Redis, exceeds limit, and dispatches a warning message to the Slack webhook channel. | |
-| 2.   | Execute another LLM call immediately after the breach alert is dispatched | Cost increments in Redis, but Slack alert is debounced (not sent) due to active `alert_sent` Redis TTL lock key. | |
+| 1.   | Configure `.env.local` with:<br>`SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."`<br>`TELEMETRY_BUDGET_LIMIT="0.01"`<br>Trigger an answers evaluation. | System aggregates token costs in Redis, cost exceeds threshold limit, and dispatches Slack alert warning message. Sets `alert_sent` lock key. | |
+| 2.   | Immediately trigger a second evaluation. | Costs increment in Redis under `input_tokens`/`output_tokens`, but Slack webhook call is skipped because the `alert_sent` Redis key is active. | |
 
 ### Test Flow 4: Async Task Queue Graceful Fallback (AC-ST-602)
 
@@ -59,8 +62,8 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Run webhook routes under Node.js runtime environments where Next.js `waitUntil` is unavailable | Background promises are registered in-memory and continue running asynchronously to completion without blocking responses. | |
-| 2.   | Send `SIGTERM` or `SIGINT` signal to the active Node.js server process | Server intercepts signal, awaits and drains all active background tasks in-flight, logs completion, and gracefully shuts down. | |
+| 1.   | Execute webhook event route (without Edge runtime `waitUntil` context). | Returns HTTP `202` immediately. Validation processing proceeds asynchronously in-memory. | |
+| 2.   | Send termination command in another shell:<br>`kill -SIGTERM <node_process_id>` | Server intercepts `SIGTERM` and prints:<br>`[ArchiCheck] Received SIGTERM. Draining background task queue...`<br>Blocks process exit until active promises resolve, then prints:<br>`[ArchiCheck] All background tasks successfully drained.` | |
 
 ### Test Flow 5: Declarative Onboarding & Cohort Configuration (AC-ST-301)
 
@@ -68,8 +71,8 @@ To manually validate the reliability, scaling, onboarding, and telemetry guardra
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Submit PR from developer login unregistered in `config/cohorts.yaml` | Webhook uses default configuration parameters (e.g., complexity score 5). | |
-| 2.   | Submit PR from developer login registered under frontend-team (e.g., `frontend-dev-1`) | Webhook dynamically merges overrides: complexity score threshold shifts to 3, and front-end test/doc path filters are applied. | |
+| 1.   | Send PR webhook payload where `pull_request.user.login` is `external-contractor`. | Evaluation proceeds using default configuration limits (`complexity_threshold = 5`). | |
+| 2.   | Send PR webhook payload where `pull_request.user.login` is `frontend-dev-1` (registered in `config/cohorts.yaml`). | Overrides merge dynamically: gating checks are run using overridden threshold (`complexity_threshold = 3`) and custom path filters. | |
 
 ---
 
