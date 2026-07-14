@@ -14,8 +14,7 @@ import { checkTokenBudget } from '@/lib/telemetry/budgetAlert';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 import { scrubSecrets } from '@/lib/security/sanitizer';
-// @ts-expect-error next/server does not export waitUntil in older next typings
-import { waitUntil } from 'next/server';
+import { trackTask } from '@/lib/utils/asyncTracker';
 
 /**
  * POST handler for GitHub App webhooks.
@@ -196,9 +195,7 @@ export async function POST(req: NextRequest) {
           }
         })();
 
-        if (typeof waitUntil === 'function') {
-          waitUntil(gatingTask);
-        }
+        trackTask(gatingTask);
 
         return NextResponse.json({ 
           message: 'Pull request event accepted and queued for analysis',
@@ -430,9 +427,7 @@ export async function POST(req: NextRequest) {
           }
         })();
 
-        if (typeof waitUntil === 'function') {
-          waitUntil(validationTask);
-        }
+        trackTask(validationTask);
 
         return NextResponse.json({ message: 'Comment accepted for evaluation' }, { status: 202 });
 
