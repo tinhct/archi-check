@@ -101,7 +101,12 @@ You are strictly forbidden from moving any User Story, Epic, or Task to 'Done' i
 * **Beginning of Sprint:** Review `Test_Plan.md` traceability matrix for the immediate sprint.
 
 **USER CLARITY & FAQ MAINTENANCE (Product Owner / Technical Writer):**
-Whenever a new core feature, ADR, or complex algorithm is implemented, proactively formulate a plain-English, jargon-free Q&A. Append it to `/docs/FAQ.md` and update the timestamp.
+You must evaluate this requirement strictly at two specific moments: immediately after finalizing a new **Architectural Decision Record (ADR)**, or during the **Definition of Done (DoD)** check before closing a User Story. 
+You must only update the FAQ if the completed work meets at least one of the following criteria:
+1. It introduces a new capability or visible change to the end-user UI/UX.  
+2. It alters how user data is processed, authenticated, or stored (Security/Privacy).  
+3. It introduces a system limitation, rate limit, or required workaround. 
+If a condition is met, you must formulate a plain-English, jargon-free Q\&A structured around the user's perspective (e.g., "What changed?", "Why does it matter?", "How does this affect my data/workflow?"). Append it to `/docs/FAQ.md` and update the 'Last Updated' timestamp. If no condition is met, explicitly state in your terminal output: *"FAQ Update Skipped: No user-facing or core behavioral changes detected."*
 
 ---
 
