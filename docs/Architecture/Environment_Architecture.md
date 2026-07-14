@@ -1,6 +1,6 @@
 # Environment & Infrastructure Architecture
 
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-14
 
 ## 🏗️ Deployment Topology
 
@@ -36,4 +36,8 @@
 | `GITHUB_USER` | QA Bot username used in authentication fallback | Staging / CI |
 | `GITHUB_PASSWORD` | QA Bot password used in authentication fallback | Staging / CI |
 | `GITHUB_TOTP_SECRET` | QA Bot TOTP 2FA secret used in programmatic OTP code generation | Staging / CI |
+| `ARCHICHECK_MODE` | Set to `shadow` to enable read-only Webhook testing mode (intercepts and suppresses all GitHub writes) | All Environments |
+| `ARCHICHECK_SHADOW_FORMAT` | Set to `json` to switch shadow logs from human-readable blocks to minified single-line structured JSON logs | Dev / Staging |
+| `LLM_API_KEY` | Developer's personal free-tier API key used by the `gemini-developer` provider for the BYOK wizard | Dev / Staging |
+
 

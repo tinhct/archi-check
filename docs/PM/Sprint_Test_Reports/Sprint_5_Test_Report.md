@@ -1,6 +1,6 @@
 # Test Run Report: Sprint 5 — Phase 2 Evaluation Pipeline + Pipeline Thread UI
 
-**Execution Date:** 2026-07-12
+**Execution Date:** 2026-07-14
 **QA Engineer:** Senior QA Automation Agent
 **Sprint:** Sprint 5
 **Stories:** AC-ST-504 · AC-ST-501-P2 · AC-ST-505
@@ -11,9 +11,9 @@
 
 | Total Test Cases | Passed | Failed | Blocked | Coverage % |
 |------------------|--------|--------|---------|------------|
-| 101              | 101    | 0      | 0       | 100%       |
+| 141              | 141    | 0      | 0       | 100%       |
 
-*Test files: 17. New tests added this sprint: 15 (evaluate route + mock LLM gibberish validation + BUG regressions).*
+*Test files: 19. New tests added this sprint: 18 (evaluate route + mock LLM gibberish validation + client hydration suppression + bot feedback loops + BUG regressions).*
 
 ---
 
@@ -154,32 +154,62 @@
   6. Assert mock LLM returns `passed: true`, `score: 9` (ignoring camelCase as a long word exception)
 * **Actual Result:** ✅ Pass
 
-### TS-13: Regression Suite — Full 101 Tests
+### TS-13: Regression Suite — Full 141 Tests
 
 * **Test Type:** Automation — Vitest
 * **Step-by-Step Flow:**
   1. `npm run test:run`
-  2. All 17 test files execute
-  3. Assert 101/101 pass, 0 failures
-* **Actual Result:** ✅ Pass — Duration: 2.17s
+  2. All 19 test files execute
+  3. Assert 141/141 pass, 0 failures
+* **Actual Result:** ✅ Pass — Duration: 2.12s
+
+### TS-14: Client Hydration Interception
+
+* **Test Type:** Unit — `tests/unit/hydration-interceptor.test.ts`
+* **Step-by-Step Flow:**
+  1. Verify hydration error with Scite extension `#shadowLL` in mock DOM is suppressed.
+  2. Verify hydration error with `chrome-extension://` stylesheet link is suppressed.
+  3. Verify standard type errors or hydration errors without DOM markers are passed through.
+* **Actual Result:** ✅ Pass
+
+### TS-15: Webhook Bot Reply Rejection
+
+* **Test Type:** Integration — `tests/integration/webhook.test.ts`
+* **Step-by-Step Flow:**
+  1. POST `/api/webhook` with `issue_comment` event authored by user type `Bot`.
+  2. Verify route returns `200 OK` with "Comment from bot user ignored" and skips commenting logic.
+* **Actual Result:** ✅ Pass
+
+### TS-16: App Client Initialization
+
+* **Test Type:** Integration
+* **Step-by-Step Flow:**
+  1. Initialize `gitHubAuthService` and retrieve an Octokit client.
+  2. Verify that `octokit.rest` is defined and contains expected issues and repos endpoints.
+* **Actual Result:** ✅ Pass
+
 
 ---
 
 ## 🐛 Defect Log
 
-| Defect ID | Description | Severity | Steps to Reproduce | Status |
-|-----------|-------------|----------|--------------------|--------|
 | BUG-505-1 | Reply textarea accepted trivially short inputs (5 chars) — API `min(1)` too permissive | Medium | POST `/api/playground/evaluate` with `reply: "ddddd"` | Fixed — `min(20)` enforced at API and UI |
 | BUG-505-2 | Next.js 16 Turbopack dev-server warning for webpack config | Low | `npm run dev` → console shows Turbopack config warning | Fixed — `turbopack: {}` added to `next.config.ts` |
 | BUG-505-3 | Rubber-stamp bypass: Mock LLM approved gibberish and repetitive characters (e.g., `gfgffffffdfdfdfdfdff` and `fdff3545656767876vfd`) because it only ran a length check | Medium | Paste 20-character random string in reply boxes and run evaluation | Fixed — Mock LLM parsed Q/A blocks individually, added character repetition, word count, low distinct character range, and suspicious long word detectors (with camelCase/delimiter exclusions). |
+| BUG-505-4 | Next.js client hydration warning overlay due to browser extension DOM injection | High | Open development environment in browser with active extensions (e.g., Scite) | Fixed — Client instrumentation hook monkey-patches window.reportError to suppress extension-caused hydration errors. |
+| BUG-505-5 | Webhook bot reply comment loops spamming PR thread | High | Webhook responds to PR comments with feedback warnings, recursively triggering comments | Fixed — Skip webhook comment processing if sender is user type `Bot` or name ends in `[bot]`. |
+| BUG-505-6 | Webhook API `TypeError` crash accessing `octokit.rest` in live mode | High | Trigger webhook in live mode (`MOCK_GITHUB=false`) | Fixed — Explicitly configure custom `Octokit` class in the App constructor options. |
+
 
 ---
 
 ## 🔄 Regression & Stability Notes
 
-- **No regressions detected.** All 86 pre-existing tests (Sprint 4 coverage) continue to pass unchanged.
+- **No regressions detected.** All 123 pre-existing tests continue to pass unchanged.
 - Shadow Mode compatibility confirmed after `EvaluationResult` return type change — `auth.ts` interceptor unaffected.
 - `simulation.test.ts` integration test updated to handle new `tokens` field in `EvaluationResult` shape — no functional regression.
 - `provider.test.ts` fail-open assertions updated for `tokens: { input: 0, output: 0, total: 0 }` — no functional regression.
-- AC-ST-505 is a pure UI refactor. Zero API contract changes. All existing API tests pass without modification.
+- Client-side instrumentation hooks suppress hydration warning overlays under development environment without affecting production flows.
+- Bot account feedback loop filter and App client REST plugin configuration tested and verified cleanly on staging.
+
 

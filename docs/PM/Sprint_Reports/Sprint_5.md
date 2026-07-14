@@ -1,6 +1,6 @@
 # Sprint Report: Sprint 5 — "Live-Fire" Developer Toolkit (Epic 05)
 
-**Date:** 2026-07-12
+**Date:** 2026-07-14
 
 ## 🎯 Goal
 
@@ -18,6 +18,9 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
 | **BUG-505-1** | Reply textarea accepted trivially short inputs (`min(1)`) | ✅ Fixed |
 | **BUG-505-2** | Next.js 16 Turbopack warning for webpack config | ✅ Fixed |
 | **BUG-505-3** | Mock LLM allowed rubber-stamp bypass via gibberish replies | ✅ Fixed |
+| **BUG-505-4** | Client-side hydration warning overlay on root page (Scite extension interference) | ✅ Fixed |
+| **BUG-505-5** | Infinite comment loop triggered by bot replies on issue comments | ✅ Fixed |
+| **BUG-505-6** | `TypeError` on live webhook due to unconfigured `Octokit` in `new App()` constructor | ✅ Fixed |
 
 *Note: AC-ST-501, AC-ST-502, AC-ST-503 were completed and validated in a prior session; this sprint report covers the Phase 2 extension work.*
 
@@ -89,6 +92,27 @@ Deliver the complete "Live-Fire" Developer Toolkit (Epic 05) — enabling develo
   * **Root Cause:** The Mock LLM (`mock_llm.ts`) used a simplistic evaluation rubric: checking only whether the overall concatenated string exceeded the threshold length. It did not check for character entropy, word spacing, or repetitive patterns.
 
   * **Actionable Improvement:** Expand local mock services to perform basic structure/syntax analysis on input parameters to prevent developers from learning bad habits during sandboxed trials. We implemented character repetition detectors (`/(.)\1{3,}/`), space/word counters (`words.length < 3`), unique letter variety tests, and suspicious long-word checkers in the Mock LLM. These checks correctly fail rubber-stamping attempts with a realistic error, while correctly ignoring valid camelCase class names (e.g. `OrderRepositoryDecoratorImpl`) and file path links.
+
+* **What went wrong — Client-side hydration mismatch overlay in development (BUG-505-4):**
+  A persistent, blocking Next.js development overlay appeared due to hydration mismatches caused by the Scite Chrome extension injecting elements (`#shadowLL`, stylesheets) into Next.js's internal `<MetadataWrapper>` container before React hydration executes.
+  
+  * **Root Cause:** Next.js metadata wrappers render deep inside the layout hierarchy, meaning `suppressHydrationWarning` on `<html>` or `<body>` is too shallow to suppress the error. Inline `<script>` tags in Server Components (`layout.tsx`) throw hard React 19 warnings, and client components using `useEffect` run too late in the lifecycle (after the error is already dispatched to the dev overlay via `window.reportError`).
+  
+  * **Actionable Improvement:** Use Next.js 15+ client-side instrumentation hooks (`src/instrumentation-client.ts`) which run *before* React hydration executes. Monkey-patch `window.reportError` at this stage to filter out extension-caused hydration errors based on DOM inspection (`shadowLL` or `chrome-extension://` elements). Instruct developers to run staging tests in Private/Incognito windows.
+
+* **What went wrong — Bot comment infinite feedback loop (BUG-505-5):**
+  When a comment was posted to the PR, the webhook posted a warning reply. However, this write operation triggered a new `issue_comment.created` webhook event for the bot's own comment, leading to infinite warning-comment loops.
+  
+  * **Root Cause:** The `issue_comment` event handler failed to check if the author of the incoming comment was a bot before executing validations.
+  
+  * **Actionable Improvement:** Systematically filter out webhook events authored by bot accounts (`comment.user.type === 'Bot' || comment.user.login.endsWith('[bot]')`) at the very beginning of write-triggering event handlers to eliminate feedback loops.
+
+* **What went wrong — Octokit .rest undefined on live environment (BUG-505-6):**
+  When moving to live testing (`MOCK_GITHUB=false`), the webhook crashed with a `TypeError` when accessing `octokit.rest`.
+  
+  * **Root Cause:** The `@octokit/app` constructor instantiates a base client from `@octokit/core` which does not register REST endpoint plugins unless explicitly supplied with a custom `Octokit` class.
+  
+  * **Actionable Improvement:** Ensure `App` instances are initialized with the custom REST-enabled client (`Octokit: Octokit` in options) so that `getInstallationOctokit` installs REST method plugins correctly.
 
 * **What went well:**
   - The discriminated union approach for the Phase 2 response schema (`success | sanitizer_rejection | llm_format_error`) was robust — no edge cases found during manual testing.

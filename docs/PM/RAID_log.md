@@ -1,6 +1,6 @@
 # RAID Log
 
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-14
 
 ## ⚠️ Risks (Potential future problems)
 
@@ -21,10 +21,14 @@
 | R13 | 2026-07-10 | GitHub staging E2E tests blocked by 2FA login prompts or anti-bot captchas. | H | Use Playwright `storageState` session caching + programmatic TOTP fallback. | Closed |
 | R14 | 2026-07-10 | QA E2E test runs pollute staging branch refs and PR history. | M | Unconditional Octokit API teardown scripts deleting branches/PRs. | Closed |
 | R15 | 2026-07-10 | GitHub webhooks fail to route to dynamic Vercel preview environments. | H | Programmatically update QA GitHub App webhook URL to preview URL in CI. | Closed |
-| R16 | 2026-07-12 | Production regression if `validateAnswers` return type change (`EvaluationResult`) is not handled atomically with webhook route update. | H | Dual-approval PR gate required for AC-ST-504. CI must pass green before merge. | Open |
-| R17 | 2026-07-12 | `reasoning` vs `rationale` field name conflict between existing `evaluationResponseSchema` and Phase 2 API design. If misaligned, parity breaks silently. | M | Standardize on `reasoning` everywhere. Canonical Phase 2 schema updated to use `reasoning`. Verified in AC-ST-501-P2 AC-4. | Open |
-| R18 | 2026-07-12 | `playground-fixtures.json` containing adversarial prompt injection payloads may be included in production Next.js client bundle despite middleware 404 guard. | M | Configure `next.config.ts` webpack exclusion for `src/lib/mocks/` directory. Null-safety fallback `fixtures?.fixtures ?? []` required in UI component. | Open |
-| R19 | 2026-07-12 | LLM hallucinating scores outside 0-10 range causing Zod response parse failure, resulting in unhandled 500 on evaluate endpoint. | M | Route catches Zod parse failure and returns shaped `{ reason: "llm_format_error" }` 200 OK response instead of throwing. | Open |
+| R16 | 2026-07-12 | Production regression if `validateAnswers` return type change (`EvaluationResult`) is not handled atomically with webhook route update. | H | Dual-approval PR gate required for AC-ST-504. CI must pass green before merge. | Closed |
+| R17 | 2026-07-12 | `reasoning` vs `rationale` field name conflict between existing `evaluationResponseSchema` and Phase 2 API design. If misaligned, parity breaks silently. | M | Standardize on `reasoning` everywhere. Canonical Phase 2 schema updated to use `reasoning`. Verified in AC-ST-501-P2 AC-4. | Closed |
+| R18 | 2026-07-12 | `playground-fixtures.json` containing adversarial prompt injection payloads may be included in production Next.js client bundle despite middleware 404 guard. | M | Configure `next.config.ts` webpack exclusion for `src/lib/mocks/` directory. Null-safety fallback `fixtures?.fixtures ?? []` required in UI component. | Closed |
+| R19 | 2026-07-12 | LLM hallucinating scores outside 0-10 range causing Zod response parse failure, resulting in unhandled 500 on evaluate endpoint. | M | Route catches Zod parse failure and returns shaped `{ reason: "llm_format_error" }` 200 OK response instead of throwing. | Closed |
+| R20 | 2026-07-14 | Next.js dev server showing client-side hydration warning overlays due to browser extensions injecting elements into MetadataWrapper. | M | Created `src/instrumentation-client.ts` to patch window.reportError before hydration runs, suppressing extension hydration errors in development. | Closed |
+| R21 | 2026-07-14 | Infinite comment loop triggered when bot accounts reply to comment webhooks, causing recursive webhook triggering. | M | Filter out webhook events where comment author type is 'Bot' or username ends in '[bot]'. | Closed |
+| R22 | 2026-07-14 | TypeError on live environments due to unconfigured Octokit in App constructor, leaving .rest undefined. | H | Pass custom REST-enabled Octokit class to App constructor options. | Closed |
+
 
 ## 🧠 Assumptions (Things accepted as true without proof)
 
