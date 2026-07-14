@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from '@/app/api/webhook/route';
+import { POST, GET } from '@/app/api/webhook/route';
 import { NextRequest } from 'next/server';
 import crypto from 'crypto';
 import { env } from '@/config/env';
@@ -79,6 +79,14 @@ function createMockRequest(payload: object, eventType: string = 'pull_request', 
 describe('Webhook API Route Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('should support GET health checks and return 200 OK', async () => {
+    const response = await GET();
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe('active');
+    expect(body.message).toContain('active and listening');
   });
 
   it('should reject requests missing the GitHub signature header', async () => {

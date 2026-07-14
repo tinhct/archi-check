@@ -18,6 +18,17 @@ import { getCohortOverrides } from '@/lib/config/cohortManager';
 import { trackTask } from '@/lib/utils/asyncTracker';
 
 /**
+ * GET handler to allow health checks, ngrok connection tests, and verification probes.
+ */
+export async function GET() {
+  return NextResponse.json({
+    status: 'active',
+    message: 'ArchiCheck webhook endpoint is active and listening. Please send POST webhooks here.',
+    timestamp: new Date().toISOString()
+  }, { status: 200 });
+}
+
+/**
  * POST handler for GitHub App webhooks.
  * Implements strict security signature validation and must be fail-open < 5 seconds.
  */
