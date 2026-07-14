@@ -10,6 +10,8 @@
 2. [Scoring & Metrics (Algorithmic Complexity)](#scoring--metrics)
 3. [Security & Data Privacy](#security--data-privacy)
 4. [Integrations & AI](#integrations--ai)
+5. [Local AI Playground](#local-ai-playground)
+6. [Reliability, Scaling & Governance (Sprint 6)](#reliability-scaling--governance-sprint-6)
 
 ---
 
@@ -122,5 +124,42 @@ ArchiCheck mitigates this by injecting a client-side hook in `src/instrumentatio
 
 **Recommendation:** For the cleanest developer experience, always test the Next.js application in an **Incognito/Private Window** with all extensions disabled to ensure external scripts do not interfere with the client application state.
 
+---
 
+## 📈 Reliability, Scaling & Governance (Sprint 6)
+
+### Q: What is the "Deterministic validation guardrail" in Sprint 6, and why is it useful?
+
+**A:** Deterministic validation guardrails are O(1) checks run locally on the server before invoking external LLM models:
+* **Keyboard-Mashing / Gibberish Detection:** Excludes text containing repeated character chains (e.g. `aaaa`, `1111`) or long, continuous words ($>15$ characters without path delimiters or camelCase word transitions).
+* **Information Density Verification:** Excludes responses that lack sufficient unique character variety ($\ge 6$ unique letters for replies $\ge 20$ chars) or word spacing ($< 3$ words).
+
+By filtering out spam, key mashing, or junk text instantly, the system avoids executing expensive AI queries, protecting API quotas and lowering application latency.
+
+---
+
+### Q: How does the Token Burn Telemetry Alerting engine protect our AI monthly budget?
+
+**A:** The alerting engine dynamically aggregates Gemini token costs inside a persistent Redis key store. 
+* **Pricing Model:** It tracks input and output tokens consumed across both quiz generation and validation phases. Cumulative expense is computed using current pricing metrics ($0.075 per 1M input tokens, $0.30 per 1M output tokens).
+* **Alert Thresholds:** If the total computed cost breaches the safety limit (configured via `TELEMETRY_BUDGET_LIMIT`, default `$200.00`), the engine dispatches a rich JSON payload to the `SLACK_WEBHOOK_URL`.
+* **Spam Prevention:** Once an alert is dispatched, an `alert_sent` key with a 24-hour expiration (TTL) is locked in Redis, preventing redundant webhook spamming.
+
+---
+
+### Q: How does the Request Context Async Task Queue fallback ensure task durability?
+
+**A:** Vercel Edge functions support Next.js `waitUntil` to schedule background promise executions. However, standard Node.js Docker containers or Kubernetes environments do not have a native request lifecycle hook.
+
+The `asyncTracker` utility detects runtime features:
+* On platforms with `waitUntil`, it delegates background tasks to it.
+* On standard Node.js containers, it stores active background promises in an in-memory queue. It hooks into Node.js `SIGTERM` and `SIGINT` signals to await and drain all active background tasks before allowing the container process to exit.
+
+---
+
+### Q: How do we configure Pilot Cohort overrides, and how are they matched?
+
+**A:** Administrative users can configure team-based rules in `config/cohorts.yaml`.
+* **Cohort Definition:** Each cohort defines a list of member logins (e.g. GitHub usernames) and custom parameters (such as `algorithmic_complexity_score` and `excluded_paths` overrides).
+* **Matching Logic:** When a webhook event is received, the engine parses the PR author's login, checks it against cohort lists case-insensitively, and merges matching overrides dynamically over base repository configurations. Unregistered users default to the standard repository-level rules.
 

@@ -29,7 +29,7 @@ This tracker maintains the sequential state of Sprint 6 tasks, planning approval
 - [x] **Step 3.5: Execute AC-ST-301** — Implement YAML-based pilot onboarding profiles and regional team custom rules, write configuration validation tests, and log results.
 
 ### 🛡️ Phase 4: QA Verification & DoD Handover (Senior QA Engineer)
-- [ ] **Step 4.1: Regression & E2E Verification** — Run full automated test suites (Vitest + Playwright E2E simulation) to verify zero regressions.
-- [ ] **Step 4.2: Manual Test Plans** — Create manual UAT documents under `/docs/PM/Sprint_Test_Reports/Manual-Test/` for Sprint 6 stories.
-- [ ] **Step 4.3: Definition of Done Check** — Verify Code, Test (Dev Test Logs), Handover, and Clarity (`/docs/FAQ.md` updates) criteria for all stories before closing them.
-- [ ] **Step 4.4: Sprint 6 Report Draft** — Prepare the initial draft of the Sprint 6 Report.
+- [x] **Step 4.1: Regression & E2E Verification** — Run full automated test suites (Vitest + Playwright E2E simulation) to verify zero regressions.
+- [x] **Step 4.2: Manual Test Plans** — Create manual UAT documents under `/docs/PM/Sprint_Test_Reports/Manual-Test/` for Sprint 6 stories.
+- [x] **Step 4.3: Definition of Done Check** — Verify Code, Test (Dev Test Logs), Handover, and Clarity (`/docs/FAQ.md` updates) criteria for all stories before closing them.
+- [x] **Step 4.4: Sprint 6 Report Draft** — Prepare the initial draft of the Sprint 6 Report.
