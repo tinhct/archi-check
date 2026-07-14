@@ -1,3 +1,5 @@
-lines_added_threshold: 50
+lines_added_threshold: 10
+algorithmic_complexity_score: 1                                                                                                      
+ai_reliance_ratio: 0.0            # <-- Add this to allow the Standard Gate to trigger    
 excluded_paths:
   - '**/ignored-dir/**'
