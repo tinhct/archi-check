@@ -5,6 +5,7 @@ import { scrubSecrets } from '@/lib/security/sanitizer';
 import { llmProvider } from '@/lib/llm/provider';
 import { diffParserService } from '@/lib/analyzer/diff-parser';
 import { DiffSchema, QuizSchema } from '@/schema/quiz';
+import { validateCommentReply, extractAnswers } from '@/lib/security/deterministicFilter';
 
 /**
  * POST /api/playground/evaluate — AC-ST-501-P2 / Epic-05
@@ -67,6 +68,23 @@ export async function POST(request: NextRequest) {
       { error: 'Invalid Git diff. The input must contain a valid unified git diff format.' },
       { status: 400 }
     );
+  }
+
+  // Step 2.5: Run deterministic validation check (AC-ST-603)
+  const answers = extractAnswers(reply);
+  const answersToCheck = answers.length > 0 ? answers : [reply];
+  for (const ans of answersToCheck) {
+    const filterResult = validateCommentReply(ans);
+    if (!filterResult.valid) {
+      return NextResponse.json({
+        reason: 'sanitizer_rejection',
+        passed: false,
+        score: null,
+        reasoning: `Reply rejected by validation guardrails: ${filterResult.reason}`,
+        passingThreshold: PASSING_THRESHOLD,
+        tokens: { input: 0, output: 0, total: 0 },
+      }, { status: 200 });
+    }
   }
 
   // Step 3: Sanitize the developer reply before passing to LLM

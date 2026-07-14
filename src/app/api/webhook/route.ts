@@ -12,6 +12,7 @@ import { logIntercepted } from '@/lib/shadow/shadowLogger';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 import { scrubSecrets } from '@/lib/security/sanitizer';
+import { validateCommentReply } from '@/lib/security/deterministicFilter';
 // @ts-expect-error next/server does not export waitUntil in older next typings
 import { waitUntil } from 'next/server';
 
@@ -331,6 +332,19 @@ export async function POST(req: NextRequest) {
         const cleanReply = parseDeveloperReply(comment.body);
         if (!cleanReply) {
           return NextResponse.json({ message: 'Empty reply after parsing blockquotes' }, { status: 200 });
+        }
+
+        // Run deterministic filtering (AC-ST-603)
+        const filterResult = validateCommentReply(cleanReply);
+        if (!filterResult.valid) {
+          // Post comment warning explaining the deterministic check rejection
+          await octokit.rest.issues.createComment({
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: prNumber,
+            body: `⚠️ **Architectural justification rejected by validation guardrails.**\n\n**Reason:** ${filterResult.reason}\n\nPlease provide a genuine technical explanation.`
+          });
+          return NextResponse.json({ message: 'Reply rejected by deterministic validation guardrails' }, { status: 200 });
         }
 
         // Run LLM validation asynchronously in the background

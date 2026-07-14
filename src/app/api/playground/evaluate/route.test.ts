@@ -266,6 +266,23 @@ describe('POST /api/playground/evaluate', () => {
     expect(body.error).toContain('Invalid Git diff');
   });
 
+  it('returns reason: sanitizer_rejection when the reply contains deterministic gibberish', async () => {
+    const req = makeRequest({
+      diff: VALID_DIFF,
+      quizJson: VALID_QUIZ,
+      reply: 'aaaaabbbbbcccccdddddeeeee',
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.reason).toBe('sanitizer_rejection');
+    expect(body.passed).toBe(false);
+    expect(body.score).toBeNull();
+    expect(body.reasoning).toContain('validation guardrails');
+    expect(body.tokens).toEqual({ input: 0, output: 0, total: 0 });
+  });
+
   // ─── Production Block ────────────────────────────────────────────────────────
   it('calls notFound() when NODE_ENV is production', async () => {
     const { notFound } = await import('next/navigation');

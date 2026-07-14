@@ -240,6 +240,42 @@ describe('Webhook API Route Integration Tests', () => {
     expect(body.message).toBe('Comment accepted for evaluation');
   });
 
+  it('should reject PR author comments if they contain deterministic gibberish', async () => {
+    const payload = {
+      action: 'created',
+      issue: {
+        number: 42,
+        pull_request: {}
+      },
+      comment: {
+        body: 'aaaaabbbbbcccccdddddeeeee',
+        user: { login: 'pr-author-user' },
+      },
+      repository: {
+        name: 'archi-check',
+        owner: { login: 'tinhct' },
+      },
+      installation: {
+        id: 123
+      }
+    };
+
+    vi.mocked(getPRState).mockResolvedValueOnce({
+      prId: 42,
+      commitSha: 'abcdef1234567890',
+      prAuthor: 'pr-author-user',
+      status: 'pending',
+      quizPayload: { questions: [] }
+    });
+
+    const req = createMockRequest(payload, 'issue_comment');
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.message).toBe('Reply rejected by deterministic validation guardrails');
+  });
+
   it('should execute emergency bypass if the commenter is an Admin or Maintainer', async () => {
     const payload = {
       action: 'created',
