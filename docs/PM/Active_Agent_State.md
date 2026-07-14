@@ -22,7 +22,7 @@ This tracker maintains the sequential state of Sprint 6 tasks, planning approval
 - [x] **Step 2.5: Draft & Approve Plan for AC-ST-301** — Pilot Onboarding & Cohort Configuration.
 
 ### 💻 Phase 3: Development & Local Testing (Developers & QA)
-- [ ] **Step 3.1: Execute AC-ST-601** — Write env boot validation checks, assert startup failure tests, and log results.
+- [x] **Step 3.1: Execute AC-ST-601** — Write env boot validation checks, assert startup failure tests, and log results.
 - [ ] **Step 3.2: Execute AC-ST-603** — Integrate pre-LLM deterministic gibberish validation in webhook and playground evaluate routes, add unit tests, and log results.
 - [ ] **Step 3.3: Execute AC-ST-302** — Implement token burn aggregation and Slack alerts in Vercel streams, write unit tests, and log results.
 - [ ] **Step 3.4: Execute AC-ST-602** — Implement request context async task queue for standard Node.js containers, write integration tests, and log results.

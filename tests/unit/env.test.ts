@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll } from 'vitest';
+import { describe, it, expect, afterAll, beforeEach } from 'vitest';
 import { envSchema } from '@/config/env';
 
 describe('Environment Schema Unit Tests', () => {
@@ -77,5 +77,64 @@ describe('Environment Schema Unit Tests', () => {
       expect(issue).toBeDefined();
       expect(issue?.message).toContain('GOOGLE_CREDS_JSON is required');
     }
+  });
+
+  describe('GITHUB_PRIVATE_KEY Strict Format Validation', () => {
+    beforeEach(() => {
+      process.env.NODE_ENV = 'development';
+    });
+
+    it('should accept a valid multiline key with PEM delimiters', () => {
+      const config = {
+        ...baseConfig,
+        GITHUB_PRIVATE_KEY: '-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQ...\n-----END RSA PRIVATE KEY-----'
+      };
+      const result = envSchema.safeParse(config);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.GITHUB_PRIVATE_KEY).toContain('\n');
+      }
+    });
+
+    it('should reject a key missing PEM delimiters', () => {
+      const config = {
+        ...baseConfig,
+        GITHUB_PRIVATE_KEY: 'MIICXAIBAAKBgQ...\nsome-random-content-without-headers'
+      };
+      const result = envSchema.safeParse(config);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const issue = result.error.issues.find(i => i.path.includes('GITHUB_PRIVATE_KEY'));
+        expect(issue).toBeDefined();
+        expect(issue?.message).toContain('Must start with -----BEGIN');
+      }
+    });
+
+    it('should reject a key with delimiters but no newlines (single-line)', () => {
+      const config = {
+        ...baseConfig,
+        GITHUB_PRIVATE_KEY: '-----BEGIN RSA PRIVATE KEY----- MIICXAIBAAKBgQ... -----END RSA PRIVATE KEY-----'
+      };
+      const result = envSchema.safeParse(config);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const issue = result.error.issues.find(i => i.path.includes('GITHUB_PRIVATE_KEY'));
+        expect(issue).toBeDefined();
+        expect(issue?.message).toContain('Must contain multiple lines');
+      }
+    });
+
+    it('should transform/normalize escaped \\n characters into real newlines and pass', () => {
+      const config = {
+        ...baseConfig,
+        GITHUB_PRIVATE_KEY: '-----BEGIN RSA PRIVATE KEY-----\\nMIICXAIBAAKBgQ...\\n-----END RSA PRIVATE KEY-----'
+      };
+      const result = envSchema.safeParse(config);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.GITHUB_PRIVATE_KEY).toContain('\n');
+        expect(result.data.GITHUB_PRIVATE_KEY).not.toContain('\\n');
+      }
+    });
   });
 });

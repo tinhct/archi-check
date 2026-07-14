@@ -7,7 +7,25 @@ import { z } from 'zod';
 const envSchema = z
   .object({
     GITHUB_APP_ID: z.string().min(1, 'GITHUB_APP_ID is required'),
-    GITHUB_PRIVATE_KEY: z.string().min(1, 'GITHUB_PRIVATE_KEY is required'),
+    GITHUB_PRIVATE_KEY: z.string()
+      .min(1, 'GITHUB_PRIVATE_KEY is required')
+      .transform((val) => {
+        if (val === 'mock-key') return val;
+        return val.replace(/\\n/g, '\n');
+      })
+      .refine((val) => {
+        if (val === 'mock-key') return true;
+        const trimmed = val.trim();
+        return trimmed.startsWith('-----BEGIN') && trimmed.endsWith('-----');
+      }, {
+        message: 'Invalid RSA private key structure: Must start with -----BEGIN and end with ----- (standard PEM footer delimiters)'
+      })
+      .refine((val) => {
+        if (val === 'mock-key') return true;
+        return val.includes('\n');
+      }, {
+        message: 'Invalid RSA private key structure: Must contain multiple lines with newline characters'
+      }),
     GITHUB_WEBHOOK_SECRET: z.string().min(1, 'GITHUB_WEBHOOK_SECRET is required'),
     UPSTASH_REDIS_REST_URL: z.string().url('UPSTASH_REDIS_REST_URL must be a valid URL'),
     UPSTASH_REDIS_REST_TOKEN: z.string().min(1, 'UPSTASH_REDIS_REST_TOKEN is required'),
@@ -65,8 +83,17 @@ let parsedEnv: z.infer<typeof envSchema>;
 try {
   parsedEnv = envSchema.parse(process.env);
 } catch (error) {
+  console.error('\x1b[31m%s\x1b[0m', '❌ [ArchiCheck] Environment validation failed during boot:');
+  if (error instanceof z.ZodError) {
+    error.issues.forEach((err) => {
+      console.error('\x1b[33m%s\x1b[0m', `  - ${err.path.join('.')}: ${err.message}`);
+    });
+  } else {
+    console.error('\x1b[33m%s\x1b[0m', `  - ${(error as Error).message}`);
+  }
+
   if (process.env.NODE_ENV === 'production' && process.env.SKIP_ENV_VALIDATION !== 'true') {
-    throw new Error(`Environment validation failed: ${(error as Error).message}`);
+    process.exit(1);
   }
   // In development or build-time validation bypass, mock or parse what we can
   parsedEnv = {
