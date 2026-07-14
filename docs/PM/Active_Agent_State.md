@@ -1,24 +1,35 @@
-# Active Agent State Tracker — Sprint 5 Conclusion
+# Active Agent State Tracker — Sprint 6 Planning & Execution
 
-This tracker maintains the sequential state of the End-of-Sprint pipeline for Sprint 5, preventing context amnesia across steps.
+This tracker maintains the sequential state of Sprint 6 tasks, planning approvals, development execution, and QA verification.
 
 ---
 
 ## 🏃 Active Phase Checklist
 
-### 📋 Phase 1: Agile & Retrospective Hygiene
-- [x] **Step 1.1: Retrospective Scan** — Scan the 'Lessons Learned' of the 3 most recent Sprint Reports and the Mock Bug Review to identify bottlenecks.
-- [x] **Step 1.2: Sprint Report** — Update/finalize the Sprint 5 Report in `/docs/PM/Sprint_Reports/Sprint_5.md` to reflect recent fixes (mismatches, infinite comment loop, Octokit configuration).
-- [x] **Step 1.3: Roadmap Sync** — Update `/docs/PM/Product_Roadmap.md` (Gantt statuses, Milestones, Current Focus).
-- [x] **Step 1.4: Backlog & RAID Hygiene** — Verify Master DoD, update story statuses in `Product_Backlog.md`, update Epic progress bars, groom next sprint priorities, and sync `RAID_log.md` and `Dependency_Register.md`.
+### 📋 Phase 1: Sprint Initiation & Governance Reviews
+- [ ] **Step 1.1: Dependency & RAID Verification** — Review `/docs/PM/Dependency_Register.md` for active blockers and `/docs/PM/RAID_log.md` for open risks.
+- [ ] **Step 1.2: Architecture & Sequence Alignment** — Review Data Flow, NFR Catalog, and Sequence Diagrams to ensure planned stories do not violate boundaries.
+- [ ] **Step 1.3: Security & Secrets Review** — Review Secrets Management Plan for safe API key handling on boot and validation.
+- [ ] **Step 1.4: Applied AI Prompt & Safety Review** — Review Safety Test Plan, prompt specifications, and fallback logic for gibberish filtering.
+- [ ] **Step 1.5: Integration & Stub Review** — Review Mock and Stub Strategy for telemetry and Edge queue checks.
+- [ ] **Step 1.6: QA & Test Plan Alignment** — Review `Test_Plan.md` traceability matrix for the Sprint 6 stories.
 
-### 🛡️ Phase 2: Security & Audit Hygiene
-- [x] **Step 2.1: Security Audit** — Audit code/dependencies and update `/docs/PM/Security_Audit_log.md`.
-- [x] **Step 2.2: Mock Audit** — Update `/docs/Security/Mock_Bugs_Security_Review.md` with local mock drift/defects and log Backlog stories for remediation.
-- [x] **Step 2.3: QA Regression** — Execute regression test suites, update `Defect_Log.md` / `Test_Plan.md`, and compile the sprint test reports in `/docs/PM/Sprint_Test_Reports/`.
+### 📝 Phase 2: Implementation Planning (Tech Lead)
+- [ ] **Step 2.1: Draft & Approve Plan for AC-ST-601** — Enforce Strict Environment Variable Boot Validation.
+- [ ] **Step 2.2: Draft & Approve Plan for AC-ST-603** — Standardize Pre-LLM API Validation Guardrails (Deterministic Filtering).
+- [ ] **Step 2.3: Draft & Approve Plan for AC-ST-302** — Token Burn Telemetry Alerting.
+- [ ] **Step 2.4: Draft & Approve Plan for AC-ST-602** — Edge Runtime `waitUntil` Async Queue Fallback.
+- [ ] **Step 2.5: Draft & Approve Plan for AC-ST-301** — Pilot Onboarding & Cohort Configuration.
 
-### 🏗️ Phase 3: Architectural Synchronization
-- [x] **Step 3.1: Architecture Sync** — Synchronize `/docs/Architecture/` and `/docs/Architecture/SD/` with actual live repository and CI/CD status check contexts.
-- [x] **Step 3.2: Security Sync** — Synchronize `/docs/Security/` threat models and the Vulnerability Register.
-- [x] **Step 3.3: Applied AI Sync** — Synchronize `/docs/Applied-AI/` prompts, safety logs, and telemetry schemas.
-- [x] **Step 3.4: Integration Sync** — Synchronize `/docs/Integration/` Connectivity Runbook and E2E routes.
+### 💻 Phase 3: Development & Local Testing (Developers & QA)
+- [ ] **Step 3.1: Execute AC-ST-601** — Write env boot validation checks, assert startup failure tests, and log results.
+- [ ] **Step 3.2: Execute AC-ST-603** — Integrate pre-LLM deterministic gibberish validation in webhook and playground evaluate routes, add unit tests, and log results.
+- [ ] **Step 3.3: Execute AC-ST-302** — Implement token burn aggregation and Slack alerts in Vercel streams, write unit tests, and log results.
+- [ ] **Step 3.4: Execute AC-ST-602** — Implement request context async task queue for standard Node.js containers, write integration tests, and log results.
+- [ ] **Step 3.5: Execute AC-ST-301** — Implement YAML-based pilot onboarding profiles and regional team custom rules, write configuration validation tests, and log results.
+
+### 🛡️ Phase 4: QA Verification & DoD Handover (Senior QA Engineer)
+- [ ] **Step 4.1: Regression & E2E Verification** — Run full automated test suites (Vitest + Playwright E2E simulation) to verify zero regressions.
+- [ ] **Step 4.2: Manual Test Plans** — Create manual UAT documents under `/docs/PM/Sprint_Test_Reports/Manual-Test/` for Sprint 6 stories.
+- [ ] **Step 4.3: Definition of Done Check** — Verify Code, Test (Dev Test Logs), Handover, and Clarity (`/docs/FAQ.md` updates) criteria for all stories before closing them.
+- [ ] **Step 4.4: Sprint 6 Report Draft** — Prepare the initial draft of the Sprint 6 Report.
