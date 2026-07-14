@@ -39,15 +39,23 @@ export async function drainTasks(): Promise<void> {
   await Promise.allSettled(promises);
 }
 
-// Graceful container shutdown hooks for Node.js process lifecycles
-if (typeof window === 'undefined' && typeof process !== 'undefined') {
+// Graceful container shutdown hooks for Node.js process lifecycles (skipped during testing)
+if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env.NODE_ENV !== 'test') {
   const handleShutdown = async (signal: string) => {
     console.log(`[ArchiCheck] Received ${signal}. Draining background task queue...`);
+    
+    // Safety timeout: force exit after 5 seconds to prevent hanging zombie containers
+    const timeoutPromise = new Promise<void>((_, reject) => {
+      setTimeout(() => reject(new Error('Shutdown timeout breached (5s). Force exiting.')), 5000);
+    });
+
     try {
-      await drainTasks();
+      await Promise.race([drainTasks(), timeoutPromise]);
       console.log('[ArchiCheck] All background tasks successfully drained.');
+      process.exit(0);
     } catch (err) {
-      console.error('[ArchiCheck] Error draining background tasks on shutdown:', err);
+      console.error('[ArchiCheck] Shutdown sequence warning/error:', (err as Error).message);
+      process.exit(1);
     }
   };
 
