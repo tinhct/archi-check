@@ -1,6 +1,6 @@
 # ArchiCheck: Frequently Asked Questions (FAQ)
 
-**Last Updated:** 2026-07-12
+**Last Updated:** 2026-07-14
 
 **Target Audience:** End-Users, Stakeholders, and Onboarding Developers
 
@@ -111,5 +111,16 @@ ArchiCheck uses this variable to enforce environment boundaries:
 * To verify the development code path, run `npm run dev` and navigate to `/playground`.
 * To verify the production block, run `npm run build && npm run start` and confirm `/playground` returns a 404.
 * If you want to check the current value in your shell terminal, run `echo $NODE_ENV`. If empty, it means the variable is only set in-memory during script execution.
+
+---
+
+### Q: Why does the Next.js development server sometimes show a hydration mismatch error overlay, and how does ArchiCheck mitigate it?
+
+**A:** React hydration mismatches under Next.js development mode frequently occur when third-party browser extensions (such as *Scite* or ad-blockers) inject arbitrary HTML tags (e.g. `<div id="shadowLL">`) or custom `<link>` stylesheets into the page's metadata before React finishes mounting. This results in structural differences between server-rendered HTML and client-side DOM.
+
+ArchiCheck mitigates this by injecting a client-side hook in `src/instrumentation-client.ts` that executes before hydration. This hook monkey-patches the global `window.reportError` handler. If a hydration error is thrown, it inspects the error message and the DOM for extension markers (like Scite's `#shadowLL` or `chrome-extension://` stylesheet links). If detected, it suppresses the dev overlay while preserving and passing through real application-level errors.
+
+**Recommendation:** For the cleanest developer experience, always test the Next.js application in an **Incognito/Private Window** with all extensions disabled to ensure external scripts do not interfere with the client application state.
+
 
 
