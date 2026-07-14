@@ -9,10 +9,11 @@ import { setPRState, getPRState } from '@/lib/redis/client';
 import { generateQuizComment, generateRedisFailureComment, generateNonAuthorWarningComment } from '@/lib/github/comments';
 import { parseDeveloperReply } from '@/lib/github/comment-parser';
 import { logIntercepted } from '@/lib/shadow/shadowLogger';
+import { validateCommentReply } from '@/lib/security/deterministicFilter';
+import { checkTokenBudget } from '@/lib/telemetry/budgetAlert';
 import { fetchRepositoryConfig } from '@/lib/github/configFetcher';
 import { parseAndValidateConfig } from '@/lib/config/yamlParser';
 import { scrubSecrets } from '@/lib/security/sanitizer';
-import { validateCommentReply } from '@/lib/security/deterministicFilter';
 // @ts-expect-error next/server does not export waitUntil in older next typings
 import { waitUntil } from 'next/server';
 
@@ -134,7 +135,8 @@ export async function POST(req: NextRequest) {
             }
 
             // F. Generate Quiz (LLM Provider call)
-            const { quiz: quizPayload } = await llmProvider.generateQuiz(sanitizedDiff);
+            const { quiz: quizPayload, tokens: quizTokens } = await llmProvider.generateQuiz(sanitizedDiff);
+            await checkTokenBudget(quizTokens);
 
             // F. Cache Quiz State in Upstash Redis (Cache-First)
             // If this throws (timeout/error), it falls to catch block (Fail-Open)
@@ -374,6 +376,7 @@ export async function POST(req: NextRequest) {
 
             // B. Validate via LLM
             const evaluation = await llmProvider.validateAnswers(sanitizedDiff, state.quizPayload, [cleanReply]);
+            await checkTokenBudget(evaluation.tokens);
 
             if (evaluation.passed) {
               // C1. Update status check to Success

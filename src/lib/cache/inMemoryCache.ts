@@ -55,6 +55,14 @@ export class InMemoryCache {
     return this.store.delete(key) ? 1 : 0;
   }
 
+  async incrby(key: string, value: number): Promise<number> {
+    const current = await this.get<number | string>(key);
+    const parsed = typeof current === 'string' ? parseInt(current, 10) : typeof current === 'number' ? current : 0;
+    const next = parsed + value;
+    await this.set(key, next);
+    return next;
+  }
+
   /** Utility: clear all entries (useful in unit tests) */
   flushAll(): void {
     this.store.clear();

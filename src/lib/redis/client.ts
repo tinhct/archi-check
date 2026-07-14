@@ -27,6 +27,13 @@ const mockRedis = {
     memoryStore.delete(key);
     return 1;
   },
+  incrby: async (key: string, amount: number) => {
+    const current = memoryStore.get(key);
+    const currentValue = current ? parseInt(current, 10) : 0;
+    const newValue = currentValue + amount;
+    memoryStore.set(key, newValue.toString());
+    return newValue;
+  },
 };
 
 export const redis: Redis | InMemoryCache = isShadowMode

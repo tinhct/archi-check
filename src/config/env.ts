@@ -41,6 +41,11 @@ const envSchema = z
       .string()
       .default('0.7')
       .transform((val) => parseFloat(val)),
+    TELEMETRY_BUDGET_LIMIT: z
+      .string()
+      .default('200')
+      .transform((val) => parseFloat(val)),
+    SLACK_WEBHOOK_URL: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     const isProd = process.env.NODE_ENV === 'production';
@@ -108,6 +113,8 @@ try {
     GOOGLE_CREDS_JSON: process.env.GOOGLE_CREDS_JSON || undefined,
     COMPLEXITY_THRESHOLD: parseInt(process.env.COMPLEXITY_THRESHOLD || '5', 10),
     AGENT_RELIANCE_THRESHOLD: parseFloat(process.env.AGENT_RELIANCE_THRESHOLD || '0.7'),
+    TELEMETRY_BUDGET_LIMIT: parseFloat(process.env.TELEMETRY_BUDGET_LIMIT || '200'),
+    SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL || undefined,
   };
 }
 

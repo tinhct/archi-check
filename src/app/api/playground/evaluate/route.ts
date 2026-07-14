@@ -6,6 +6,7 @@ import { llmProvider } from '@/lib/llm/provider';
 import { diffParserService } from '@/lib/analyzer/diff-parser';
 import { DiffSchema, QuizSchema } from '@/schema/quiz';
 import { validateCommentReply, extractAnswers } from '@/lib/security/deterministicFilter';
+import { checkTokenBudget } from '@/lib/telemetry/budgetAlert';
 
 /**
  * POST /api/playground/evaluate — AC-ST-501-P2 / Epic-05
@@ -159,6 +160,11 @@ export async function POST(request: NextRequest) {
       { questions: quizJson },
       [sanitizedReply]
     );
+
+    // Track token burn telemetry asynchronously without blocking API response
+    checkTokenBudget(evaluation.tokens).catch((err) => {
+      console.error('[ArchiCheck] Failed to track playground telemetry budget:', err);
+    });
 
     if (providerOverride) {
       if (originalProviderType === undefined) {
