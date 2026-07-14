@@ -19,7 +19,7 @@ This tracker maintains the sequential state of Sprint 6 tasks, planning approval
 - [x] **Step 2.2: Draft & Approve Plan for AC-ST-603** — Standardize Pre-LLM API Validation Guardrails (Deterministic Filtering).
 - [x] **Step 2.3: Draft & Approve Plan for AC-ST-302** — Token Burn Telemetry Alerting.
 - [x] **Step 2.4: Draft & Approve Plan for AC-ST-602** — Edge Runtime `waitUntil` Async Queue Fallback.
-- [ ] **Step 2.5: Draft & Approve Plan for AC-ST-301** — Pilot Onboarding & Cohort Configuration.
+- [x] **Step 2.5: Draft & Approve Plan for AC-ST-301** — Pilot Onboarding & Cohort Configuration.
 
 ### 💻 Phase 3: Development & Local Testing (Developers & QA)
 - [ ] **Step 3.1: Execute AC-ST-601** — Write env boot validation checks, assert startup failure tests, and log results.
