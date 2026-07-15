@@ -7,6 +7,10 @@
 > **The Cognitive Control Plane for Human-First Software Engineering.**
 > Gating pull requests behind interactive architectural quizzes to combat passive "rubber-stamping," preserve developer agency, and prevent systemic deskilling in the age of AI.
 
+<p align="center">
+  <a href="./docs/Testing-And-Release-Gates/Test-Reports/v1.0.0/Demo_v1.0.0-alpha.pdf"><b>📺 View the v1.0.0-alpha Demo (PDF)</b></a>
+</p>
+
 ---
 
 ## 🔍 The Problem
