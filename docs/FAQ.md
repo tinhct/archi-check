@@ -34,7 +34,7 @@
    $$\text{Score} = \min\left(10, \left\lceil \frac{\text{complexityIndicators}}{\text{linesAdded}} \times 10 + \frac{\text{totalLinesModified}}{100} \right\rceil\right)$$
 
 This baseline score is then fed into the **Heuristics Gating Engine** which decides whether to lock the PR:
-* **Standard Gate**: Locks the gate if the complexity score is $\ge 7$ (configurable via `COMPLEXITY_THRESHOLD`) **AND** the estimated AI-reliance ratio is $\ge 0.5$ (configurable via `AGENT_RELIANCE_THRESHOLD`).
+* **Standard Gate**: Locks the gate if the complexity score is $\ge 5$ (configurable via `COMPLEXITY_THRESHOLD`) **AND** the estimated AI-reliance ratio is $\ge 0.7$ (configurable via `AGENT_RELIANCE_THRESHOLD`).
 * **Velocity ("Spray & Pray") Gate**: Overrides standard thresholds to immediately lock the PR if development was suspiciously fast (the First Commit Proxy time delta between first commit and PR is $< 15\text{ minutes}$) **AND** the changes are substantial ($> 300\text{ lines added}$).
 
 ---
