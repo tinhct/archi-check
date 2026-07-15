@@ -79,6 +79,19 @@ ArchiCheck represents a live experiment in **"AI-Scrum"**—running autonomous, 
 
 ---
 
+## 📚 Documentation
+
+For deep-dives into the architecture, security models, policies, testing gates, and development procedures of ArchiCheck, refer to the **[ArchiCheck Documentation Index](./docs/README.md)**.
+
+The index maps the entire documentation layout:
+*   **[Architecture & Design](./docs/Architecture/ADRs.md):** Architectural Decision Records (ADRs), API Contracts, and environment diagrams.
+*   **[Security & Threat Models](./docs/Security/Threat_Model.md):** STRIDE threat modeling, vulnerability registers, and sandbox reviews.
+*   **[Applied AI Policies](./docs/Applied-AI/Safety_and_Hallucination_Test_Plan.md):** Model safety settings, prompt engineering guidelines, and gibberish mitigations.
+*   **[Project Management](./docs/PM/Product_Backlog.md):** Sprint reports, Scrum backlogs, risk registers, and state tracking.
+*   **[Testing & Release Gates](./docs/Testing-And-Release-Gates/Test_Plan.md):** Vitest rules, Playwright integrations, and manual UAT test checklists.
+
+---
+
 ## ⚙️ Quick Start
 
 ### Prerequisites
