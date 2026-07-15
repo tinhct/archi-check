@@ -1,21 +1,21 @@
 # System Threat Model (STRIDE)
 
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-15
 
 ## 🎯 Threat Landscape Visualization
 
 ```mermaid
 flowchart TD
     %% Define Boundaries
-    subgraph Trust Boundary: Public Internet
+    subgraph "Trust Boundary: Public Internet"
         GitHub[GitHub Webhook Service]
     end
     
-    subgraph Trust Boundary: Edge Serverless (Vercel)
+    subgraph "Trust Boundary: Edge Serverless (Vercel)"
         App[ArchiCheck Webhook App]
     end
     
-    subgraph Trust Boundary: Secure Private Networks
+    subgraph "Trust Boundary: Secure Private Networks"
         Redis[(Upstash Redis Cache)]
         LLM[Vertex AI / Gemini API]
     end
