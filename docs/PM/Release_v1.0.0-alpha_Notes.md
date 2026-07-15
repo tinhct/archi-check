@@ -43,12 +43,12 @@ To enable ArchiCheck on your repositories, refer to the **[Onboarding Guide](../
 
 ```yaml
 # Sample .archicheck.yml
-gatingRules:
-  complexityThreshold: 5        # Gate PRs scoring 5 or higher
-  agentRelianceThreshold: 0.7   # Gate if AI reliance matches/exceeds 70%
-  excludePaths:                 # Skip verification for config and lockfiles
-    - "package-lock.json"
-    - "node_modules/**"
+algorithmic_complexity_score: 5      # Gate PRs scoring 5 or higher (1 to 10)
+ai_reliance_ratio: 0.7              # Gate if AI reliance is >= 70% (0.0 to 1.0)
+lines_added_threshold: 300          # Min code additions to trigger Velocity Gate (default: 300)
+excluded_paths:                     # Paths ignored during analysis
+  - "**/node_modules/**"
+  - "package-lock.json"
 ```
 
 Refer to the **[FAQ Guide](../../docs/FAQ.md)** for developer workarounds, security details, and API limits.

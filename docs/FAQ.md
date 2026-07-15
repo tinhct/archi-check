@@ -170,6 +170,14 @@ The `asyncTracker` utility detects runtime features:
 **A:** ArchiCheck parses the incoming GitHub Webhook pull request payload and fetches the `.archicheck.yml` (or `.archicheck.yaml`) file directly from the head commit SHA (`pull_request.head.sha`) of your specific PR branch. 
 
 *   **PR Branch Requirement:** Because configuration is loaded dynamically from the head commit, any custom rules or threshold overrides you wish to apply must be committed and pushed directly to your feature branch (the branch you are opening the PR from) for the system to register them.
-*   **Default Fallback:** If the file is missing from your PR branch, the system logs a fallback warning and defaults to global configuration limits (complexity score $\ge 5$, AI reliance $\ge 0.7$ ).
+*   **Default Fallback:** If the file is missing from your PR branch, the system logs a fallback warning and defaults to global configuration limits (complexity score $\ge 5$, AI reliance $\ge 70\%$).
 
+---
 
+### Q: What options are supported in `.archicheck.yml`?
+
+**A:** ArchiCheck supports a flat configuration schema with the following fields:
+*   `algorithmic_complexity_score` (default: `5`): The minimum baseline complexity score (from `1` to `10`) required to trigger the Standard Gate.
+*   `ai_reliance_ratio` (default: `0.7`): The minimum ratio of AI-authored code (from `0.0` to `1.0`, matching `70%`) required to trigger the Standard Gate.
+*   `lines_added_threshold` (default: `300`): The minimum volume of code additions required to trigger the Velocity ("Spray & Pray") Gate when commits are pushed rapidly.
+*   `excluded_paths` (list of globs): Files and folders that are ignored by the complexity scanner (e.g., lockfiles, dependencies).

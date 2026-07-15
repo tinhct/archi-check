@@ -150,6 +150,20 @@ The index maps the entire documentation layout:
 
 To customize complexity thresholds, exclude paths, or configure AI-reliance ratios, add a `.archicheck.yml` configuration file to the root of your repository.
 
+Here is the supported configuration schema with standard default values:
+
+```yaml
+# .archicheck.yml
+algorithmic_complexity_score: 5      # Gate PRs scoring 5 or higher (1 to 10)
+ai_reliance_ratio: 0.7              # Gate if AI reliance is >= 70% (0.0 to 1.0)
+lines_added_threshold: 300          # Min code additions to trigger Velocity Gate (default: 300)
+excluded_paths:                     # Paths ignored during analysis
+  - "**/node_modules/**"
+  - "package-lock.json"
+  - "yarn.lock"
+  - "pnpm-lock.yaml"
+```
+
 > [!IMPORTANT]
 > **Branch Configuration Rule:** ArchiCheck loads repository configurations dynamically from the head commit of the incoming pull request. Therefore, **any custom rules or modifications to `.archicheck.yml` must be committed and pushed directly to your feature branch** (the branch you are opening the PR from) for the system to apply them to your evaluation.
 
