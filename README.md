@@ -127,6 +127,18 @@ ArchiCheck represents a live experiment in **"AI-Scrum"**—running autonomous, 
 
 ---
 
+## 💬 Frequently Asked Questions (FAQ)
+
+We maintain a comprehensive, plain-English **[Frequently Asked Questions Guide](./docs/FAQ.md)** covering:
+*   **Algorithmic Gating & Metrics:** How complexity scoring and the "Spray & Pray" velocity filters are calculated.
+*   **Security & Data Privacy:** Outbound secrets redaction, HMAC timing-safe webhook verification, and Vercel Edge middleware access rules.
+*   **Integrations & AI:** How the fail-open resiliency policies, timeout gates, and administrative slash bypass commands operate under outage conditions.
+*   **Local Playground Sandbox:** How the offline two-stage evaluation pipeline and per-question textboxes work.
+
+Refer to the **[FAQ Guide](./docs/FAQ.md)** for complete details on onboarding, limitations, and customization options.
+
+---
+
 ## 📄 License
 
 ArchiCheck is open-source software released under the [MIT License](./LICENSE).
