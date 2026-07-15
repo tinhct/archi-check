@@ -35,7 +35,7 @@ gantt
 | **M2: Scorer & Webhook Gate** | 2026-07-13 | Done | Diff parsing, secret scrubber, ReDoS watchdogs, Pending checks, quiz comment, Admin bypass. |
 | **M3: Sandbox & Customization** | 2026-07-10 | Done | Local mock LLM sandbox, config `.archicheck.yml` parser, Playwright E2E GitHub simulation. |
 | **M4: Live-Fire Developer Toolkit** | 2026-07-12 | Done | Shadow Mode, BYOK Setup Wizard, Local AI Playground Phase 1 & Phase 2 (two-stage evaluation pipeline, Pipeline Thread UI). |
-| **M5: Production Dogfooding & Scale** | 2026-07-15 | Done | Dogfooding pilots with early adopter Beta cohorts, telemetry logs audits, and budget cap alarms. |
+| **M5: Production Dogfooding & Scale** | 2026-07-25 | Active | Dogfooding pilots with early adopter Beta cohorts, telemetry logs audits, and budget cap alarms. |
 
 ## 📈 Current Focus & Next Steps
 
