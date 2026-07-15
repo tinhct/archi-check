@@ -11,7 +11,8 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "setup:keys": "node scripts/setup-keys.mjs"
+    "setup:keys": "node scripts/setup-keys.mjs",
+    "postinstall": "node -e \"const fs = require('fs'); if (!fs.existsSync('.env.local')) { fs.copyFileSync('.env.example', '.env.local'); console.log('Auto-created .env.local from .env.example template.'); }\""
   },
   "dependencies": {
     "@google-cloud/vertexai": "^1.12.0",

@@ -95,6 +95,7 @@ ArchiCheck represents a live experiment in **"AI-Scrum"**—running autonomous, 
     ```
 
 2.  **Install Dependencies:**
+    Install dependencies (this will also automatically initialize your `.env.local` file from the `.env.example` template if it is missing):
     ```bash
     npm install
     ```
