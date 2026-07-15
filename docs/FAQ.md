@@ -170,6 +170,6 @@ The `asyncTracker` utility detects runtime features:
 **A:** ArchiCheck parses the incoming GitHub Webhook pull request payload and fetches the `.archicheck.yml` (or `.archicheck.yaml`) file directly from the head commit SHA (`pull_request.head.sha`) of your specific PR branch. 
 
 *   **PR Branch Requirement:** Because configuration is loaded dynamically from the head commit, any custom rules or threshold overrides you wish to apply must be committed and pushed directly to your feature branch (the branch you are opening the PR from) for the system to register them.
-*   **Default Fallback:** If the file is missing from your PR branch, the system logs a fallback warning and defaults to global configuration limits (complexity score $\ge 5$, AI reliance $\ge 70%).
+*   **Default Fallback:** If the file is missing from your PR branch, the system logs a fallback warning and defaults to global configuration limits (complexity score $\ge 5$, AI reliance $\ge 0.7$ ).
 
 
