@@ -34,7 +34,7 @@ Instead of treating developer verification as a purely administrative task, Arch
 
 *   **Active Cognitive Gating:** Dynamically assesses incoming Git diffs for complexity and AI-reliance cues. If complexity exceeds system thresholds, it locks the PR commit status and generates interactive, language-agnostic architectural comprehension quizzes directly in the PR thread.
 *   **Automatic Secret & Privacy Sanitizer:** Utilizes ECMAScript regex lookbehinds and protective execution limits to redact sensitive items (such as AWS credentials, Google API keys, or Slack bot tokens) from code diffs before transmitting data to external LLMs, protecting repository secrets from context window exposure.
-*   **Free-Tier Developer Sandbox (Local AI Playground):** Offers a stateful, offline playground featuring a custom-built, React-based "Pipeline Thread" UI. Developers can locally seed mock scenarios, test answers, view separate prompt/generation token telemetry, and debug evaluate rubrics locally without live GitHub webhook connections.
+*   **Free-Tier Developer Sandbox (Local AI Playground):** Offers a stateful, offline playground featuring a custom-built, React-based "Pipeline Thread" UI. Developers can locally seed mock scenarios, test answers, view separate prompt/generation token telemetry, and debug evaluate rubrics locally without live GitHub webhook connections. See the **[Local AI Playground Guide](./docs/Onboarding/Local_AI_Playground_Guide.md)**.
 *   **Edge-Ready Asynchronous Lifecycles:** Features an intelligent background execution manager that leverages serverless `waitUntil` hooks on Edge runtimes, or falls back to an in-memory queue with graceful termination hooks on standalone container runtimes to prevent thread loss during container restarts.
 *   **Pre-LLM Deterministic Guardrails:** Uses high-efficiency, pre-LLM check filters to reject obvious keyboard mashing, spam answers, or duplicate letter strings instantly, saving API token quotas and giving developers immediate local warning badge feedback.
 
@@ -92,7 +92,7 @@ ArchiCheck represents a live experiment in **"AI-Scrum"**—running autonomous, 
 For deep-dives into the architecture, security models, policies, testing gates, and development procedures of ArchiCheck, refer to the **[ArchiCheck Documentation Index](./docs/README.md)**.
 
 The index maps the entire documentation layout:
-*   **[Onboarding](./docs/Onboarding/GitHub_App_Install_Guide.md):** Step-by-step guide for registering your GitHub App, configuring environment variables, and installing ArchiCheck on your repositories.
+*   **[Onboarding](./docs/Onboarding/GitHub_App_Install_Guide.md):** Step-by-step guides for registering your GitHub App and utilizing the **[Local AI Playground Guide](./docs/Onboarding/Local_AI_Playground_Guide.md)** sandbox.
 *   **[Architecture & Design](./docs/Architecture/ADRs.md):** Architectural Decision Records (ADRs), API Contracts, and environment diagrams.
 *   **[Security & Threat Models](./docs/Security/Threat_Model.md):** STRIDE threat modeling, vulnerability registers, and sandbox reviews.
 *   **[Applied AI Policies](./docs/Applied-AI/Safety_and_Hallucination_Test_Plan.md):** Model safety settings, prompt engineering guidelines, and gibberish mitigations.

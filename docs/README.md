@@ -57,6 +57,7 @@ Details backlog grooming, scoping files, and sprint reports managed under our AI
 ### 6. 🚀 Onboarding & Setup (`./Onboarding/`)
 Guides and resources to help new developers set up and configure ArchiCheck.
 *   **[GitHub_App_Install_Guide.md](./Onboarding/GitHub_App_Install_Guide.md):** Step-by-step instructions for registering your self-hosted GitHub App, configuring webhook event listeners, and mapping environment credentials.
+*   **[Local_AI_Playground_Guide.md](./Onboarding/Local_AI_Playground_Guide.md):** Guide for utilizing the offline developer sandbox to test diff analysis, secret sanitization, prompt settings, and answer grading.
 
 ---
 
@@ -74,6 +75,6 @@ Ultimate system authority remains with the engineering team. In the event of mod
 
 ## 💬 Quick Links
 *   **[GitHub App Installation Guide](./Onboarding/GitHub_App_Install_Guide.md)**
+*   **[Local AI Playground Guide](./Onboarding/Local_AI_Playground_Guide.md)**
 *   **[System FAQ](./FAQ.md)**
-*   **[Local AI Playground Manual](./PM/Sprint_Test_Reports/Manual-Test/Manual_Test_Epic_05_Live_Fire_Toolkit.md)**
 *   **[Active Agent State Tracking](./PM/Active_Agent_State.md)**
