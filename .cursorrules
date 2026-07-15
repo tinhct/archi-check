@@ -116,7 +116,7 @@ At the end of every sprint, execute this pipeline in strict sequential phases us
 
 **PHASE 1: AGILE & RETROSPECTIVE HYGIENE (Scrum Master / PM)**
 1. **Retrospective Scan:** Scan the 'Lessons Learned' of the 3 most recent Sprint Reports and the Mock Bug Review. Cross-reference past bottlenecks against the new plan. Inject 'Historical Mitigation' bullets to prevent repeating anti-patterns.
-2. **Sprint Report:** Generate the Sprint Report in `/docs/PM/Sprint_Reports/`. Write a brutally honest retrospective identifying root causes of AI hallucinations or failures.
+2. **Sprint Report:** Check `/docs/PM/Sprint_Reports/`for an existing report for the current sprint. If a file exists, update it. If it does not exist, generate a new file using `Sprint_Report_Template.md` strictly following the naming convention: `Sprint_Report_[Sprint_Number].md`. In the 'Lessons Learned' section, you must write a brutally honest retrospective. Do not gloss over your own mistakes. You must identify the exact root causes of any AI hallucinations, blocked tasks, or architectural failures during the sprint, and state 1-2 actionable engineering process improvements to prevent recurrence.
 3. **Roadmap Sync:** Update `/docs/PM/Product_Roadmap.md` (Gantt statuses, Milestones, Current Focus).
 4. **Backlog & RAID Hygiene:** Move completed items to 'Done' (verifying Master DoD) and update Epic progress bars. You must explicitly flag any newly discovered technical debt as new user stories. Groom 'Next Sprint Priorities'. Finally, review `/docs/PM/RAID_log.md` and `/docs/PM/Dependency_Register.md`, update the status of Open/Pending items, sync delayed dependencies as new risks, and update their timestamps.
 
