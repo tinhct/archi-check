@@ -1,5 +1,9 @@
 # 🛡️ ArchiCheck
 
+<p align="center">
+  <img src="./public/logo.png" alt="ArchiCheck Logo" width="200" />
+</p>
+
 > **The Cognitive Control Plane for Human-First Software Engineering.**
 > Gating pull requests behind interactive architectural quizzes to combat passive "rubber-stamping," preserve developer agency, and prevent systemic deskilling in the age of AI.
 
