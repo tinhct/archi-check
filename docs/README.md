@@ -13,6 +13,7 @@ docs/
 ├── Applied-AI/                 # Prompt specs, safety policies, and hallucination tests
 ├── Architecture/               # System topology, API contracts, sequence maps, and ADRs
 ├── Integration/                # Connectors and contract interface mappings
+├── Onboarding/                 # Getting started and GitHub App installation guides
 ├── PM/                         # Agile backlog, RAID logs, scoping sheets, and sprint reports
 │   └── Active_Agent_State.md   # Live agent state and context preservation log
 ├── Security/                   # STRIDE threat models and vulnerability registers
@@ -53,6 +54,10 @@ Details backlog grooming, scoping files, and sprint reports managed under our AI
 *   **[RAID_log.md](./PM/RAID_log.md) & [Dependency_Register.md](./PM/Dependency_Register.md):** Tracks risks, assumptions, blockers, and system dependencies.
 *   **[Sprint Reports](./PM/Sprint_Reports/):** brutally honest sprint retrospectives detailing AI hallucinations and engineering improvements.
 
+### 6. 🚀 Onboarding & Setup (`./Onboarding/`)
+Guides and resources to help new developers set up and configure ArchiCheck.
+*   **[GitHub_App_Install_Guide.md](./Onboarding/GitHub_App_Install_Guide.md):** Step-by-step instructions for registering your self-hosted GitHub App, configuring webhook event listeners, and mapping environment credentials.
+
 ---
 
 ## 📚 Core System Policies Summary
@@ -68,6 +73,7 @@ Ultimate system authority remains with the engineering team. In the event of mod
 ---
 
 ## 💬 Quick Links
+*   **[GitHub App Installation Guide](./Onboarding/GitHub_App_Install_Guide.md)**
 *   **[System FAQ](./FAQ.md)**
 *   **[Local AI Playground Manual](./PM/Sprint_Test_Reports/Manual-Test/Manual_Test_Epic_05_Live_Fire_Toolkit.md)**
 *   **[Active Agent State Tracking](./PM/Active_Agent_State.md)**
