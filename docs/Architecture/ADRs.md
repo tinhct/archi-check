@@ -212,3 +212,40 @@ Implement a three-phase React state machine (`idle → quiz_ready → evaluated`
 * **Positive:** No cross-pane eye travel. Format ambiguity eliminated. API contract unchanged (zero backend impact). State invalidation prevents evaluation of stale quiz/diff combinations.
 * **Negative:** `perQuestionReplies` is a `Record<string, string>` instead of a plain string — slightly more complex state shape. Fixture `phase2.reply` string cannot be split across N question boxes without a parse utility (deferred to future sprint).
 
+---
+
+## ADR-013 — Strict Boot-Time Environment Normalization and Key Struct Verification
+
+**Status:** Accepted
+**Date:** 2026-07-15
+**Story:** AC-ST-601
+
+### Context
+Improperly formatted PEM key blocks (such as single-line configurations or incorrect delimiter bounds) cause JWT sign operations to fail silently at runtime, resulting in confusing application behavior on live staging/production servers.
+
+### Decision
+Perform key format validation at startup via `src/config/env.ts`. Validate the GITHUB_PRIVATE_KEY string layout, checking for multiline headers and footers in production. In addition, normalize any literal `\n` characters to support container orchestrators that escape newlines. Halt process boot with `process.exit(1)` immediately on failure.
+
+### Consequences
+* **Positive:** Key syntax bugs are flagged on server start rather than in-flight on webhook triggers. Normalization eliminates common copy-paste container configuration bugs.
+* **Negative:** Development environment setups require valid key variables or fallback configuration mocks to start dev tasks.
+
+---
+
+## ADR-014 — Edge Runtime Fallback Background Queues for Standalone Node Contexts
+
+**Status:** Accepted
+**Date:** 2026-07-15
+**Story:** AC-ST-602
+
+### Context
+When running on standard Node.js containers rather than serverless Edge runtimes (Vercel Edge), Next's `waitUntil` is unavailable, risking early thread termination and uncompleted AI scoring operations on asynchronous webhook routes.
+
+### Decision
+Build an in-memory active tasks registry (`asyncTracker.ts`) to track background promises on Node.js containers. Add process hooks for `SIGTERM` and `SIGINT` that wait for active promises to complete before exiting, bounded by a 5-second safety timeout to avoid zombie states in orchestrators.
+
+### Consequences
+* **Positive:** Ensures background task reliability across Serverless, Edge, and standard Node.js container environments.
+* **Negative:** Restarts can delay up to 5 seconds during container terminations if background AI validations are in-flight.
+
+

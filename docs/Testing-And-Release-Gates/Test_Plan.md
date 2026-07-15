@@ -1,19 +1,21 @@
 # Current Phase/Release Test Plan
 
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
-**Target Release Version:** v1.0.0-alpha
+**Target Release Version:** v1.0.0
 
 ## 📦 Scope of Testing
 
 *   **In-Scope for this Release:**
     *   **Epic-01: Diff Scorer & Security Sanitizer** (parsing logic, regex lookbehinds, ReDoS watchdogs, LLM provider timeout retries).
     *   **Epic-02: Interrogation Gate & Bypass** (synchronous pending checks, author verification rules, blockquote comment parser, slash command roles).
+    *   **Epic-03: Staging Polish & Telemetry** (cohort configurations overrides and token usage alert integrations).
     *   **Epic-04: Repository Customization & DX** (local mock LLM service, `.archicheck.yml` configuration parser, file size limiters).
     *   **Epic-05: The "Live-Fire" Developer Toolkit** (Shadow Mode read-only webhooks, local memory state cache, CLI setup wizard, Local AI Playground Phase 1 & Phase 2, Pipeline Thread UI, and client-side hydration overlay suppression).
+    *   **Production Scale, Reliability & Governance** (strict environment variable boot validations, pre-LLM deterministic validation guardrails, and Edge Runtime fallback queues).
     *   **Defensive Prompt-Injection Controls** (regex XML tag sanitizations and defensive instructions).
 *   **Out-of-Scope:**
-    *   **Epic-03: Staging Polish & Telemetry** (cohort configurations and token usage alert integrations are deferred to subsequent sprints).
+    *   **Future Enterprise Plugins** (active code line tracking, multiple VCS support, advanced billing modules).
 
 ## 🧪 Testing Types Execution Plan
 
@@ -26,7 +28,7 @@
 *   **Execution**: Automated Vitest run matching the Traceability Matrix stories below.
 
 ### 3. Regression Testing Plan
-*   **Scope**: Run the full 141-test suite on all modified paths to ensure zero regression on Edge context configurations or mock handlers.
+*   **Scope**: Run the full 171-test suite on all modified paths to ensure zero regression on Edge context configurations or mock handlers.
 *   **Execution**: CI pipeline gate check (GitGaurdian + Vitest coverage gates >90%).
 
 ### 4. End-to-End (E2E) Testing Plan
@@ -73,13 +75,11 @@
 | **AC-ST-501-P2** | Local AI Playground — Phase 2 | Unit / Integration | Run | Pass | BUG-505-1, BUG-505-3 | 2026-07-14 |
 | **AC-ST-504** | Isolate & Surface LLM Telemetry | Unit / Integration | Run | Pass | None | 2026-07-14 |
 | **AC-ST-505** | Playground UI Thread Layout | UI / Unit | Run | Pass | BUG-505-1 | 2026-07-14 |
-| **AC-ST-601** | Enforce Strict Env Boot Validation | Unit | To Do | N/A | None | 2026-07-14 |
-| **AC-ST-602** | Edge Runtime waitUntil Queue Fallback | Integration / Unit | To Do | N/A | None | 2026-07-14 |
-| **AC-ST-603** | Pre-LLM API Validation Guardrails | Integration / Unit | To Do | N/A | None | 2026-07-14 |
-| **AC-ST-302** | Token Burn Telemetry Alerting | Integration / Unit | To Do | N/A | None | 2026-07-14 |
-| **AC-ST-301** | Pilot Onboarding & Cohort Config | Integration / Unit | To Do | N/A | None | 2026-07-14 |
-
-
+| **AC-ST-601** | Enforce Strict Env Boot Validation | Unit | Run | Pass | BUG-601-1, BUG-601-2 | 2026-07-15 |
+| **AC-ST-602** | Edge Runtime waitUntil Queue Fallback | Integration / Unit | Run | Pass | None | 2026-07-15 |
+| **AC-ST-603** | Pre-LLM API Validation Guardrails | Integration / Unit | Run | Pass | None | 2026-07-15 |
+| **AC-ST-302** | Token Burn Telemetry Alerting | Integration / Unit | Run | Pass | None | 2026-07-15 |
+| **AC-ST-301** | Pilot Onboarding & Cohort Config | Integration / Unit | Run | Pass | None | 2026-07-15 |
 
 ## 🚨 Risk-Based Testing Priorities
 
@@ -90,6 +90,6 @@
 
 ## 📝 Release Sign-Off
 
-*   **QA Persona Approval:** ✅ Approved — Epic 5 complete, all tests passing.
-*   **Date of Sign-Off:** 2026-07-14
-*   **Release Notes Link:** [Sprint Report 5](../PM/Sprint_Reports/Sprint_5.md)
+*   **QA Persona Approval:** ✅ Approved — Sprint 6 complete, all 171 tests passing.
+*   **Date of Sign-Off:** 2026-07-15
+*   **Release Notes Link:** [Sprint Report 6](../PM/Sprint_Reports/Sprint_6.md)

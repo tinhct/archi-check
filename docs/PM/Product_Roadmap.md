@@ -24,7 +24,7 @@ gantt
     section Phase 3: Launch
     Sprint 4 Customization & DX       :done, sprint4, after sprint3, 7d
     Sprint 5 Live-Fire Toolkit        :done, sprint5, after sprint4, 8d
-    Sprint 6 Staging Polish           :active, sprint6, after sprint5, 7d
+    Sprint 6 Staging Polish           :done, sprint6, after sprint5, 7d
 ```
 
 ## 📍 Milestones & Deliverables
@@ -35,10 +35,10 @@ gantt
 | **M2: Scorer & Webhook Gate** | 2026-07-13 | Done | Diff parsing, secret scrubber, ReDoS watchdogs, Pending checks, quiz comment, Admin bypass. |
 | **M3: Sandbox & Customization** | 2026-07-10 | Done | Local mock LLM sandbox, config `.archicheck.yml` parser, Playwright E2E GitHub simulation. |
 | **M4: Live-Fire Developer Toolkit** | 2026-07-12 | Done | Shadow Mode, BYOK Setup Wizard, Local AI Playground Phase 1 & Phase 2 (two-stage evaluation pipeline, Pipeline Thread UI). |
-| **M5: Production Dogfooding** | 2026-08-10 | Active | Dogfooding pilots with early adopter Beta cohorts, telemetry logs audits, and budget cap alarms. |
+| **M5: Production Dogfooding & Scale** | 2026-07-15 | Done | Dogfooding pilots with early adopter Beta cohorts, telemetry logs audits, and budget cap alarms. |
 
 ## 📈 Current Focus & Next Steps
 
-* **Currently Completed (Sprint 5):** Full "Live-Fire" Developer Toolkit (Epic 05) — Local AI Playground Phase 1 & Phase 2 (two-stage evaluation pipeline with per-question inline reply boxes, Zod response schema union, and fixture system), Shadow Mode (real GitHub webhook authentication & request interception with local memory cache), BYOK CLI setup wizard, and the "Pipeline Thread" UI layout redesign. All stories and BUG fixes are fully complete.
-* **Up Next (Sprint 6):** AC-ST-302 Token Burn Telemetry Alerting (budget cap alarms for Vercel execution streams). AC-ST-301 Pilot Onboarding & Cohort Configuration (developer Alpha trials for early pilot teams).
-* **Key Blockers/Risks:** None currently active. All Sprint 5 implementation is validated with 141/141 tests green, TypeScript compilation clean.
+* **Currently Completed (Sprint 6):** Enforced strict environment variable boot validation and normalization (AC-ST-601). Standardized pre-LLM API validation guardrails (AC-ST-603). Token Burn Telemetry Alerting and Slack alarms integration (AC-ST-302). Edge Runtime `waitUntil` Async Queue Fallback (AC-ST-602). Pilot Onboarding & Cohort Configuration YAML overrides mapping (AC-ST-301).
+* **Up Next:** Transitioning to production deployment, setting up monitoring boards, and preparing for initial organization-wide onboarding trials.
+* **Key Blockers/Risks:** None currently active. All Sprint 6 implementation is validated with 171/171 tests green, TypeScript compilation clean.

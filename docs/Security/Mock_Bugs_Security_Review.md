@@ -1,6 +1,6 @@
 # Mock Environment Security & Defect Review  
-**Last Updated:** 2026-07-14  
-**Target Phase/Sprint:** Sprint 5
+**Last Updated:** 2026-07-15  
+**Target Phase/Sprint:** Sprint 6
 
 ## 🎯 Objective  
 Review local mock/sandbox testing failures to identify configuration drifts, architectural gaps, and hidden vulnerabilities before they propagate to Staging or Production.
@@ -14,6 +14,8 @@ Review local mock/sandbox testing failures to identify configuration drifts, arc
 | **BUG-505-3: Rubber-Stamp Mock Bypass** | Local Mock | Architecture (simplistic mock LLM provider verifying length only) | Developers bypass gates using 20-character repetitive/random strings (e.g., `'gfgffffff...'`) | Implement semantic structures check (repetitive sequence, word density, unique letter counts) in Mock LLM and queue stories for production API gates | Closed |  
 | **BUG-505-5: Bot Comment Loop** | Live Staging / Local Mock | Code (webhook issue_comment event handler reacted to bot-authored comments recursively) | Generates infinite warning-comment loops, spamming PR threads and risking API rate limit locks | Filter out comments authored by bot accounts (`comment.user.type === 'Bot' || comment.user.login.endsWith('[bot]')`) at webhook entry | Closed |  
 | **BUG-505-6: Webhook API TypeError Crash** | Live Staging | Configuration (App constructor failed to pass REST-enabled Octokit class config) | Completely crashes live webhook processing, falling back to fail-open | Pass custom REST-enabled `Octokit` class to the App constructor options | Closed |  
+| **BUG-601-1: Mock Redis incrby** | Local Mock | Code (mock client lacks `incrby` method) | Crashing token budget logging and disabling E2E shadow mode simulations | Implement `incrby` simulate counter logic using read-evaluate-write sequence | Closed |  
+| **BUG-601-2: Graceful Shutdown hanging** | Node Container | Code (missing process.exit() and timeout bounds on SIGTERM listener) | Zombie containers hanging indefinitely in orchestration platforms | Implement a 5-second race timeout and call process.exit() to release event loops | Closed |  
 
 
 ## 🛡️ Architectural & Mock Gaps Identified  

@@ -1,6 +1,6 @@
 # Master Dependency Register
 
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 **Owner:** Senior Project Manager
 
@@ -28,7 +28,7 @@ graph TD
 | **DEP-02** | AI | Google Cloud Vertex AI credentials authentication JSON. | Epic 1: Diff Scorer | Vertex API Access / AI Engineer | 2026-07-07 | Resolved | 2026-07-06 |
 | **DEP-03** | External | GitHub App permission token exchange for comment posting. | Epic 2: Webhook Gating | GitHub Developer Settings / PM | 2026-07-07 | Resolved | 2026-07-06 |
 | **DEP-04** | AI | Defensive Prompt-Injection Prompt Specifications approval. | Epic 1: Diff Scorer | Prompt Specifications / QA Lead | 2026-07-08 | Resolved | 2026-07-08 |
-| **DEP-05** | Internal / AI | Telemetry collection logs and Redis budget cap triggers. | Epic 3: Staging Polish | State telemetry audit / Tech Lead | 2026-07-15 | Open | 2026-07-09 |
+| **DEP-05** | Internal / AI | Telemetry collection logs and Redis budget cap triggers. | Epic 3: Staging Polish | State telemetry audit / Tech Lead | 2026-07-15 | Resolved | 2026-07-15 |
 | **DEP-06** | External | Dedicated E2E QA Bot credentials (storageState JSON, user/pass, TOTP secret) | Epic 4: Playwright E2E | GitHub Secrets / PM | 2026-07-10 | Resolved | 2026-07-10 |
 | **DEP-07** | External | Dedicated QA GitHub App instance with dynamic webhook configurations | Epic 4: Playwright E2E | GitHub Dev Settings / Tech Lead | 2026-07-10 | Resolved | 2026-07-10 |
 | **DEP-08** | Internal | Next.js Middleware edge path blocking configuration | AC-ST-501 Playground | Routing Architecture / Tech Lead | 2026-07-12 | Resolved | 2026-07-14 |

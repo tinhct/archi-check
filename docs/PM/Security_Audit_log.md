@@ -1,6 +1,6 @@
 # Security Audit Log
 
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ## 🛡️ Vulnerability Tracker (Simulated SAST)
 
@@ -18,6 +18,7 @@
 | V10 | 2026-07-12 | **API minimum reply length gap** — Original `reply` Zod validation used implicit `min(1)` allowing trivially short inputs to reach the LLM evaluator, potentially wasting quota or producing meaningless scores. | L | `src/app/api/playground/evaluate/route.ts` | Raised to `z.string().min(20)` mirroring mock LLM's `minimum_answer_length: 20` constraint. UI disables Evaluate button below threshold. | Resolved |
 | V11 | 2026-07-14 | **Bot reply infinite loop comment spam vulnerability** — Bot replies to webhook trigger comments generated their own webhook event, creating recursive comment spam loops. | M | `src/app/api/webhook/route.ts` | Filter out comments created by bot users (`comment.user.type === 'Bot' || comment.user.login.endsWith('[bot]')`) at webhook entry. | Resolved |
 | V12 | 2026-07-14 | **TypeError/unhandled crash on live webhook route when MOCK_GITHUB=false** — Webhook route crashes with TypeError when accessing `octokit.rest`. | H | `src/lib/github/auth.ts` | Pass Octokit class to App constructor options to register REST plugins, preventing undefined `.rest` calls. | Resolved |
+| V13 | 2026-07-15 | **Resource exhaustion and token budget drain via keyboard mashing and gibberish comments** — Spam inputs bypass local verification to invoke external LLM queries, draining API limits. | M | `src/app/api/webhook/route.ts` & `src/app/api/playground/evaluate/route.ts` | Implement pre-LLM O(1) deterministic alphanumeric duplication, letter variety, and continuous word length check filters. | Resolved |
 
 ## 📦 Dependency Risks (Simulated SCA)
 
