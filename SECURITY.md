@@ -1,4 +1,4 @@
-# Security Policy (SECURITY.md)
+# Security Policy
 
 We take the security of ArchiCheck and its integrations seriously. As a gatekeeper for code merging, maintaining a bulletproof security profile is central to our mission. 
 
