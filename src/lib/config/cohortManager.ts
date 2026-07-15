@@ -35,6 +35,7 @@ export function getCohortOverrides(
   const filePath = configFilePath || path.join(process.cwd(), 'config/cohorts.yaml');
 
   if (!fs.existsSync(filePath)) {
+    console.log(`[ArchiCheck] Cohorts configuration file not found. Using base configuration.`);
     return baseConfig;
   }
 
@@ -49,8 +50,11 @@ export function getCohortOverrides(
     );
 
     if (!matchedCohort) {
+      console.log(`[ArchiCheck] No active cohort overrides found for author '${author}'. Using base configuration.`);
       return baseConfig;
     }
+
+    console.log(`[ArchiCheck] Active cohort match found for author '${author}': '${matchedCohort.name}'. Applying overrides: ${JSON.stringify(matchedCohort.overrides)}`);
 
     // Filter out undefined fields to avoid overwriting baseConfig fields with undefined
     const cleanOverrides = Object.fromEntries(

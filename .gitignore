@@ -46,4 +46,10 @@ docs/**/Test-Execution-Logs/
 
 # local mock LLM sandbox overrides
 .archicheck.mock.local.json
+
+# Test Flow 4: Async Task Queue Graceful Fallback (AC-ST-602)
 trigger.js
+trigger2.js
+
+# Test Flow 5: Declarative Onboarding & Cohort Configuration (AC-ST-301)
+trigger2.js
