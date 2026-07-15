@@ -163,3 +163,13 @@ The `asyncTracker` utility detects runtime features:
 * **Cohort Definition:** Each cohort defines a list of member logins (e.g. GitHub usernames) and custom parameters (such as `algorithmic_complexity_score` and `excluded_paths` overrides).
 * **Matching Logic:** When a webhook event is received, the engine parses the PR author's login, checks it against cohort lists case-insensitively, and merges matching overrides dynamically over base repository configurations. Unregistered users default to the standard repository-level rules.
 
+---
+
+### Q: How does ArchiCheck load the `.archicheck.yml` configuration overrides, and why must they be committed to my PR branch?
+
+**A:** ArchiCheck parses the incoming GitHub Webhook pull request payload and fetches the `.archicheck.yml` (or `.archicheck.yaml`) file directly from the head commit SHA (`pull_request.head.sha`) of your specific PR branch. 
+
+*   **PR Branch Requirement:** Because configuration is loaded dynamically from the head commit, any custom rules or threshold overrides you wish to apply must be committed and pushed directly to your feature branch (the branch you are opening the PR from) for the system to register them.
+*   **Default Fallback:** If the file is missing from your PR branch, the system logs a fallback warning and defaults to global configuration limits (complexity score $\ge 5$, AI reliance $\ge 70\%$).
+
+
