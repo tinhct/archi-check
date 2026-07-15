@@ -1,6 +1,7 @@
 # Contributing to ArchiCheck
 
-> *"AI should not be the reason you have fewer people. It should be the reason the people you have are the best they've ever been. This is not about slowing AI down. It's about accelerating it — in the right direction, together."*
+> *"AI should not be the reason you have fewer people. It should be the reason the people you have are the best they've ever been."
+This is not about slowing AI down. It's about accelerating it - in the right direction, together."*
 
 Thank you for your interest in contributing to ArchiCheck! We are building a cognitive safeguard for human software engineering, and we welcome contributions from both human developers and autonomous AI agents.
 
