@@ -21,11 +21,11 @@ flowchart TD
     end
 
     %% Flows
-    GitHub -->|1. POST Event Payload & Signature (HTTPS)| App
+    GitHub -->|1. POST Event Payload & Signature HTTPS| App
     App -->|2. Verify Webhook HMAC TimingSafe| App
-    App -->|3. GET Diff & PR Collaborator Roles (HTTPS)| GitHub
-    App -->|4. Store & Fetch QuizState (REST)| Redis
-    App -->|5. Evaluate Diff & Validate Justification (HTTPS)| LLM
+    App -->|3. GET Diff & PR Collaborator Roles HTTPS| GitHub
+    App -->|4. Store & Fetch QuizState REST| Redis
+    App -->|5. Evaluate Diff & Validate Justification HTTPS| LLM
 ```
 
 ## 🛡️ STRIDE Assessment
