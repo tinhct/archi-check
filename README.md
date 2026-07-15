@@ -92,6 +92,7 @@ ArchiCheck represents a live experiment in **"AI-Scrum"**—running autonomous, 
 For deep-dives into the architecture, security models, policies, testing gates, and development procedures of ArchiCheck, refer to the **[ArchiCheck Documentation Index](./docs/README.md)**.
 
 The index maps the entire documentation layout:
+*   **[Onboarding](./docs/Onboarding/GitHub_App_Install_Guide.md):** Step-by-step guide for registering your GitHub App, configuring environment variables, and installing ArchiCheck on your repositories.
 *   **[Architecture & Design](./docs/Architecture/ADRs.md):** Architectural Decision Records (ADRs), API Contracts, and environment diagrams.
 *   **[Security & Threat Models](./docs/Security/Threat_Model.md):** STRIDE threat modeling, vulnerability registers, and sandbox reviews.
 *   **[Applied AI Policies](./docs/Applied-AI/Safety_and_Hallucination_Test_Plan.md):** Model safety settings, prompt engineering guidelines, and gibberish mitigations.
@@ -104,36 +105,40 @@ The index maps the entire documentation layout:
 
 ### Prerequisites
 *   Node.js (v20+ recommended)
-*   An active Upstash Redis database (or local cache mock configuration)
-*   A Google Gemini or Vertex AI developer API key (optional, for real provider testing)
+*   A registered GitHub App connected to your server — see the **[GitHub App Installation Guide](./docs/Onboarding/GitHub_App_Install_Guide.md)**.
+*   An active [Upstash Redis](https://upstash.com) database (free tier is sufficient).
+*   A Google Gemini or Vertex AI developer API key (optional — only required for live-fire LLM testing; use `LLM_PROVIDER_TYPE=mock` to skip).
 
 ### 🛠️ Getting Started
 
-1.  **Clone the Repository:**
+1.  **Register Your GitHub App:**
+    Follow the **[GitHub App Installation Guide](./docs/Onboarding/GitHub_App_Install_Guide.md)** to create and install your GitHub App, generate a private key, and collect the three required credentials: `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, and `GITHUB_WEBHOOK_SECRET`.
+
+2.  **Clone the Repository:**
     ```bash
     git clone https://github.com/tinhct/archi-check.git
     cd archi-check
     ```
 
-2.  **Install Dependencies:**
+3.  **Install Dependencies:**
     Install dependencies (this will also automatically initialize your `.env.local` file from the `.env.example` template if it is missing):
     ```bash
     npm install
     ```
 
-3.  **Run the Setup Wizard:**
+4.  **Run the Setup Wizard:**
     Configure your local developer environment parameters, BYOK free-tier credentials, and mock configurations:
     ```bash
     npm run setup:keys
     ```
 
-4.  **Run in Development Mode:**
+5.  **Run in Development Mode:**
     Start the local Next.js development server:
     ```bash
     npm run dev
     ```
 
-5.  **Run the Test Suite:**
+6.  **Run the Test Suite:**
     Validate your configuration with the automated unit and integration tests:
     ```bash
     # Run the full test suite
