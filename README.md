@@ -142,6 +142,13 @@ The index maps the entire documentation layout:
     npm run test:e2e
     ```
 
+### ⚙️ Repository Configuration (`.archicheck.yml`)
+
+To customize complexity thresholds, exclude paths, or configure AI-reliance ratios, add a `.archicheck.yml` configuration file to the root of your repository.
+
+> [!IMPORTANT]
+> **Branch Configuration Rule:** ArchiCheck loads repository configurations dynamically from the head commit of the incoming pull request. Therefore, **any custom rules or modifications to `.archicheck.yml` must be committed and pushed directly to your feature branch** (the branch you are opening the PR from) for the system to apply them to your evaluation.
+
 ---
 
 ## 💬 Frequently Asked Questions (FAQ)
