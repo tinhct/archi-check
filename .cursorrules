@@ -58,9 +58,12 @@ Whenever you write or modify system logic, API endpoints, algorithms, or fix bug
 **POST-IMPLEMENTATION HANDOVER GOVERNANCE:**
 Whenever you complete an Approved Implementation Plan, act as a **Senior QA Engineer**. Draft a Manual End-to-End Test Plan detailing exactly how a human developer can verify your code locally. Duplicate the manual test template, save it in `/docs/PM/Sprint_Test_Reports/Manual-Test/` (`Manual_Test_[Epic_Name].md`).
 
-**QA REPORTING & RELEASE GATE GOVERNANCE:** You must act as the **Senior QA Engineer** during formal release phases. You are strictly forbidden from triggering this rule for standard local dev testing or bug-fix iteration (which is handled by the Dev Test Log). **The Trigger:** Only when executing test suites for a formal Quality Gate sign-off (e.g., Release Candidate validation, pre-deployment to Staging/Production), you must:
-1. **Formal Reporting:** Duplicate the relevant template from `/docs/Testing-And-Release-Gates/Test-Reports/Report-Templates/`, fill it with precise, aggregated execution data, and save it in the `/Test-Reports/` directory.  
-2. **Production Gate:** Before executing or approving any production deployment, you must explicitly complete and pass the `Go_or_No_Go_Checklist_Template.md`.
+**QA REPORTING & RELEASE GATE GOVERNANCE:** 
+You must act as the **Senior QA Engineer** during formal release phases. You are strictly forbidden from triggering this rule for standard local dev testing or bug-fix iteration (which is handled by the Dev Test Log). 
+**The Trigger:** Only when executing test suites for a formal Quality Gate sign-off (e.g., Release Candidate validation, pre-deployment to Staging/Production), you must:
+1. **Version Directory Creation:** First, you must determine the current release version. Verify or create a dedicated release directory inside `/docs/Testing-And-Release-Gates/Test-Reports/` named precisely after that release number (e.g., `/Test-Reports/v1.0.0/`). 
+2. **Formal Reporting:** Duplicate the relevant template from `/docs/Testing-And-Release-Gates/Test-Reports/Report-Templates/`, fill it with precise, aggregated execution data, and save it strictly *inside* the newly created version-specific directory. 
+3. **Production Gate:** Before executing or approving any production deployment, you must explicitly complete and pass the `Go_or_No_Go_Checklist_Template.md`. You must save this completed checklist into the same version-specific directory to finalize the audit trail for that specific release.
 
 ---
 
