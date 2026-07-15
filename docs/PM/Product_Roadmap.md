@@ -1,6 +1,6 @@
 # Product Roadmap
 
-**Last Updated:** 2026-07-14
+**Last Updated:** 2026-07-15
 
 ## 🎯 Product Vision
 ArchiCheck serves as a cognitive safeguard for software teams. It detects when developers may be "rubber-stamping" complex AI-generated changes, and gates pull requests behind interactive, language-agnostic architectural comprehension quizzes to keep engineering intuition active, preserve accountability, and protect long-term system integrity.
@@ -14,17 +14,17 @@ gantt
     axisFormat %m/%d
     
     section Phase 1: Foundation
-    Sprint 0 Setup & Compliance       :done, sprint0, 2026-06-01, 7d
-    Sprint 1 Webhook & Caching        :done, sprint1, after sprint0, 7d
+    Sprint 0: Setup & Compliance     :done, sprint0, 2026-06-01, 7d
+    Sprint 1: Webhook & Caching      :done, sprint1, after sprint0, 7d
     
     section Phase 2: Core Features
-    Sprint 2 Scorer & LLM Connect     :done, sprint2, after sprint1, 7d
-    Sprint 3 Webhook Loop & Bypass    :done, sprint3, after sprint2, 7d
+    Sprint 2: Scorer & LLM Connect   :done, sprint2, after sprint1, 7d
+    Sprint 3: Webhook Bypass         :done, sprint3, after sprint2, 7d
     
     section Phase 3: Launch
-    Sprint 4 Customization & DX       :done, sprint4, after sprint3, 7d
-    Sprint 5 Live-Fire Toolkit        :done, sprint5, after sprint4, 8d
-    Sprint 6 Staging Polish           :done, sprint6, after sprint5, 7d
+    Sprint 4: DX & Customization     :done, sprint4, after sprint3, 7d
+    Sprint 5: Live-Fire Sandbox      :done, sprint5, after sprint4, 8d
+    Sprint 6: Scale & Telemetry      :done, sprint6, after sprint5, 7d
 ```
 
 ## 📍 Milestones & Deliverables
