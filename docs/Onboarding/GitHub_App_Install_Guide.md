@@ -168,17 +168,29 @@ GitHub will now send webhook events for pull request activity on those repositor
    npm run dev
    ```
 
-2. Open a pull request (or synchronize an existing one) in one of the installed repositories.
+2. **Test Option A: Local Webhook Simulator (Fastest)**
+   You can simulate an incoming GitHub webhook locally using our simulation script. It reads your `.env.local` webhook secret, signs a mock pull request payload, and fires it at your local server.
+   Run the script from your project root:
+   ```bash
+   node scripts/simulate-webhook.js
+   ```
+   You can also customize the PR author and PR number by passing them as arguments:
+   ```bash
+   node scripts/simulate-webhook.js developer-login 105
+   ```
 
-3. Watch your terminal for incoming webhook events:
+3. **Test Option B: Real GitHub Event**
+   Open a pull request (or synchronize/push to an existing one) in one of your installed repositories.
+
+4. Watch your dev server terminal for incoming webhook events:
    ```
    POST /api/webhook 202 in 800ms
-   [ArchiCheck] Processing PR #12 in your-org/your-repo
+   [ArchiCheck] Processing PR #101 in tinhct/archi-check
    ```
 
-4. If you see `POST /api/webhook 401`, your `GITHUB_WEBHOOK_SECRET` does not match the one configured in your GitHub App. Double-check both values.
-
-5. If you see `POST /api/webhook 200 in 7ms` (fast response with no processing logs), the PR diff did not meet the complexity threshold — this is expected for small changes. Refer to the [FAQ](../FAQ.md#scoring--metrics) for how scoring works.
+5. **Troubleshooting Responses:**
+   - **`POST /api/webhook 401`:** The incoming signature verification failed. Double-check that `GITHUB_WEBHOOK_SECRET` in `.env.local` matches exactly what you configured in the GitHub App settings.
+   - **`POST /api/webhook 200 in 7ms` (with no background analysis logs):** The PR diff was analyzed but bypassed gating because it did not meet the complexity thresholds. This is normal for small changes. Refer to the [FAQ](../FAQ.md#scoring--metrics) for metric details.
 
 ---
 
