@@ -105,51 +105,49 @@ The index maps the entire documentation layout:
 
 ### Prerequisites
 *   Node.js (v20+ recommended)
-*   A registered GitHub App connected to your server — see the **[GitHub App Installation Guide](./docs/Onboarding/GitHub_App_Install_Guide.md)**.
-*   An active [Upstash Redis](https://upstash.com) database (free tier is sufficient).
-*   A Google Gemini or Vertex AI developer API key (optional — only required for live-fire LLM testing; use `LLM_PROVIDER_TYPE=mock` to skip).
 
-### 🛠️ Getting Started
+---
 
-1.  **Register Your GitHub App:**
-    Follow the **[GitHub App Installation Guide](./docs/Onboarding/GitHub_App_Install_Guide.md)** to create and install your GitHub App, generate a private key, and collect the three required credentials: `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, and `GITHUB_WEBHOOK_SECRET`.
+### 🚀 Path A: The Zero-Config Sandbox (Get Started in 60s)
+If you want to run tests or explore the **Local AI Playground** immediately without registering GitHub Apps, Redis, or LLM API keys:
 
-2.  **Clone the Repository:**
+1.  **Clone the Repository:**
     ```bash
     git clone https://github.com/tinhct/archi-check.git
     cd archi-check
     ```
 
-3.  **Install Dependencies:**
-    Install dependencies (this will also automatically initialize your `.env.local` file from the `.env.example` template if it is missing):
+2.  **Install Dependencies:**
+    This automatically initializes a local `.env.local` file preconfigured to use the offline Mock LLM provider and mock database:
     ```bash
     npm install
     ```
 
-4.  **Run the Setup Wizard:**
-    Configure your local developer environment parameters, BYOK free-tier credentials, and mock configurations:
-    ```bash
-    npm run setup:keys
-    ```
-
-5.  **Run in Development Mode:**
-    Start the local Next.js development server:
+3.  **Start the Dev Server:**
     ```bash
     npm run dev
     ```
 
-6.  **Run the Test Suite:**
-    Validate your configuration with the automated unit and integration tests:
+4.  **Explore & Test:**
+    *   Open your browser to **`http://localhost:3000/playground`** to test diffs, secret scrubbing, and justification evaluation.
+    *   Run the test suite: **`npm run test:run`** (unit & integration tests) or **`npm run test:e2e`** (local Playwright E2E simulation).
+
+---
+
+### 🔌 Path B: Live GitHub App & LLM Integration (Live Gating)
+If you are ready to connect ArchiCheck to your actual repositories to enforce PR gating checks:
+
+1.  **Register Your GitHub App:**
+    Follow the step-by-step **[GitHub App Installation Guide](./docs/Onboarding/GitHub_App_Install_Guide.md)** to register your App, configure permissions, and collect your keys (`GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`, and `GITHUB_WEBHOOK_SECRET`).
+
+2.  **Run the Setup Wizard:**
+    Configure your free-tier Gemini API key for live-fire LLM questions:
     ```bash
-    # Run the full test suite
-    npm run test:run
-    
-    # Run tests in watch mode
-    npm run test
-    
-    # Run Playwright E2E simulation tests
-    npm run test:e2e
+    npm run setup:keys
     ```
+
+3.  **Configure Your Target Repositories:**
+    Add a [`.archicheck.yml`](#️-repository-configuration-archicheckyml) configuration file to your repository's branch to activate the gating rules.
 
 ### ⚙️ Repository Configuration (`.archicheck.yml`)
 
