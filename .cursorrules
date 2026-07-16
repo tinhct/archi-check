@@ -1,4 +1,4 @@
-# ARCHICHECK GLOBAL AI GOVERNANCE & EXECUTION RULES
+# ARCHICHECK AI GOVERNANCE & EXECUTION RULES
 
 **GLOBAL BEHAVIOR, PATHING & DOCUMENTATION STANDARDS:** 
 * **Security:** When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. Use standardized relative paths (`./`, `../`) or placeholders (`<PROJECT_ROOT>`). 
