@@ -146,17 +146,20 @@ If you are ready to connect ArchiCheck to your actual repositories to enforce PR
     npm run setup:keys
     ```
 
-3.  **Configure Your Target Repositories:**
-    Add a [`.archicheck.yml`](#️-repository-configuration-archicheckyml) configuration file to your repository's branch to activate the gating rules.
+3.  **Configure Your Gated Target Repositories:**
+    Add a [`.archicheck.yml`](#️-target-repository-configuration-archicheckyml) configuration file to the root of the repository you want to protect (committed directly to the feature branch you are opening the PR from) to activate the gating rules.
 
-### ⚙️ Repository Configuration (`.archicheck.yml`)
+### ⚙️ Target Repository Configuration (`.archicheck.yml`)
 
-To customize complexity thresholds, exclude paths, or configure AI-reliance ratios, add a `.archicheck.yml` configuration file to the root of your repository.
+To customize complexity thresholds, exclude paths, or configure AI-reliance ratios, add a `.archicheck.yml` configuration file to the root of your **gated repositories** (the external repositories you want to protect and gate, e.g. `your-org/your-app-repo`). 
+
+> [!WARNING]
+> Do not add this configuration to your cloned `archi-check` server repository. It must be added to the repositories containing the code changes you want to analyze and gate.
 
 Here is the supported configuration schema with standard default values:
 
 ```yaml
-# .archicheck.yml
+# .archicheck.yml (Add to the root of your gated repository)
 algorithmic_complexity_score: 5      # Gate PRs scoring 5 or higher (1 to 10)
 ai_reliance_ratio: 0.7              # Gate if AI reliance is >= 70% (0.0 to 1.0)
 lines_added_threshold: 300          # Min code additions to trigger Velocity Gate (default: 300)
@@ -168,7 +171,7 @@ excluded_paths:                     # Paths ignored during analysis
 ```
 
 > [!IMPORTANT]
-> **Branch Configuration Rule:** ArchiCheck loads repository configurations dynamically from the head commit of the incoming pull request. Therefore, **any custom rules or modifications to `.archicheck.yml` must be committed and pushed directly to your feature branch** (the branch you are opening the PR from) for the system to apply them to your evaluation.
+> **Branch Configuration Rule:** ArchiCheck loads repository configurations dynamically from the head commit of the incoming pull request. Therefore, **any custom rules or modifications to `.archicheck.yml` must be committed and pushed directly to your feature branch** (the branch in the gated repository that you are opening the PR from) for the system to apply them to your evaluation.
 
 ---
 
