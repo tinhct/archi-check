@@ -70,7 +70,7 @@ flowchart TD
 ArchiCheck is designed in accordance with the **Human-First-AI Framework** (as detailed at [humanfirstengineering.dev](https://humanfirstengineering.dev)). Rather than aiming to automate the developer out of the system, ArchiCheck utilizes AI to enhance human agency, cognitive responsibility, and knowledge retention.
 
 ### 📐 Scoping Process & Problem Framing
-We enforce a strict, documentation-driven **Scoping Process** before any code is committed. Every proposed epic, feature, or tool begins with a rigorous system scoping report mapping out target outcomes, boundaries, user friction points, and failure domains. This keeps technical debt quarantined and guarantees that development remains aligned with human accessibility needs.
+We enforce a strict, documentation-driven **Scoping Process** before any code is generated. Every proposed epic, feature, or tool begins with a rigorous system scoping report mapping out target outcomes, boundaries, user friction points, and failure domains. This keeps technical debt quarantined and guarantees that development remains aligned with human accessibility needs.
 
 ### 👮 High-Level AI-Agent Governance
 ArchiCheck executes within a bounded, declarative **AI-Agent Governance** framework. Autonomous agents are prohibited from making unverified mutations or side-effects. All security boundaries, mock stubs, and pipeline caching structures are locked under strict execution schemas, ensuring that AI agents act as auxiliary partners while humans maintain architectural authority.
