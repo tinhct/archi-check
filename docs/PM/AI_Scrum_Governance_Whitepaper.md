@@ -115,7 +115,7 @@ flowchart LR
     Intake --> Plan[3. Tech Lead Drafts Plan]
     Plan -->|Human Approves Plan| Code[4. Engineer Writes Code]
     Code --> Test[5. QA Runs Automated Tests]
-    Test --> Manual[6. Developer Runs Manual Test]
+    Test --> Manual[6. Human Runs Manual Test]
     Manual -->|Human Approves Quality Gate| GoNoGo[7. Complete Go/No-Go Checklist]
     GoNoGo --> Release[8. Release Tag & Deployment]
 ```
