@@ -52,6 +52,7 @@ Details backlog grooming, scoping files, and sprint reports managed under our AI
 *   **[Product_Backlog.md](./PM/Product_Backlog.md):** Agile User Stories (`AC-ST-XXX`) containing Acceptance Criteria and epic progress bars.
 *   **[Active_Agent_State.md](./PM/Active_Agent_State.md):** Live context log checked off by agents to prevent context amnesia during multi-turn runs.
 *   **[RAID_log.md](./PM/RAID_log.md) & [Dependency_Register.md](./PM/Dependency_Register.md):** Tracks risks, assumptions, blockers, and system dependencies.
+*   **[AI_Scrum_Governance_Whitepaper.md](./PM/AI_Scrum_Governance_Whitepaper.md):** Comprehensive report detailing the multi-agent AI-Scrum governance lifecycle, persistent state tracking, and Human-in-the-Loop approval gates.
 *   **[Sprint Reports](./PM/Sprint_Reports/):** brutally honest sprint retrospectives detailing AI hallucinations and engineering improvements.
 
 ### 6. 🚀 Onboarding & Setup (`./Onboarding/`)
@@ -76,5 +77,6 @@ Ultimate system authority remains with the engineering team. In the event of mod
 ## 💬 Quick Links
 *   **[GitHub App Installation Guide](./Onboarding/GitHub_App_Install_Guide.md)**
 *   **[Local AI Playground Guide](./Onboarding/Local_AI_Playground_Guide.md)**
+*   **[AI-Scrum Governance Whitepaper](./PM/AI_Scrum_Governance_Whitepaper.md)**
 *   **[System FAQ](./FAQ.md)**
 *   **[Active Agent State Tracking](./PM/Active_Agent_State.md)**
