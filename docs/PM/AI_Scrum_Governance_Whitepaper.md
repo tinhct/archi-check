@@ -2,7 +2,7 @@
 
 Has anyone else been experimenting with strict governance rules for coding agents? How are your autonomous agents faring against the silent thief of 'context amnesia'?
 
-At ArchiCheck, we ran a live experiment in **"AI-Scrum"**—orchestrating a team of autonomous, role-playing AI agents within the structured sprint cadences and rigorous governance of an enterprise software engineering team. This whitepaper details the architectural guardrails, governance boundaries, and state-tracking mechanisms we implemented to transform non-deterministic agent executions into a highly reliable, production-grade delivery pipeline.
+While building ArchiCheck, we ran a live experiment in **"AI-Scrum"**—orchestrating a team of autonomous, role-playing AI agents within the structured sprint cadences and rigorous governance of an enterprise software engineering team. This whitepaper details the architectural guardrails, governance boundaries, and state-tracking mechanisms we implemented to transform non-deterministic agent executions into a highly reliable, production-grade delivery pipeline.
 
 ---
 
