@@ -134,3 +134,9 @@ Review and update the entire architectural baseline to reflect the actual deploy
 2. **Security:** Sync `/docs/Security/` and Vulnerability Register.
 3. **Applied AI:** Sync `/docs/Applied-AI/` (Telemetry schema, prompt performance, hallucination logs).
 4. **Integration:** Sync `/docs/Integration/` (Connectivity Runbook, E2E paths).
+
+**PHASE 4: PUBLIC & ONBOARDING DOCUMENTATION HYGIENE (Technical Writer / Product Owner)**
+Review the completed sprint deliverables to ensure all external and new-hire documentation strictly mirrors the live repository.
+1. **README Synchronization:** Review the root `README.md`. If the sprint introduced new core features, changed the local development setup, or altered the architecture flowchart, you must update the `README.md` to perfectly reflect the current live state. Do not hallucinate capabilities.
+2. **Onboarding Synchronization:** Scan all documents within the `/docs/Onboarding/` directory. If the sprint altered local installation steps, testing requirements, or AI governance rules, update the onboarding guides immediately so new contributors are not left with stale or broken instructions.
+3. **FAQ Sanity Check:** Briefly review `/docs/FAQ.md` to ensure the Q&As generated during the sprint's daily DoD checks are properly formatted, logically grouped, and do not contradict the updated `README.md`.
