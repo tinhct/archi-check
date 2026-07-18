@@ -2,13 +2,13 @@
 
 Has anyone else been experimenting with strict governance rules for coding agents? How are your autonomous agents faring against the silent thief of 'context amnesia'?
 
-At ArchiCheck, we ran a live experiment in **"AI-Scrum"**—orchestrating a team of autonomous, role-playing AI agents within the structured sprint cadences and rigorous governance of an enterprise software engineering team. This whitepaper details the architectural guardrails, governance boundaries, and state-tracking mechanisms we implemented to transform non-deterministic agent executions into a highly reliable, production-grade delivery pipeline.
+While building ArchiCheck, we ran a live experiment in **"AI-Scrum"**—orchestrating a team of autonomous, role-playing AI agents within the structured sprint cadences and rigorous governance of an enterprise software engineering team. This whitepaper details the architectural guardrails, governance boundaries, and state-tracking mechanisms we implemented to transform non-deterministic agent executions into a highly reliable, production-grade delivery pipeline.
 
 ---
 
 ## ## Phase 1: Project Scaffolding & Setup
 
-Operating autonomous agents in a commercial codebase without strict structural templates is a recipe for codebase drift, fragmented APIs, and broken integrations. We established a strict, documentation-driven **Project Scaffolding** before a single line of feature code was written.
+Operating autonomous agents without strict structural templates is a recipe for codebase drift, fragmented APIs, and broken integrations. We established a strict, documentation-driven **Project Scaffolding** before a single line of feature code was written.
 
 ### 📐 Scaffolding & Standardized Document Structure
 The repository is divided into two distinct logical zones: the core application codebase (`src/` and `tests/`) and the system documentation plane (`docs/`). To prevent documentation sprawl, the knowledge repository is organized into a deterministic domain map:
@@ -115,7 +115,7 @@ flowchart LR
     Intake --> Plan[3. Tech Lead Drafts Plan]
     Plan -->|Human Approves Plan| Code[4. Engineer Writes Code]
     Code --> Test[5. QA Runs Automated Tests]
-    Test --> Manual[6. Developer Runs Manual Test]
+    Test --> Manual[6. Human Runs Manual Test]
     Manual -->|Human Approves Quality Gate| GoNoGo[7. Complete Go/No-Go Checklist]
     GoNoGo --> Release[8. Release Tag & Deployment]
 ```
@@ -137,13 +137,13 @@ To maintain absolute control over the codebase, every phase in the development l
 
 #### 4. Code (Engineer Writes Code)
 *   **Agent Action:** The Software Engineer agent reads the approved plan and writes clean, lint-passing source code targeting only the designated files. The agent is blocked from writing code if the plan remains in `Draft`.
-*   **Human Action:** Monitors code generation steps and intervenes in case of execution anomalies.
+*   **Human Action:** Monitors code generation steps.
 
 #### 5. Test (QA Runs Automated Tests)
 *   **Agent Action:** The QA agent runs automated test discovery, updates or writes test suites (Vitest/Playwright), executes the automated tests, and generates a capped test execution log.
-*   **Human Action:** Verifies the test logs and ensures code coverage metrics are met.
+*   **Human Action:** Verifies the test logs.
 
-#### 6. Manual (Developer Runs Manual Test)
+#### 6. Manual (Human Runs Manual Test)
 *   **Agent Action:** The QA agent compiles a step-by-step E2E manual test checklist (`Manual_Test_[Epic_Name].md`) detailing local server commands and webhook trigger scripts.
 *   **Human Action:** Executes the manual test run locally (handling ngrok tunnels, real GitHub App credentials, and verifying actual UI render states).
 
@@ -165,5 +165,3 @@ We enforce three strict approval gates:
 
 ### 🎯 Concluding Synthesis: The Trust Architect
 By mapping the complex, multi-layered responsibilities of a cross-functional software team into a deterministic state machine, we have successfully established **"Trust Architect"** boundaries. Using role-playing, strict approval gates, on-disk state tracking, and lessons-learned retrospectives, the system is prevented from spiraling into hallucinations, repeating past mistakes, or burning token budgets. 
-
-This governance setup absolutely sets the foundation for a peaceful sleep at night, knowing the system won't autonomously degrade your architecture or commit unverified changes to production.
