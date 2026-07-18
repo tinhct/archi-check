@@ -8,7 +8,7 @@ While building ArchiCheck, we ran a live experiment in **"AI-Scrum"**—orchestr
 
 ## ## Phase 1: Project Scaffolding & Setup
 
-Operating autonomous agents in a commercial codebase without strict structural templates is a recipe for codebase drift, fragmented APIs, and broken integrations. We established a strict, documentation-driven **Project Scaffolding** before a single line of feature code was written.
+Operating autonomous agents without strict structural templates is a recipe for codebase drift, fragmented APIs, and broken integrations. We established a strict, documentation-driven **Project Scaffolding** before a single line of feature code was written.
 
 ### 📐 Scaffolding & Standardized Document Structure
 The repository is divided into two distinct logical zones: the core application codebase (`src/` and `tests/`) and the system documentation plane (`docs/`). To prevent documentation sprawl, the knowledge repository is organized into a deterministic domain map:
@@ -137,13 +137,13 @@ To maintain absolute control over the codebase, every phase in the development l
 
 #### 4. Code (Engineer Writes Code)
 *   **Agent Action:** The Software Engineer agent reads the approved plan and writes clean, lint-passing source code targeting only the designated files. The agent is blocked from writing code if the plan remains in `Draft`.
-*   **Human Action:** Monitors code generation steps and intervenes in case of execution anomalies.
+*   **Human Action:** Monitors code generation steps.
 
 #### 5. Test (QA Runs Automated Tests)
 *   **Agent Action:** The QA agent runs automated test discovery, updates or writes test suites (Vitest/Playwright), executes the automated tests, and generates a capped test execution log.
-*   **Human Action:** Verifies the test logs and ensures code coverage metrics are met.
+*   **Human Action:** Verifies the test logs.
 
-#### 6. Manual (Developer Runs Manual Test)
+#### 6. Manual (Human Runs Manual Test)
 *   **Agent Action:** The QA agent compiles a step-by-step E2E manual test checklist (`Manual_Test_[Epic_Name].md`) detailing local server commands and webhook trigger scripts.
 *   **Human Action:** Executes the manual test run locally (handling ngrok tunnels, real GitHub App credentials, and verifying actual UI render states).
 
