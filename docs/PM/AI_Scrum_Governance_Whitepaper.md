@@ -132,28 +132,32 @@ To maintain absolute control over the codebase, every phase in the development l
 *   **Human Action (Lead Architect & DevSecOps):** Audits and signs off on the proposed architectural modifications, API contracts, security threat models, and dependency maps before implementation planning is allowed to start.
 
 #### 3. Plan (Tech Lead Drafts Plan)
-*   **Agent Action:** The Tech Lead agent compiles a detailed, step-by-step `Implementation_Plan_[Story-ID].md` detailing the file paths to create/modify, refactoring steps, and validation targets.
-*   **Human Action:** Conducts a plan review in the file system or chat UI. The human must explicitly change the document status from `Draft` to `Approved` to unlock the developer's coding gate.
+*   **Agent Action:** The Tech Lead agent scans past sprint reports for lessons learned, drafts a step-by-step `Implementation_Plan_[Story-ID].md` containing explicit target file paths, code changes, and test files to verify, and injects a "Historical Mitigation" section based on past retrospectives.
+*   **Human Action:** Reviews the implementation plan in the file system or chat UI. The human must explicitly change the document status from `Draft` to `Approved` to unlock the developer's coding gate.
 
 #### 4. Code (Engineer Writes Code)
-*   **Agent Action:** The Software Engineer agent reads the approved plan and writes clean, lint-passing source code targeting only the designated files. The agent is blocked from writing code if the plan remains in `Draft`.
-*   **Human Action:** Monitors code generation steps.
+*   **Agent Action:** The Software Engineer agent reads the approved plan and writes clean, lint-passing source code targeting only the designated files. The agent is blocked from writing code if the plan remains in `Draft`. If a technical blocker, compile error, or API change forces a plan deviation, the agent is strictly forbidden from improvising: it must halt execution immediately, log the issue in the Dev Test Log, and request a plan update.
+*   **Human Action:** Monitors code generation steps, reviews intermediate code diffs, and approves plan adjustments or overrides if blockers are encountered.
 
 #### 5. Test (QA Runs Automated Tests)
-*   **Agent Action:** The QA agent runs automated test discovery, updates or writes test suites (Vitest/Playwright), executes the automated tests, and generates a capped test execution log.
-*   **Human Action:** Verifies the test logs.
+*   **Agent Action:** The QA agent runs automated test discovery, updates or writes test suites (Vitest/Playwright) according to boundaries in the `Test_Governance_Policy.md`, executes the tests, and generates a capped test execution log (`Dev_Test_Log_[Story-ID].md`). If the test logs exceed 50 lines, it truncates success logs and records only exact error stack traces.
+*   **Human Action:** Verifies the test logs to ensure CI/CD pipelines run green.
 
 #### 6. Manual (Human Runs Manual Test)
-*   **Agent Action:** The QA agent compiles a step-by-step E2E manual test checklist (`Manual_Test_[Epic_Name].md`) detailing local server commands and webhook trigger scripts.
-*   **Human Action:** Executes the manual test run locally (handling ngrok tunnels, real GitHub App credentials, and verifying actual UI render states).
+*   **Agent Action:** The QA agent compiles a step-by-step E2E manual test checklist (`Manual_Test_[Epic_Name].md` under `/docs/PM/Sprint_Test_Reports/Manual-Test/`) detailing server startup, environment parameter values, connection verification scripts, and expected visual outcomes.
+*   **Human Action:** Executes the manual test run locally (verifying external integrations, ngrok tunnels, real database connections, and visual layout behaviors) and certifies E2E functional completeness.
 
 #### 7. Go/No-Go Checklist
-*   **Agent Action:** The QA agent generates a versioned release folder (e.g. `/Test-Reports/v1.0.0/`) and populates the Go/No-Go checklist template.
-*   **Human Action:** Runs through the operational checks (rollback steps, service limits, telemetry budgets) and signs off the `Go_or_No_Go_Checklist_Template.md` to finalize the release audit trail.
+*   **Agent Action:** The QA agent generates a versioned release folder (e.g. `/Test-Reports/vX.Y.Z/`), populates the `Go_or_No_Go_Checklist_Template.md`, and compiles formal quality reports.
+*   **Human Action:** Reviews aggregated metrics (test coverage, threat closures, database capacity constraints) and formally signs off the Go/No-Go checklist to authorize the production release.
 
 #### 8. Release Tag & Deployment
-*   **Agent Action:** The Technical Writer agent synchronizes the root `README.md` and onboarding guides to reflect the live codebase state, then writes release notes.
-*   **Human Action:** Performs the final git tag cut (`git tag -a v1.0.0-alpha`) and triggers production deployment.
+*   **Agent Action:** The PM, DevSecOps, and Architect agents execute the **End-of-Sprint Pipeline**:
+    - **PM/Scrum Master:** Updates the roadmap Gantt chart and backlog progress bars, rolls over incomplete items, syncs open dependencies to risks, and writes a brutally honest retrospective (`Sprint_Report_[Sprint_Number].md`) identifying the root cause of any hallucinations or blockers.
+    - **DevSecOps:** Conducts dependency security audits and logs mock cache drift.
+    - **Solution Architect:** Synchronizes `/docs/Architecture/` and `/docs/SD/` diagrams to perfectly match the final deployed code topology.
+    - **Technical Writer:** Updates `README.md` and onboarding guides to reflect live local install/test instructions, and generates release notes.
+*   **Human Action:** Verifies the synchronized documentation, cuts the final repository tag (`git tag -a v1.0.0-alpha`), and triggers production deployment.
 
 ---
 
