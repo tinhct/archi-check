@@ -113,7 +113,7 @@ flowchart TD
     Decision -->|Hotfix / P1| HotfixBypass[3. Hotfix Bypass Lane]
 
     subgraph Full Flow [1. Full Governance Flow]
-        Scoping[Stage 1: Scoping Doc & Approach Gate] --> Design[Stage 2: Solution Design & Intake]
+        Scoping[Stage 1: Scoping Doc & Approach Gate] --> Design[Stage 2: Epic Intake & Solution Design]
         Design --> Plan[Stage 3: Tech Plan & Plan Gate]
         Plan --> Code[Stage 4: Coding & Dev Logs]
         Code --> Test[Stage 5: QA Automated Test Discovery]
@@ -147,7 +147,7 @@ Regardless of the stage or task type, all active agents must follow these global
 *   **Agent Action:** The PM agent scans lessons learned from the three most recent Sprint Reports. Using the standard scoping template under `/docs/PM/Scoping/`, the agent defines the Problem, Constraints, and Success Criteria, and drafts 2-3 Candidate Approaches with detailed trade-offs and a "Historical Mitigation" note.
 *   **Human Action:** Reviews the scoped approaches in the document and selects the canonical candidate. The PM agent is strictly prohibited from selecting the approach.
 
-#### 2. Solution Design & Epic Intake (Design Synced)
+#### 2. Epic Intake & Solution Design (Design Synced)
 *   **Agent Action:** The Solution Architect, Security Engineer, and PM execute intake sequentially:
     *   *Backlog Grooming:* PM updates `/docs/PM/Product_Backlog.md` with structured stories (`AC-ST-XXX`) and acceptance criteria, linking them back to the approved Scoping Document. Logs blockers in `/docs/PM/Dependency_Register.md`.
     *   *System Topology Design:* Architect updates `/docs/Architecture/` and `/docs/SD/` sitemaps (C4 diagrams, Sequence Maps, Data Flow charts, and API Contracts).
@@ -189,12 +189,12 @@ Regardless of the stage or task type, all active agents must follow these global
 
 #### A. Standard Task Protocol (Feature/Task Additions)
 For isolated, non-breaking feature additions (such as adding a nullable database column or updating a static UI component) that do not impact macro-architecture or security boundaries, the team may bypass the heavy Epic Scoping and Threat Modeling phases:
-*   **Bypassed Stages:** Stage 1 (Scoping) and Stage 2 (Epic Solution Design).
+*   Bypassed Stages: Stage 1 (Scoping) and Stage 2 (Epic Intake & Solution Design).
 *   **Enforced Stages:** The Tech Lead must still draft an Implementation Plan (Stage 3), seek human approval to code, and proceed through automated and manual testing gates (Stages 4-7) before merging.
 
 #### B. Hotfix / P1 Protocol (Production Defect Resolution)
 If a critical production error or block is discovered, the workflow triggers the emergency Hotfix Protocol. The agent acts with Principal Engineer authority:
-*   **Bypassed Stages:** Bypasses Stage 1 (Scoping), Stage 2 (Design), Stage 3 (Tech Plan Approval Gate), and Stage 6 (Manual E2E Handover).
+*   Bypassed Stages: Bypasses Stage 1 (Scoping), Stage 2 (Epic Intake & Solution Design), Stage 3 (Tech Plan Approval Gate), and Stage 6 (Manual E2E Handover).
 *   **Enforced Action:** The agent directly resolves the isolated issue, logs the truncated error stack in the Dev Test Log (Stage 5), and documents the change in the RAID log and release notes (Stage 8). Altering macro-architecture is strictly forbidden.
 
 ---
