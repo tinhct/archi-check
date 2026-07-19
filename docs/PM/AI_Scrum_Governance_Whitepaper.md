@@ -101,39 +101,62 @@ Autonomous agents excel at code generation within mock environments, but they ha
 *   **Endpoint Validation:** Verifying webhook signature validation (`x-hub-signature-256`) against real GitHub payloads requires human developers to trigger real commits.
 *   **Staging & Live-Fire Audits:** Reviewing if comments look correct, if badges render legibly, and if status check locks are released requires human eyes to confirm the developer experience (DX).
 
-We enforce a rule where the agent **must write a detailed, step-by-step Manual Test Plan** (e.g. [`Manual_Test_Epic_05_Live_Fire_Toolkit.md`](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/docs/PM/Sprint_Test_Reports/Manual-Test/Manual_Test_Epic_05_Live_Fire_Toolkit.md)) on completion of any implementation plan. This ensures the human developer has an explicit checklist to manually verify the agent's deliverables.
+We enforce a rule where the agent **must write a detailed, step-by-step Manual Test Plan** (e.g. [`Manual_Test_Epic_05_Live_Fire_Toolkit.md`](file:///Users/tinhct/Documents/AI%20Projects/ArchiCheck%20Project/archi-check/docs/PM/Sprint_Test_Reports/Manual-Test/Manual_Test_Epic_05_Live_Fire_Toolkit.md)) on completion of any implementation plan. This ensures the human developer has an explicit checklist to manually verify ## ## Phase 5: Human-in-the-Loop (HITL), Task Bypass Protocols, & Final Approvals
+
+The ultimate safety gate in the AI-Scrum framework is the **Human-in-the-Loop (HITL)** approval process, supported by branch-specific task bypass rules.
+
+```mermaid
+flowchart TD
+    Start[New Task/Feature] --> Decision{Task Type?}
+    Decision -->|Standard Feature| FullFlow[1. Full Governance Flow]
+    Decision -->|Standard Task| TaskBypass[2. Standard Task Bypass Lane]
+    Decision -->|Hotfix / P1| HotfixBypass[3. Hotfix Bypass Lane]
+
+    subgraph Full Flow [1. Full Governance Flow]
+        Scoping[Stage 1: Scoping Doc & Approach Gate] --> Design[Stage 2: Solution Design & Intake]
+        Design --> Plan[Stage 3: Tech Plan & Plan Gate]
+        Plan --> Code[Stage 4: Coding & Dev Logs]
+        Code --> Test[Stage 5: QA Automated Test Discovery]
+        Test --> Manual[Stage 6: Handover Manual E2E]
+        Manual --> GoNoGo[Stage 7: Go/No-Go Release Gate]
+        GoNoGo --> Release[Stage 8: End-of-Sprint Sync & Deploy]
+    end
+
+    subgraph Standard Task [2. Standard Task Bypass Lane]
+        T_Plan[Stage 3: Tech Plan & Plan Gate] --> T_Code[Stage 4: Coding & Dev Logs]
+        T_Code --> T_Test[Stage 5-7: Standard QA & E2E Testing]
+    end
+
+    subgraph Hotfix [3. Hotfix Bypass Lane]
+        H_Code[Stage 4: Direct Coding / Principal Eng] --> H_Test[Stage 5: Dev Log QA]
+        H_Test --> H_RAID[Stage 8: RAID Log & Release]
+    end
+```
+
+### 📋 Global Behavior & Execution Rules
+Regardless of the stage or task type, all active agents must follow these global constraints:
+1.  **State Tracking:** Agents must track their sequence progress in `/docs/PM/Active_Agent_State.md`. Tasks must be checked off in the markdown file *before* proceeding to the next step to prevent context amnesia.
+2.  **Path Verification:** Before creating or modifying any file, agents must run search commands to locate the exact path of target directories or templates, preventing duplicate or orphaned files.
+3.  **Relative Pathing & Security Scrubbing:** Exposing absolute paths, system usernames, or local machine names in technical documentation is strictly prohibited. All documents must use relative pathing (`./`, `../`) and placeholders.
 
 ---
 
-## ## Phase 5: Human-in-the-Loop (HITL) & Final Approvals
-
-The ultimate safety gate in the AI-Scrum framework is the **Human-in-the-Loop (HITL)** approval process.
-
-```mermaid
-flowchart LR
-    Scoping[1. Scoping Doc Drafted] -->|Human Approves Approach| Design[2. Solution Design & Epic Intake]
-    Design --> Plan[3. Tech Lead Drafts Plan]
-    Plan -->|Human Approves Plan| Code[4. Engineer Writes Code]
-    Code --> Test[5. QA Runs Automated Tests]
-    Test --> Manual[6. Human Runs Manual Test]
-    Manual -->|Human Approves Quality Gate| GoNoGo[7. Complete Go/No-Go Checklist]
-    GoNoGo --> Release[8. Release Tag & Deployment]
-```
-
-### 🚪 Stage-by-Stage Human & Agent Responsibility Matrix
-To maintain absolute control over the codebase, every phase in the development lifecycle balances automated agentic execution with explicit human authorization:
+### 🚪 Stage-by-Stage Human & Agent Responsibility Matrix (Full Flow)
 
 #### 1. Scoping (Scoping Doc Drafted)
-*   **Agent Action:** The PM agent scans past sprint reports for lessons learned, uses the standard scoping template, and drafts a Scoping Document outlining 2-3 candidate approaches with technical trade-offs.
-*   **Human Action:** Reviews the scoped approaches in the document and selects the canonical candidate to proceed with.
+*   **Agent Action:** The PM agent scans lessons learned from the three most recent Sprint Reports. Using the standard scoping template under `/docs/PM/Scoping/`, the agent defines the Problem, Constraints, and Success Criteria, and drafts 2-3 Candidate Approaches with detailed trade-offs and a "Historical Mitigation" note.
+*   **Human Action:** Reviews the scoped approaches in the document and selects the canonical candidate. The PM agent is strictly prohibited from selecting the approach.
 
 #### 2. Solution Design & Epic Intake (Design Synced)
-*   **Agent Action (Solution Architect & Security Engineer):** Translates the approved approach into detailed system specs. Drafts or updates Architectural Decision Records (ADRs) under `/docs/Architecture/ADRs.md`, draws C4 Context/Container models, maps data flows and Sequence Diagrams in `/docs/Architecture/SD/`, defines schema definitions (Zod/JSON Schema) and API contracts, and updates STRIDE threat models. Refines the backlog stories (`AC-ST-XXX`) to match the finalized design boundaries.
-*   **Human Action (Lead Architect & DevSecOps):** Audits and signs off on the proposed architectural modifications, API contracts, security threat models, and dependency maps before implementation planning is allowed to start.
+*   **Agent Action:** The Solution Architect, Security Engineer, and PM execute intake sequentially:
+    *   *Backlog Grooming:* PM updates `/docs/PM/Product_Backlog.md` with structured stories (`AC-ST-XXX`) and acceptance criteria, linking them back to the approved Scoping Document. Logs blockers in `/docs/PM/Dependency_Register.md`.
+    *   *System Topology Design:* Architect updates `/docs/Architecture/` and `/docs/SD/` sitemaps (C4 diagrams, Sequence Maps, Data Flow charts, and API Contracts).
+    *   *Security & Applied AI Policy:* Security Engineer drafts STRIDE Threat Models and updates the Secrets Management Plan. AI Engineer designs Prompt Specs, AI routing logic, and the traceability matrix.
+*   **Human Action (Lead Architect & DevSecOps):** Audits and signs off on the proposed architectural modifications, API contracts, threat models, and dependency registers before implementation planning can begin.
 
 #### 3. Plan (Tech Lead Drafts Plan)
-*   **Agent Action:** The Tech Lead agent scans past sprint reports for lessons learned, drafts a step-by-step `Implementation_Plan_[Story-ID].md` containing explicit target file paths, code changes, and test files to verify, and injects a "Historical Mitigation" section based on past retrospectives.
-*   **Human Action:** Reviews the implementation plan in the file system or chat UI. The human must explicitly change the document status from `Draft` to `Approved` to unlock the developer's coding gate.
+*   **Agent Action:** The Tech Lead agent scans past sprint reports for lessons learned, drafts a step-by-step `Implementation_Plan_[Story-ID].md` containing target file paths, specific code changes, test suites to verify, and injects a "Historical Mitigation" section to prevent repeating anti-patterns.
+*   **Human Action:** Reviews the plan. The human must explicitly change the document status from `Draft` to `Approved` to unlock the developer's coding gate.
 
 #### 4. Code (Engineer Writes Code)
 *   **Agent Action:** The Software Engineer agent reads the approved plan and writes clean, lint-passing source code targeting only the designated files. The agent is blocked from writing code if the plan remains in `Draft`. If a technical blocker, compile error, or API change forces a plan deviation, the agent is strictly forbidden from improvising: it must halt execution immediately, log the issue in the Dev Test Log, and request a plan update.
@@ -141,23 +164,38 @@ To maintain absolute control over the codebase, every phase in the development l
 
 #### 5. Test (QA Runs Automated Tests)
 *   **Agent Action:** The QA agent runs automated test discovery, updates or writes test suites (Vitest/Playwright) according to boundaries in the `Test_Governance_Policy.md`, executes the tests, and generates a capped test execution log (`Dev_Test_Log_[Story-ID].md`). If the test logs exceed 50 lines, it truncates success logs and records only exact error stack traces.
-*   **Human Action:** Verifies the test logs to ensure CI/CD pipelines run green.
+*   **Human Action:** Verified the test logs to ensure CI/CD pipelines run green.
 
 #### 6. Manual (Human Runs Manual Test)
 *   **Agent Action:** The QA agent compiles a step-by-step E2E manual test checklist (`Manual_Test_[Epic_Name].md` under `/docs/PM/Sprint_Test_Reports/Manual-Test/`) detailing server startup, environment parameter values, connection verification scripts, and expected visual outcomes.
 *   **Human Action:** Executes the manual test run locally (verifying external integrations, ngrok tunnels, real database connections, and visual layout behaviors) and certifies E2E functional completeness.
 
 #### 7. Go/No-Go Checklist
-*   **Agent Action:** The QA agent generates a versioned release folder (e.g. `/Test-Reports/vX.Y.Z/`), populates the `Go_or_No_Go_Checklist_Template.md`, and compiles formal quality reports.
+*   **Agent Action:** The QA agent generates a versioned release folder (e.g. `/docs/Testing-And-Release-Gates/Test-Reports/vX.Y.Z/`), populates the `Go_or_No_Go_Checklist_Template.md`, and compiles formal quality reports.
 *   **Human Action:** Reviews aggregated metrics (test coverage, threat closures, database capacity constraints) and formally signs off the Go/No-Go checklist to authorize the production release.
 
 #### 8. Release Tag & Deployment
-*   **Agent Action:** The PM, DevSecOps, and Architect agents execute the **End-of-Sprint Pipeline**:
-    - **PM/Scrum Master:** Updates the roadmap Gantt chart and backlog progress bars, rolls over incomplete items, syncs open dependencies to risks, and writes a brutally honest retrospective (`Sprint_Report_[Sprint_Number].md`) identifying the root cause of any hallucinations or blockers.
-    - **DevSecOps:** Conducts dependency security audits and logs mock cache drift.
-    - **Solution Architect:** Synchronizes `/docs/Architecture/` and `/docs/SD/` diagrams to perfectly match the final deployed code topology.
-    - **Technical Writer:** Updates `README.md` and onboarding guides to reflect live local install/test instructions, and generates release notes.
+*   **Agent Action:** PM, DevSecOps, Architect, and Technical Writer agents execute the **End-of-Sprint Pipeline**:
+    *   *Agile Hygiene (PM):* Updates the roadmap Gantt chart and backlog progress bars, rolls over incomplete items, syncs open dependencies to risks, and writes a brutally honest retrospective (`Sprint_Report_[Sprint_Number].md`) identifying the root cause of any hallucinations or blockers.
+    *   *Master Definition of Done (DoD) verification:* Before moving any story to 'Done' in the backlog, the PM agent must explicitly verify that: (1) Code matches the approved plan, (2) Test logs are generated and green, (3) Manual Test Handover plans are completed, and (4) `/docs/FAQ.md` is updated with user-centric Q&As (or skips verified).
+    *   *Security & Mock Audits (DevSecOps):* Conducts dependency security audits, logs mock cache drift, and files mock review issues.
+    *   *Architectural Sync (Architect):* Synchronizes `/docs/Architecture/` and `/docs/SD/` diagrams to perfectly match the final deployed code topology.
+    *   *Technical Writer:* Updates `README.md` and onboarding guides to reflect live local install/test instructions, and generates release notes.
 *   **Human Action:** Verifies the synchronized documentation, cuts the final repository tag (`git tag -a v1.0.0-alpha`), and triggers production deployment.
+
+---
+
+### 🔀 Task Bypass Lanes
+
+#### A. Standard Task Protocol (Feature/Task Additions)
+For isolated, non-breaking feature additions (such as adding a nullable database column or updating a static UI component) that do not impact macro-architecture or security boundaries, the team may bypass the heavy Epic Scoping and Threat Modeling phases:
+*   **Bypassed Stages:** Stage 1 (Scoping) and Stage 2 (Epic Solution Design).
+*   **Enforced Stages:** The Tech Lead must still draft an Implementation Plan (Stage 3), seek human approval to code, and proceed through automated and manual testing gates (Stages 4-7) before merging.
+
+#### B. Hotfix / P1 Protocol (Production Defect Resolution)
+If a critical production error or block is discovered, the workflow triggers the emergency Hotfix Protocol. The agent acts with Principal Engineer authority:
+*   **Bypassed Stages:** Bypasses Stage 1 (Scoping), Stage 2 (Design), Stage 3 (Tech Plan Approval Gate), and Stage 6 (Manual E2E Handover).
+*   **Enforced Action:** The agent directly resolves the isolated issue, logs the truncated error stack in the Dev Test Log (Stage 5), and documents the change in the RAID log and release notes (Stage 8). Altering macro-architecture is strictly forbidden.
 
 ---
 
@@ -169,3 +207,5 @@ We enforce three strict approval gates:
 
 ### 🎯 Concluding Synthesis: The Trust Architect
 By mapping the complex, multi-layered responsibilities of a cross-functional software team into a deterministic state machine, we have successfully established **"Trust Architect"** boundaries. Using role-playing, strict approval gates, on-disk state tracking, and lessons-learned retrospectives, the system is prevented from spiraling into hallucinations, repeating past mistakes, or burning token budgets. 
+
+This governance setup absolutely sets the foundation for a peaceful sleep at night, knowing the system won't autonomously degrade your architecture or commit unverified changes to production. past mistakes, or burning token budgets.
