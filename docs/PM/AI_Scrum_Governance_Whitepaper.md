@@ -111,8 +111,8 @@ The ultimate safety gate in the AI-Scrum framework is the **Human-in-the-Loop (H
 
 ```mermaid
 flowchart LR
-    Scoping[1. Scoping Doc Drafted] -->|Human Approves Approach| Intake[2. Backlog Refined & Design Synced]
-    Intake --> Plan[3. Tech Lead Drafts Plan]
+    Scoping[1. Scoping Doc Drafted] -->|Human Approves Approach| Design[2. Solution Design & Epic Intake]
+    Design --> Plan[3. Tech Lead Drafts Plan]
     Plan -->|Human Approves Plan| Code[4. Engineer Writes Code]
     Code --> Test[5. QA Runs Automated Tests]
     Test --> Manual[6. Human Runs Manual Test]
@@ -127,9 +127,9 @@ To maintain absolute control over the codebase, every phase in the development l
 *   **Agent Action:** The PM agent scans past sprint reports for lessons learned, uses the standard scoping template, and drafts a Scoping Document outlining 2-3 candidate approaches with technical trade-offs.
 *   **Human Action:** Reviews the scoped approaches in the document and selects the canonical candidate to proceed with.
 
-#### 2. Intake (Backlog Refined & Design Synced)
-*   **Agent Action:** PM and Architect agents groom the backlog, refine user stories (`AC-ST-XXX`) with clear acceptance criteria, update C4 architecture models, map API contracts, and draft STRIDE threat models.
-*   **Human Action:** Audits refined stories, approves changes to security boundaries, and verifies the dependency registers.
+#### 2. Solution Design & Epic Intake (Design Synced)
+*   **Agent Action (Solution Architect & Security Engineer):** Translates the approved approach into detailed system specs. Drafts or updates Architectural Decision Records (ADRs) under `/docs/Architecture/ADRs.md`, draws C4 Context/Container models, maps data flows and Sequence Diagrams in `/docs/Architecture/SD/`, defines schema definitions (Zod/JSON Schema) and API contracts, and updates STRIDE threat models. Refines the backlog stories (`AC-ST-XXX`) to match the finalized design boundaries.
+*   **Human Action (Lead Architect & DevSecOps):** Audits and signs off on the proposed architectural modifications, API contracts, security threat models, and dependency maps before implementation planning is allowed to start.
 
 #### 3. Plan (Tech Lead Drafts Plan)
 *   **Agent Action:** The Tech Lead agent compiles a detailed, step-by-step `Implementation_Plan_[Story-ID].md` detailing the file paths to create/modify, refactoring steps, and validation targets.
