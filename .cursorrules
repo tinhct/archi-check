@@ -4,6 +4,7 @@
 * **Security:** When writing or updating technical documents, absolutely do not expose local device names, absolute file paths, or system usernames. Use standardized relative paths (`./`, `../`) or placeholders (`<PROJECT_ROOT>`). 
 * **Path Verification:** Before creating or modifying any file, you must use file-search commands to verify the exact path of the target directory or template to prevent orphaned files.
 * **Pipeline State Tracking:** For any multi-step sequence (Epic Intake, End-of-Sprint), you must maintain your location using `/docs/PM/Active_Agent_State.md`. Physically check off tasks in this file before moving to the next prompt to prevent context amnesia.
+* **Formatting Integrity & Non-Destructive Editing:** When modifying an existing document, you must strictly preserve its established structural formatting (Markdown heading hierarchies, table structures, bullet nesting, and code blocks). You are forbidden from unnecessarily rewriting untouched sections, breaking existing table layouts, or degrading the established visual layout of the file.
 
 ---
 
