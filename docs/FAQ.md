@@ -27,15 +27,37 @@
 
 ### Q: How do you calculate the architectural complexity scores? Describe the Algorithmic Complexity Scoring Engine.
 
-**A:** ArchiCheck calculates a **Baseline Complexity Score (0 to 10)** for each pull request. This score is derived by scanning the added lines of the Git unified diff (excluding blocklisted assets, documentation, or lockfiles) and checking the ratio of structural syntax keywords against total additions:
+**A:** ArchiCheck calculates a **Baseline Complexity Score (0 to 10)** for each pull request through a deterministic parsing pipeline executed by the `DiffParserService` (located in `src/lib/analyzer/diff-parser.ts`).
 
-1. **Keyword Analysis**: The engine counts structural syntax indicators (keywords like `class`, `interface`, `async`, `useState`, `useEffect`, `if`, `for`, `switch`, `try`, etc.).
-2. **Scoring Formula**:
-   $$\text{Score} = \min\left(10, \left\lceil \frac{\text{complexityIndicators}}{\text{linesAdded}} \times 10 + \frac{\text{totalLinesModified}}{100} \right\rceil\right)$$
+This pipeline works as follows:
 
-This baseline score is then fed into the **Heuristics Gating Engine** which decides whether to lock the PR:
-* **Standard Gate**: Locks the gate if the complexity score is $\ge 5$ (configurable via `COMPLEXITY_THRESHOLD`) **AND** the estimated AI-reliance ratio is $\ge 0.7$ (configurable via `AGENT_RELIANCE_THRESHOLD`).
-* **Velocity ("Spray & Pray") Gate**: Overrides standard thresholds to immediately lock the PR if development was suspiciously fast (the First Commit Proxy time delta between first commit and PR is $< 15\text{ minutes}$) **AND** the changes are substantial ($> 300\text{ lines added}$).
+1. **Filtering & File Exclusion Rules:**
+   To ensure the engine only scores meaningful code additions, the parser completely skips files matching the following categories:
+   * **Lockfiles:** `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `go.sum`.
+   * **Static/Media Assets:** `.svg`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.ico`, `.webp`, `.mp4`, `.webm`, `.min.js`.
+   * **Build Artifacts:** directories like `dist/`, `build/`, `.next/`.
+   * **Documentation/Configs:** `.md`, `.csv`, `.json` formats, along with custom path exclusions configured in `.archicheck.yml`.
+
+2. **Added Line Keyword Analysis:**
+   The parser scans every newly added line (lines beginning with `+` but not `+++`) and checks it against a structural syntax regular expression:
+   ```typescript
+   /\b(class|interface|async|useState|useEffect|function|const|let|var|if|for|while|switch|try|catch)\b/i
+   ```
+   If a match is found, the engine increments the `complexityIndicators` count.
+
+3. **Mathematical Scoring Formula:**
+   The complexity score is calculated dynamically using this formula:
+   $$\text{Score} = \min\left(10, \left\lceil \left(\frac{\text{complexityIndicators}}{\text{linesAdded}} \times 10\right) + \frac{\text{totalLinesModified}}{100} \right\rceil\right)$$
+   * **Keyword Density Term:** $(\text{complexityIndicators} / \text{linesAdded}) \times 10$ measures how structural keywords are concentrated in the new changes.
+   * **Volume Modifier Term:** $\text{totalLinesModified} / 100$ adds a size penalty of $+1$ point for every 100 lines changed (adds + removals) to gate extremely large refactors.
+   * **Ceiling & Cap:** The sum is rounded up to the next integer using `Math.ceil` and capped at a maximum of `10` via `Math.min`.
+
+4. **Heuristics Gating Check (AI-Reliance Estimation):**
+   The baseline score is evaluated alongside the PR's AI-reliance state inside `HeuristicsService` (`src/lib/analyzer/heuristics.ts`):
+   * **Standard Gate:** Locks the PR if $\text{Score} \ge \text{COMPLEXITY\_THRESHOLD}$ (default: `5`) **AND** $\text{aiRelianceRatio} \ge \text{AGENT\_RELIANCE\_THRESHOLD}$ (default: `0.7`).
+     * *Current State:* The `aiRelianceRatio` is placeholder-hardcoded to `0.0` in the MVP webhook endpoint, effectively routing Standard Gates to pass-through.
+     * *Future State:* Story 3.2 is structured to ingest dynamic AI-reliance ratios sourced from IDE integration logs, copilot author metadata, or copy-paste telemetry.
+   * **Velocity ("Spray & Pray") Gate (AI Proxy):** Because identifying exact AI authors is difficult in stateless git diffs, the system integrates a velocity proxy gate. If the duration between the first commit and PR creation is **$< 15$ minutes** AND changes are substantial (**$> 300$ lines added**), the engine assumes AI generation/copy-pasting and immediately locks the PR.
 
 ---
 
