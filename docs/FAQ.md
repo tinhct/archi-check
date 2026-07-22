@@ -54,10 +54,10 @@ This pipeline works as follows:
 
 4. **Heuristics Gating Check (AI-Reliance Estimation):**
    The baseline score is evaluated alongside the PR's AI-reliance state inside `HeuristicsService` (`src/lib/analyzer/heuristics.ts`):
-   * **Standard Gate:** Locks the PR if $\text{Score} \ge \text{COMPLEXITY\_THRESHOLD}$ (default: `5`) **AND** $\text{aiRelianceRatio} \ge \text{AGENT\_RELIANCE\_THRESHOLD}$ (default: `0.7`).
+   * **Standard Gate:** Locks the PR if the complexity score is $\ge$ `COMPLEXITY_THRESHOLD` (default: `5`) **AND** the estimated `aiRelianceRatio` is $\ge$ `AGENT_RELIANCE_THRESHOLD` (default: `0.7`).
      * *Current State:* The `aiRelianceRatio` is placeholder-hardcoded to `0.0` in the MVP webhook endpoint, effectively routing Standard Gates to pass-through.
      * *Future State:* Story 3.2 is structured to ingest dynamic AI-reliance ratios sourced from IDE integration logs, copilot author metadata, or copy-paste telemetry.
-   * **Velocity ("Spray & Pray") Gate (AI Proxy):** Because identifying exact AI authors is difficult in stateless git diffs, the system integrates a velocity proxy gate. If the duration between the first commit and PR creation is **$< 15$ minutes** AND changes are substantial (**$> 300$ lines added**), the engine assumes AI generation/copy-pasting and immediately locks the PR.
+   * **Velocity ("Spray & Pray") Gate (AI Proxy):** Because identifying exact AI authors is difficult in stateless git diffs, the system integrates a velocity proxy gate. If the duration between the first commit and PR creation is $< 15\text{ minutes}$ AND changes are substantial ($> 300\text{ lines added}$), the engine assumes AI generation/copy-pasting and immediately locks the PR.
 
 ---
 
