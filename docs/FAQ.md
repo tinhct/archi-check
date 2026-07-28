@@ -203,3 +203,11 @@ The `asyncTracker` utility detects runtime features:
 *   `ai_reliance_ratio` (default: `0.7`): The minimum ratio of AI-authored code (from `0.0` to `1.0`, matching `70%`) required to trigger the Standard Gate.
 *   `lines_added_threshold` (default: `300`): The minimum volume of code additions required to trigger the Velocity ("Spray & Pray") Gate when commits are pushed rapidly.
 *   `excluded_paths` (list of globs): Files and folders that are ignored by the complexity scanner (e.g., lockfiles, dependencies).
+
+---
+
+### Q: How do we configure a custom model version for Gemini or Vertex AI?
+
+**A:** You can dynamically customize the model version used in API requests by setting the `GEMINI_MODEL_VERSION` environment variable:
+* **Default:** If this variable is unconfigured, the system defaults to `gemini-2.5-flash` to maintain zero-config out-of-the-box operation.
+* **Override:** Define `GEMINI_MODEL_VERSION` in your environment (e.g., in `.env.local` for local execution or as an environment parameter in container deployments) to target a newer model name (such as `gemini-2.5-pro` or other versions as they are released). The value is validated on boot against environment configurations.
