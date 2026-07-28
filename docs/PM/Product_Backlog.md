@@ -8,7 +8,7 @@
 
 | Total Epics | Total Stories | To Do | In Progress | Done | Completion % | Created/Updated Date |
 |-------------|---------------|-------|-------------|------|--------------|----------------------|
-| 5           | 23            | 0     | 0           | 23   | 100%         | 2026-07-15           |
+| 5           | 24            | 1     | 0           | 23   | 95.8%        | 2026-07-28           |
 
 ## 🚀 Epic Wall & Release Mapping
 
@@ -79,6 +79,17 @@
 *   2. [x] Obvious gibberish comments are rejected at the API layer (returning a status nudge / comment), avoiding expensive non-deterministic LLM evaluation calls.
 *   3. [x] Playground evaluate route (`/api/playground/evaluate`) uses the same deterministic checker.
 * **Dependencies / Blockers:** Relies on Epic-05 (ac-st-501-p2, mock semantic validator logic)
+
+##### 🆔 AC-ST-701: Dynamic Gemini Model Version Configuration
+* **Priority:** High
+* **Status:** To Do
+* **Assigned Sprint:** Sprint 7
+* **Description:** As a Developer or Administrator, I want the Gemini model version name to be configurable via the environment variable `GEMINI_MODEL_VERSION` so that I can easily benchmark, optimize, or deploy newer Gemini/Vertex AI model versions without modifying hardcoded source files.
+* **Acceptance Criteria:**
+  1. [ ] **Env Schema Validation:** Add `GEMINI_MODEL_VERSION` to the Zod schema (`src/config/env.ts`) with a default value of `'gemini-2.5-flash'`. Ensure it falls back to `'gemini-2.5-flash'` in local development if unconfigured.
+  2. [ ] **Dynamic Provider Instantiation:** Update `callGeminiDeveloper` and `callVertexAI` inside the LLM provider service (`src/lib/llm/provider.ts`) to dynamically retrieve and instantiate the model using the value of `env.GEMINI_MODEL_VERSION` (falling back to `'gemini-2.5-flash'` if undefined).
+  3. [ ] **Unit Test Coverage:** Update environment schema tests (`tests/unit/env.test.ts`) to verify that `GEMINI_MODEL_VERSION` is parsed, and add a test in `tests/unit/provider.test.ts` to assert that provider models retrieve the config-defined version. Use `afterEach` hooks in all environment tests to restore `process.env` properties, avoiding cross-suite test leakage.
+* **Dependencies / Blockers:** None. Linked to Scoping Document [Scoping_DynamicGeminiModelVersion.md](../docs/PM/Scoping/Scoping_DynamicGeminiModelVersion.md).
 
 ---
 
@@ -342,8 +353,8 @@ The following items were identified during the Phase 2 design session and are de
 
 **Next Sprint Priorities (Refinement Queue):**
 
-**Sprint 6 — COMPLETE ✅**
-All Sprint 6 stories are complete and validated.
+**Sprint 7 — Active Sprint 🚀**
+1. **AC-ST-701: Dynamic Gemini Model Version Configuration** (High - Enable flexible model version overrides for developers and operations).
 
 **Future Priorities:**
-1. **Production Deployment & Release Validation:** Validate live environment tokens and release candidate packages.
+2. **Production Deployment & Release Validation:** Validate live environment tokens and release candidate packages.
