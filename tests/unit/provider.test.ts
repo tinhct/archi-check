@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { llmProvider } from '@/lib/llm/provider';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { env } from '@/config/env';
 
 vi.mock('@google/generative-ai', () => {
   return {
@@ -109,5 +110,33 @@ describe('LLMProvider Unit Tests & Resiliency', () => {
 
     expect(result.score).toBe(7);
     expect(result.passed).toBe(true); // Overridden to true because score >= 7
+  });
+
+  describe('Dynamic Model Version configuration', () => {
+    let originalModelVersion: string;
+
+    beforeEach(() => {
+      originalModelVersion = env.GEMINI_MODEL_VERSION;
+    });
+
+    afterEach(() => {
+      env.GEMINI_MODEL_VERSION = originalModelVersion;
+    });
+
+    it('should request the custom model configured in env.GEMINI_MODEL_VERSION', async () => {
+      env.GEMINI_MODEL_VERSION = 'gemini-custom-model-override';
+      
+      const spy = vi.spyOn(GoogleGenerativeAI.prototype, 'getGenerativeModel').mockReturnValue({
+        generateContent: vi.fn().mockRejectedValue(new Error('Stop execution'))
+      } as never);
+
+      await llmProvider.generateQuiz('some-diff-content');
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'gemini-custom-model-override'
+        })
+      );
+    });
   });
 });

@@ -32,6 +32,7 @@ const envSchema = z
     LLM_PROVIDER: z.enum(['gemini', 'claude']).default('gemini'),
     LLM_PROVIDER_TYPE: z.enum(['gemini-developer', 'vertex', 'mock']).default('gemini-developer'),
     LLM_API_KEY: z.string().default('mock-api-key'),
+    GEMINI_MODEL_VERSION: z.string().default('gemini-2.5-flash'),
     GOOGLE_CREDS_JSON: z.string().optional(),
     COMPLEXITY_THRESHOLD: z
       .string()
@@ -110,6 +111,7 @@ try {
     LLM_PROVIDER: (process.env.LLM_PROVIDER as 'gemini' | 'claude') || 'gemini',
     LLM_PROVIDER_TYPE: (process.env.LLM_PROVIDER_TYPE as 'gemini-developer' | 'vertex' | 'mock') || 'gemini-developer',
     LLM_API_KEY: process.env.LLM_API_KEY || 'mock-api-key',
+    GEMINI_MODEL_VERSION: process.env.GEMINI_MODEL_VERSION || 'gemini-2.5-flash',
     GOOGLE_CREDS_JSON: process.env.GOOGLE_CREDS_JSON || undefined,
     COMPLEXITY_THRESHOLD: parseInt(process.env.COMPLEXITY_THRESHOLD || '5', 10),
     AGENT_RELIANCE_THRESHOLD: parseFloat(process.env.AGENT_RELIANCE_THRESHOLD || '0.7'),

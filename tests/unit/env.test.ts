@@ -137,4 +137,24 @@ describe('Environment Schema Unit Tests', () => {
       }
     });
   });
+
+  describe('GEMINI_MODEL_VERSION validation', () => {
+    it('should parse custom model name and default to gemini-2.5-flash when undefined', () => {
+      const configWithModel = {
+        ...baseConfig,
+        GEMINI_MODEL_VERSION: 'gemini-2.5-pro'
+      };
+      const resultCustom = envSchema.safeParse(configWithModel);
+      expect(resultCustom.success).toBe(true);
+      if (resultCustom.success) {
+        expect(resultCustom.data.GEMINI_MODEL_VERSION).toBe('gemini-2.5-pro');
+      }
+
+      const resultDefault = envSchema.safeParse(baseConfig);
+      expect(resultDefault.success).toBe(true);
+      if (resultDefault.success) {
+        expect(resultDefault.data.GEMINI_MODEL_VERSION).toBe('gemini-2.5-flash');
+      }
+    });
+  });
 });
