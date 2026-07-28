@@ -29,9 +29,9 @@ To manually validate the configuration override logic for the Gemini and Vertex 
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Ensure `GEMINI_MODEL_VERSION` is omitted from your `.env.local` or environment keys. Run: `npm run dev` (starts the development server). | Next.js development server starts cleanly on port 3000. | |
-| 2.   | Load the Local Playground (`http://localhost:3000/playground`) in your browser. | The UI compiles and loads the sandbox successfully. | |
-| 3.   | Provide a test diff, enter a mock/valid API key in the UI, select the "Gemini (BYOK)" provider, and click **Generate Quiz**. | The provider initializes the Gemini client, defaults to calling `gemini-2.5-flash`, and returns the structured quiz payload. | |
+| 1.   | Ensure `GEMINI_MODEL_VERSION` is omitted from your `.env.local` or environment keys. Run: `npm run dev` (starts the development server). | Next.js development server starts cleanly on port 3000. | Pass |
+| 2.   | Load the Local Playground (`http://localhost:3000/playground`) in your browser. | The UI compiles and loads the sandbox successfully. | Pass |
+| 3.   | Provide a test diff, enter a mock/valid API key in the UI, select the "Gemini (BYOK)" provider, and click **Generate Quiz**. | The provider initializes the Gemini client, defaults to calling `gemini-2.5-flash`, and returns the structured quiz payload. | Pass |
 
 ### Test Flow 2: Verification of Dynamic Override Config
 
@@ -39,6 +39,6 @@ To manually validate the configuration override logic for the Gemini and Vertex 
 
 | Step | Action (Terminal/UI Input) | Expected System Response | Actual Result (Pass/Fail) |
 |------|----------------------------|--------------------------|---------------------------|
-| 1.   | Shut down the server. Run in terminal:<br>`GEMINI_MODEL_VERSION="gemini-2.5-pro" npm run dev` | Server boots and parses the custom Zod environment schema. | |
-| 2.   | Load the Local Playground in your browser, enter your developer API key, select "Gemini (BYOK)", and trigger **Generate Quiz**. | The system resolves `env.GEMINI_MODEL_VERSION`, instantiates the generative client targeting `gemini-2.5-pro`, and executes the query. | |
-| 3.   | (Optional) Provide an invalid/non-existent model name:<br>`GEMINI_MODEL_VERSION="gemini-non-existent-version" npm run dev`<br>Trigger a quiz generation. | The Google SDK request is dispatched and fails with a `404 Model not found` error, verifying that the provider did indeed send the overridden model name parameter rather than defaulting. | |
+| 1.   | Shut down the server. Run in terminal:<br>`GEMINI_MODEL_VERSION="gemini-2.5-pro" npm run dev` | Server boots and parses the custom Zod environment schema. | Pass |
+| 2.   | Load the Local Playground in your browser, enter your developer API key, select "Gemini (BYOK)", and trigger **Generate Quiz**. | The system resolves `env.GEMINI_MODEL_VERSION`, instantiates the generative client targeting `gemini-2.5-pro`, and executes the query. | Pass |
+| 3.   | (Optional) Provide an invalid/non-existent model name:<br>`GEMINI_MODEL_VERSION="gemini-non-existent-version" npm run dev`<br>Trigger a quiz generation. | The Google SDK request is dispatched and fails with a `404 Model not found` error, verifying that the provider did indeed send the overridden model name parameter rather than defaulting. | Pass |
